@@ -5,19 +5,18 @@ automation script for creating and obfuscating metasploit shellcode
 
 ## Features
 
-### Version 0.1
+### Version 0.2
 
 - build shellcode with msfvenom
 - searching for hashed Windows API functions
 - change ROR13 Hash to ROL Hash with individual Key
-- Save modified shellcode to disk
+- Raw and formatted output (C++,C#, C inline ASM, Powershell, Python, Hex)
 
 ## ToDo
 
 - choose between building a shellcode and use an existing one
 - write shellcode in a template file (.cpp)
 - automatical compile feature
-- export shellcode to different formats (e.g. c++, c#, hex...)
 - Use PATH for better msfvenom integration
 - object oriented rewrite for better module integration
 
