@@ -1,5 +1,5 @@
 # shencode
-automation scr ipt for creating and obfuscating metasploit shellcode
+automation script for creating and obfuscating metasploit shellcode
 
 ![shencode-1.png](shencode-1.png)
 
@@ -15,6 +15,7 @@ automation scr ipt for creating and obfuscating metasploit shellcode
 ## ToDo
 
 - choose between building a shellcode and use an existing one
+- Parser optimization
 - write shellcode in a template file (.cpp)
 - automatical compile feature
 - Use PATH for better msfvenom integration
