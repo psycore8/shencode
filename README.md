@@ -1,7 +1,7 @@
 # shencode
 automation script for creating and obfuscating metasploit shellcode
 
-![[shencode-2.png]]
+![](shencode-2.png)
 
 ## Features
 
