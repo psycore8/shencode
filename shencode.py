@@ -48,7 +48,7 @@ def main(command_line=None):
   parser_output = subparsers.add_parser("output", help="create formatted output by filename")
   parser_output.add_argument("-f", "--filename", help="raw input file with shellcode")
   parser_output.add_argument("-s", "--syntax", help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
-  #parser_output.add_argument("-w", "--write", help="write output to the given filename (replacing $%BUFFER%$ placeholder in the file")
+  parser_output.add_argument("-w", "--write", help="write output to the given filename (replacing $%BUFFER%$ placeholder in the file")
   
   args = parser.parse_args(command_line)
   OutputFormat = args.output
@@ -120,6 +120,9 @@ def main(command_line=None):
    b2s = assist.bin2sc
    scFormat = b2s.process(filename,OutputFormat)
    print(scFormat)
+   if args.write:
+     assist.FileManipulation.WriteToTemplate(args.write, scFormat)
+     print(f"{nstate.OKGREEN} Output written in buf"+args.write)
 
   print(f"{nstate.OKGREEN} DONE!")
 
