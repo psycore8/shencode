@@ -1,5 +1,6 @@
 from datetime import datetime
 import sys
+import shutil, fileinput
 
 class helper:
   def GenerateFileName():
@@ -35,7 +36,7 @@ class bin2sc:
         shellcode += "\" \n\""
         ctr = 0
       ctr += 1
-    shellcode += "\""
+    shellcode += "\";"
     return shellcode
  
   def process_casm(filename):
@@ -104,3 +105,18 @@ class bin2sc:
     for b in open(filename, "rb").read():
       shellcode += b.to_bytes(1, "big").hex()
     return shellcode
+  
+class FileManipulation:
+  def DuplicateFile(filename):
+    dst = 'buf'+filename
+    shutil.copyfile(filename, dst)
+    return dst
+  
+  def WriteToTemplate(filename, shellcode):
+    TemplateFile = FileManipulation.DuplicateFile(filename)
+    TplPlaceholder = '!++BUFFER++!'
+    TextReplace = shellcode
+    with fileinput.FileInput(TemplateFile, inplace=True) as file:
+      for line in file:
+        print(line.replace(TplPlaceholder, TextReplace), end='')
+
