@@ -34,7 +34,8 @@ def main(command_line=None):
   parser_create = subparsers.add_parser("create", help="create a shellcode using msfvenom")
   parser_create.add_argument("-p", "--payload", help="payload to use e.g. windows/shell_reverse_tcp")
   parser_create.add_argument("-lh", "--lhost", help="LHOST Argument")
-  parser_create.add_argument("-lp", "--lport", help="LPORT Argument")
+  #parser_create.add_argument("-lp", "--lport", help="LPORT Argument")
+  parser_create.add_argument("-c", "--cmd", help="CMD Argument")
   parser_encode = subparsers.add_parser("encode", help="encode windows function hashes to ROL")
   parser_encode.add_argument("-r", "--ror2rol", action="store_true", help="change ROR13 to ROL encoding")
   parser_encode.add_argument("-rk", "--key", help="ROL key for encoding")
@@ -45,6 +46,8 @@ def main(command_line=None):
   parser_encode.add_argument("-xk", "--xorkey", help="XOR key for encoding")
   parser_inject = subparsers.add_parser("inject", help="inject shellcode")
   parser_inject.add_argument("-f", "--filename", help="raw input file with shellcode to inject")
+  parser_inject.add_argument("-p", "--processname", help="raw input file with shellcode to inject")
+  parser_inject.add_argument("-s", "--startprocess", action="store_true", help="raw input file with shellcode to inject")
   parser_output = subparsers.add_parser("output", help="create formatted output by filename")
   parser_output.add_argument("-f", "--filename", help="raw input file with shellcode")
   parser_output.add_argument("-s", "--syntax", help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
@@ -109,7 +112,10 @@ def main(command_line=None):
         print(f"{nstate.FAIL} File not found or cannot be opened.")
         exit()
     inject = sc.inject
-    inject.create_shellcode_function(shellcode)
+    inject.Shellcode = shellcode
+    inject.StartProcess = args.startprocess
+    inject.Target_Process = args.processname
+    inject.start_injection()
 
   if args.output or args.command == 'output':
    if args.command == 'output':
