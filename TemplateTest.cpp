@@ -1,3 +1,7 @@
+/*
+	python shencode.py output --filename shellcode.raw --syntax c --write TemplateTest.cpp
+	this command will replace !++BUFFER++! with c formatted shellcode
+*/
 #include <stdio.h>
 #include <string.h>
 #include <windows.h>
