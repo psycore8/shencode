@@ -5,6 +5,8 @@ import utils.assist as assist
 import utils.msf as msf
 import utils.shellcode as sc
 
+Version = '0.4.0'
+
 msfvenom_path = "c:\\metasploit-framework\\bin\\msfvenom.bat"
 dll_paths = ['C:\\Windows\\System32\\kernel32.dll', 
              'C:\\Windows\\System32\\ws2_32.dll', 
@@ -22,20 +24,30 @@ class nstate:
     ENDC = '\033[0m'
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
+    LINK = '\033[94m\033[4m'
 
 def main(command_line=None):
-  print(f"{nstate.HEADER}____ _  _ ____ _  _ ____ ____ ___  ____ {nstate.ENDC}")
-  print(f"{nstate.HEADER}[__  |__| |___ |\\ | |    |  | |  \\ |___ {nstate.ENDC}")
-  print(f"{nstate.HEADER}___] |  | |___ | \\| |___ |__| |__/ |___{nstate.ENDC}")
-  print(f"{nstate.HEADER}Version 0.3 by psycore8{nstate.ENDC}")
+  # print(f"{nstate.HEADER}____ _  _ ____ _  _ ____ ____ ___  ____ {nstate.ENDC}")
+  # print(f"{nstate.HEADER}[__  |__| |___ |\\ | |    |  | |  \\ |___ {nstate.ENDC}")
+  # print(f"{nstate.HEADER}___] |  | |___ | \\| |___ |__| |__/ |___{nstate.ENDC}")
+  # print(f"{nstate.HEADER}Version {Version} by psycore8{nstate.ENDC}")
+  print(f"{nstate.HEADER}")
+  print(f"  _______   __                      _______              __         ")
+  print(f" |   _   | |  |--. .-----. .-----. |   _   | .-----. .--|  | .-----.")
+  print(f" |   1___| |     | |  -__| |     | |.  1___| |  _  | |  _  | |  -__|")
+  print(f" |____   | |__|__| |_____| |__|__| |.  |___  |_____| |_____| |_____|")
+  print(f" |:  1   |                         |:  1   |                        ")
+  print(f" |::.. . |                         |::.. . |                        ")
+  print(f" `-------\'                         `-------\'                      ")
+  print(f"Version {Version} by psycore8 -{nstate.ENDC} {nstate.LINK}https://www.nosociety.de{nstate.ENDC}") 
   parser = argparse.ArgumentParser(description="create and obfuscate shellcodes")
   parser.add_argument("-o", "--output", choices=["c","casm","cs","ps1","py","hex"], help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
   subparsers = parser.add_subparsers(dest='command')
   parser_create = subparsers.add_parser("create", help="create a shellcode using msfvenom")
   parser_create.add_argument("-p", "--payload", help="payload to use e.g. windows/shell_reverse_tcp")
   parser_create.add_argument("-lh", "--lhost", help="LHOST Argument")
-  #parser_create.add_argument("-lp", "--lport", help="LPORT Argument")
-  parser_create.add_argument("-c", "--cmd", help="CMD Argument")
+  parser_create.add_argument("-lp", "--lport", help="LPORT Argument")
+  parser_create.add_argument("-c", "--cmd", type=str, help="msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"")
   parser_encode = subparsers.add_parser("encode", help="encode windows function hashes to ROL")
   parser_encode.add_argument("-r", "--ror2rol", action="store_true", help="change ROR13 to ROL encoding")
   parser_encode.add_argument("-rk", "--key", help="ROL key for encoding")
@@ -44,6 +56,11 @@ def main(command_line=None):
   parser_encode.add_argument("-s", "--showmod",   action="store_true", help="display modifications")
   parser_encode.add_argument("-x", "--xor",   action="store_true", help="use additional XOR encoding")
   parser_encode.add_argument("-xk", "--xorkey", help="XOR key for encoding")
+  parser_encode = subparsers.add_parser("extract", help="extract shellcode from/to pattern")
+  parser_encode.add_argument("-f", "--filename", help="inputfile")
+  parser_encode.add_argument("-o", "--outputfile", help="outputfile")
+  parser_encode.add_argument("-fb", "--first-byte", help="extract from here")
+  parser_encode.add_argument("-lb", "--last-byte", help="extract until here")
   parser_inject = subparsers.add_parser("inject", help="inject shellcode")
   parser_inject.add_argument("-f", "--filename", help="raw input file with shellcode to inject")
   parser_inject.add_argument("-p", "--processname", help="raw input file with shellcode to inject")
@@ -57,19 +74,22 @@ def main(command_line=None):
   OutputFormat = args.output
   
   if args.command == "create":
+    print(f'{args.cmd}')
     print(f"{nstate.OKBLUE} create payload")
     cs = msf.msfvenom
-    filename = cs.CreateShellcode(msfvenom_path, args.payload, args.lhost, args.lport)
+    # Function depricated, delete
+    #filename = cs.CreateShellcode(msfvenom_path, args.payload, args.lhost, args.lport)
+    cs.CreateShellcodeEx(msfvenom_path, args.cmd)
 
-    path = "./"+filename
-    cf = os.path.isfile(path)
-    if cf == True:
-      print(f"{nstate.OKGREEN} shellcode created")
+    #path = "./"+filename
+    #cf = os.path.isfile(path)
+    #if cf == True:
+      #print(f"{nstate.OKGREEN} shellcode created")
       #os.environ['SHENCODE_FILENAME'] = filename
       #print(f"{nstate.OKBLUE} filename in environment: "+os.environ.get("SHENCODE_FILENAME"))
-    else:
-      print(f"{nstate.FAIL} shellcode output not found, EXIT")
-      exit()
+    #else:
+      #print(f"{nstate.FAIL} shellcode output not found, EXIT")
+      #exit()
   elif args.command == "encode":
     filename = args.filename 
     if args.ror2rol:
@@ -102,6 +122,34 @@ def main(command_line=None):
         print(f"{nstate.FAIL} XOR encoded Shellcode error, aborting script execution")
         exit()
   
+  elif args.command == "extract":
+    if args.outputfile == "":
+      print(f"{nstate.FAIL} please provide an output filename!")
+      exit()
+    print(f"{nstate.OKBLUE} try to open file")
+    filename = args.filename
+    short_fn = os.path.basename(filename)
+    try:
+      with open(filename, "rb") as file:
+        shellcode = file.read()
+        print(f"{nstate.OKGREEN} reading {short_fn} successful!")
+    except FileNotFoundError:
+      print(f"{nstate.FAIL} file not found, exit")
+      exit()
+    print(f"{nstate.OKBLUE} cutting shellcode from {args.first_byte} to {args.last_byte}")
+    shellcode_new = shellcode[int(args.first_byte):int(args.last_byte)]
+    with open(args.outputfile, 'wb') as file:
+      file.write(shellcode_new)
+    path = args.outputfile
+    cf = os.path.isfile(path)
+    short_fn = os.path.basename(args.outputfile)
+    if cf == True:
+      print(f"{nstate.OKGREEN} written shellcode to {short_fn}")
+    else:
+      print(f"{nstate.OKFAIL} error while writing")
+      exit()
+
+
   elif args.command == "inject":
     print(f"{nstate.OKBLUE} Reading shellcode")
     filename = args.filename
