@@ -123,7 +123,7 @@ class ror2rol:
          
     return new_shellcode
   
-  def process(dll_paths, filename, showmod, decompile, ror_key):
+  def process(dll_paths, filename, out_file, showmod, decompile, ror_key):
     for dll in dll_paths:
       ror2rol.lookup_functions(dll)
     # Read existing shellcode
@@ -133,6 +133,7 @@ class ror2rol:
         shellcode = file.read()
     except FileNotFoundError:
         print(f"{nstate.FAIL} File not found or cannot be opened.")
+        exit()
  
     new_shellcode = ror2rol.process_shellcode(shellcode,int(ror_key))
  
@@ -156,14 +157,14 @@ class ror2rol:
       hex_string = ''.join('0x{:02X},'.format(byte) for byte in modified_shellcode)
       print(hex_string[:-1])
     """
-    outputfile = "output.bin"
+    outputfile = out_file
     print(f"{nstate.OKBLUE} Writing bytes to file: " + outputfile)
     with open(outputfile, 'wb') as file:
       file.write(modified_shellcode)
     path = outputfile
     cf = os.path.isfile(path)
     if cf == True:
-      print(f"{nstate.OKGREEN} encoded shellcode created")
+      print(f"{nstate.OKGREEN} encoded shellcode created in {outputfile}")
     else:
       print(f"{nstate.FAIL} encoded Shellcode error, aborting script execution")
       exit()
