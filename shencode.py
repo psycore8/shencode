@@ -49,9 +49,11 @@ def main(command_line=None):
   parser_create.add_argument("-lp", "--lport", help="LPORT Argument")
   parser_create.add_argument("-c", "--cmd", type=str, help="msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"")
   parser_encode = subparsers.add_parser("encode", help="encode windows function hashes to ROL")
+  parser_encode.add_argument("-f", "--filename", help="raw input file with shellcode")
+  parser_encode.add_argument("-o", "--outputfile", help="raw input file with shellcode")
   parser_encode.add_argument("-r", "--ror2rol", action="store_true", help="change ROR13 to ROL encoding")
   parser_encode.add_argument("-rk", "--key", help="ROL key for encoding")
-  parser_encode.add_argument("-f", "--filename", help="raw input file with shellcode")
+  # remove arguments -d -s 
   parser_encode.add_argument("-d", "--decompile", action="store_true", help="decompile modified bytes")
   parser_encode.add_argument("-s", "--showmod",   action="store_true", help="display modifications")
   parser_encode.add_argument("-x", "--xor",   action="store_true", help="use additional XOR encoding")
@@ -91,7 +93,8 @@ def main(command_line=None):
       #print(f"{nstate.FAIL} shellcode output not found, EXIT")
       #exit()
   elif args.command == "encode":
-    filename = args.filename 
+    filename = args.filename
+    out_file = args.outputfile 
     if args.ror2rol:
       ror_key = int(args.key)
       if (ror_key < 32) or (ror_key > 255):
@@ -100,7 +103,7 @@ def main(command_line=None):
 
       
       ror2rol = sc.ror2rol
-      ror2rol.process(dll_paths, filename, args.showmod, args.decompile, args.key)
+      ror2rol.process(dll_paths, filename, out_file, args.showmod, args.decompile, args.key)
     if args.xor:
       xor = sc.xor
       print(f"{nstate.OKBLUE} Reading shellcode")
@@ -111,13 +114,13 @@ def main(command_line=None):
           print(f"{nstate.FAIL} File not found or cannot be opened.")
           exit()
       modified_shellcode = xor.xor_crypt_bytes(shellcode, int(args.xorkey))
-      outputfile = 'xoroutput.bin'
+      outputfile = out_file
       with open(outputfile, 'wb') as file:
         file.write(modified_shellcode)
       path = outputfile
       cf = os.path.isfile(path)
       if cf == True:
-        print(f"{nstate.OKGREEN} XOR encoded shellcode created")
+        print(f"{nstate.OKGREEN} XOR encoded shellcode created in {outputfile}")
       else:
         print(f"{nstate.FAIL} XOR encoded Shellcode error, aborting script execution")
         exit()
