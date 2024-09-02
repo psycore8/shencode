@@ -158,7 +158,7 @@ class ror2rol:
       print(hex_string[:-1])
     """
     outputfile = out_file
-    print(f"{nstate.OKBLUE} Writing bytes to file: " + outputfile)
+    print(f"{nstate.OKBLUE} Writing bytes to file: {outputfile}")
     with open(outputfile, 'wb') as file:
       file.write(modified_shellcode)
     path = outputfile
