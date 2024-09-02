@@ -5,7 +5,7 @@ import utils.assist as assist
 import utils.msf as msf
 import utils.shellcode as sc
 
-Version = '0.4.0'
+Version = '0.4.1'
 
 msfvenom_path = "c:\\metasploit-framework\\bin\\msfvenom.bat"
 dll_paths = ['C:\\Windows\\System32\\kernel32.dll', 
@@ -41,7 +41,7 @@ def main(command_line=None):
   print(f" `-------\'                         `-------\'                      ")
   print(f"Version {Version} by psycore8 -{nstate.ENDC} {nstate.LINK}https://www.nosociety.de{nstate.ENDC}") 
   parser = argparse.ArgumentParser(description="create and obfuscate shellcodes")
-  parser.add_argument("-o", "--output", choices=["c","casm","cs","ps1","py","hex"], help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
+  parser.add_argument("-o", "--output", choices=["c","casm","cs","ps1","py","hex","inspect"], help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
   subparsers = parser.add_subparsers(dest='command')
   parser_create = subparsers.add_parser("create", help="create a shellcode using msfvenom")
   parser_create.add_argument("-p", "--payload", help="payload to use e.g. windows/shell_reverse_tcp")
@@ -70,6 +70,7 @@ def main(command_line=None):
   parser_output = subparsers.add_parser("output", help="create formatted output by filename")
   parser_output.add_argument("-f", "--filename", help="raw input file with shellcode")
   parser_output.add_argument("-s", "--syntax", help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
+  parser_output.add_argument("-l", "--lines", action="store_true", help="adds a line numbering after each 8 bytes")
   parser_output.add_argument("-w", "--write", help="write output to the given filename (replacing $%BUFFER%$ placeholder in the file")
   
   args = parser.parse_args(command_line)
@@ -172,14 +173,15 @@ def main(command_line=None):
    if args.command == 'output':
      filename = args.filename
      OutputFormat = args.syntax
+     lines = args.lines
    print(filename)
    print(f"{nstate.OKBLUE} processing shellcode format...")
    b2s = assist.bin2sc
-   scFormat = b2s.process(filename,OutputFormat)
+   scFormat = b2s.process(filename,OutputFormat,lines)
    print(scFormat)
    if args.write:
      assist.FileManipulation.WriteToTemplate(args.write, scFormat)
-     print(f"{nstate.OKGREEN} Output written in buf"+args.write)
+     print(f"{nstate.OKGREEN} Output written in buf {args.write}")
 
   print(f"{nstate.OKGREEN} DONE!")
 
