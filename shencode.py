@@ -4,6 +4,7 @@ import os
 import utils.assist as assist
 import utils.msf as msf
 import utils.shellcode as sc
+import utils.obfuscating as obf
 
 Version = '0.4.1'
 
@@ -27,10 +28,6 @@ class nstate:
     LINK = '\033[94m\033[4m'
 
 def main(command_line=None):
-  # print(f"{nstate.HEADER}____ _  _ ____ _  _ ____ ____ ___  ____ {nstate.ENDC}")
-  # print(f"{nstate.HEADER}[__  |__| |___ |\\ | |    |  | |  \\ |___ {nstate.ENDC}")
-  # print(f"{nstate.HEADER}___] |  | |___ | \\| |___ |__| |__/ |___{nstate.ENDC}")
-  # print(f"{nstate.HEADER}Version {Version} by psycore8{nstate.ENDC}")
   print(f"{nstate.HEADER}")
   print(f"  _______   __                      _______              __         ")
   print(f" |   _   | |  |--. .-----. .-----. |   _   | .-----. .--|  | .-----.")
@@ -54,10 +51,11 @@ def main(command_line=None):
   parser_encode.add_argument("-r", "--ror2rol", action="store_true", help="change ROR13 to ROL encoding")
   parser_encode.add_argument("-rk", "--key", help="ROL key for encoding")
   # remove arguments -d -s 
-  parser_encode.add_argument("-d", "--decompile", action="store_true", help="decompile modified bytes")
-  parser_encode.add_argument("-s", "--showmod",   action="store_true", help="display modifications")
+  #parser_encode.add_argument("-d", "--decompile", action="store_true", help="decompile modified bytes")
+  #parser_encode.add_argument("-s", "--showmod",   action="store_true", help="display modifications")
   parser_encode.add_argument("-x", "--xor",   action="store_true", help="use additional XOR encoding")
   parser_encode.add_argument("-xk", "--xorkey", help="XOR key for encoding")
+  parser_encode.add_argument("-u", "--uuid",   action="store_true", help="Obfuscate Shellcode as UUID")
   parser_encode = subparsers.add_parser("extract", help="extract shellcode from/to pattern")
   parser_encode.add_argument("-f", "--filename", help="inputfile")
   parser_encode.add_argument("-o", "--outputfile", help="outputfile")
@@ -80,31 +78,21 @@ def main(command_line=None):
     print(f'{args.cmd}')
     print(f"{nstate.OKBLUE} create payload")
     cs = msf.msfvenom
-    # Function depricated, delete
-    #filename = cs.CreateShellcode(msfvenom_path, args.payload, args.lhost, args.lport)
     cs.CreateShellcodeEx(msfvenom_path, args.cmd)
 
-    #path = "./"+filename
-    #cf = os.path.isfile(path)
-    #if cf == True:
-      #print(f"{nstate.OKGREEN} shellcode created")
-      #os.environ['SHENCODE_FILENAME'] = filename
-      #print(f"{nstate.OKBLUE} filename in environment: "+os.environ.get("SHENCODE_FILENAME"))
-    #else:
-      #print(f"{nstate.FAIL} shellcode output not found, EXIT")
-      #exit()
   elif args.command == "encode":
     filename = args.filename
-    out_file = args.outputfile 
+    out_file = args.outputfile
+
     if args.ror2rol:
       ror_key = int(args.key)
       if (ror_key < 32) or (ror_key > 255):
         print(f"{nstate.FAIL} Key must be between 33 and 255")
         exit()
-
-      
       ror2rol = sc.ror2rol
-      ror2rol.process(dll_paths, filename, out_file, args.showmod, args.decompile, args.key)
+      # ror2rol.process(dll_paths, filename, out_file, args.showmod, args.decompile, args.key)
+      ror2rol.process(dll_paths, filename, out_file, args.key)
+
     if args.xor:
       xor = sc.xor
       print(f"{nstate.OKBLUE} Reading shellcode")
@@ -125,7 +113,18 @@ def main(command_line=None):
       else:
         print(f"{nstate.FAIL} XOR encoded Shellcode error, aborting script execution")
         exit()
-  
+
+    if args.uuid:
+      short_fn = os.path.basename(filename)
+      ou = obf.obf_uuid
+      print(f"{nstate.OKBLUE} try to open file")
+      if ou.open_file(filename):
+        print(f"{nstate.OKGREEN} reading {short_fn} successful!")
+      else:
+        print(f"{nstate.FAIL} file not found, exit")
+      print(f"{nstate.OKBLUE} try to generate UUIDs")  
+      print(ou.CreateVar())
+
   elif args.command == "extract":
     if args.outputfile == "":
       print(f"{nstate.FAIL} please provide an output filename!")
