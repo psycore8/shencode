@@ -123,7 +123,8 @@ class ror2rol:
          
     return new_shellcode
   
-  def process(dll_paths, filename, out_file, showmod, decompile, ror_key):
+  # def process(dll_paths, filename, out_file, showmod, decompile, ror_key):
+  def process(dll_paths, filename, out_file, ror_key):
     for dll in dll_paths:
       ror2rol.lookup_functions(dll)
     # Read existing shellcode
@@ -142,10 +143,10 @@ class ror2rol:
     bytes_to_insert = b"\xFF\xC0\xFF\xC8" * 5  # INC EAX, DEC EAX
     modified_shellcode = new_shellcode[:position] + bytes_to_insert + new_shellcode[position:]
   
-    if showmod:
-      print(f"{nstate.OKGREEN} Modifications")
-      highlighted_changes = ror2rol.highlight_byte_changes(shellcode, modified_shellcode)
-      print(highlighted_changes)
+    #if showmod:
+      #print(f"{nstate.OKGREEN} Modifications")
+      #highlighted_changes = ror2rol.highlight_byte_changes(shellcode, modified_shellcode)
+      #print(highlighted_changes)
  
     print(f"{nstate.OKBLUE} Shellcode size: " + str(len(modified_shellcode)))
     """
@@ -169,11 +170,11 @@ class ror2rol:
       print(f"{nstate.FAIL} encoded Shellcode error, aborting script execution")
       exit()
  
-    if decompile:
-      print(f"{nstate.OKGREEN} ASM Code")
-      md = Cs(CS_ARCH_X86, CS_MODE_64)
-      for i in md.disasm(modified_shellcode, 0x1000):
-        print("0x%x:\t%s\t%s\t%s" %(i.address, ' '.join('{:02x}'.format(x) for x in i.bytes), i.mnemonic, i.op_str))
+    #if decompile:
+      #print(f"{nstate.OKGREEN} ASM Code")
+      #md = Cs(CS_ARCH_X86, CS_MODE_64)
+      #for i in md.disasm(modified_shellcode, 0x1000):
+        #print("0x%x:\t%s\t%s\t%s" %(i.address, ' '.join('{:02x}'.format(x) for x in i.bytes), i.mnemonic, i.op_str))
 
 class xor:
    def xor_crypt_string(data, key, encode = False, decode = False):
