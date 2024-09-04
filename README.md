@@ -2,6 +2,8 @@
 
 A multi purpose tool for shellcode operations
 
+I am developing under Windows. This release brings some compatibility fixes for Kali Linux. `inject` and `ROR2ROL` are Windows dependent. All other features are now available for Kali and maybe other Posix OS.
+
 ![](shencode-040.png)
 
 ## Features
@@ -11,13 +13,13 @@ A multi purpose tool for shellcode operations
 - create
 	- create shellcodes with msfvenom
 - encode
-	- `ROR13` to `ROL` with custom key
+	- `ROR13` to `ROL` with custom key (only Windows)
 	- `XOR` encryption
 	- `UUID` obfuscation for shellcodes
 - extract
 	- extract shellcode from position `x` to `y`
 - inject
-	- inject shellcode into a remote process
+	- inject shellcode into a remote process (only Windows)
 - output
 	- raw shellcode to file
 	- formatting options: `C++, C#, C-ASM, PS, PY, HEX`
