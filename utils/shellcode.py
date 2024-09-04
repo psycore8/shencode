@@ -194,13 +194,14 @@ class xor:
     return bytes(out)
    
 class inject:
-  from ctypes import windll
-  from ctypes import wintypes
-  from urllib import request
-  from time import sleep
-  import wmi
-  import argparse
-  import threading
+  if os.name == 'nt':
+    from ctypes import windll
+    from ctypes import wintypes
+    from urllib import request
+    from time import sleep
+    import wmi
+    import argparse
+    import threading
 
   Target_Process = ''
   Shellcode = ''
