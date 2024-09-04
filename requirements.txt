@@ -1,0 +1,4 @@
+capstone==5.0.3
+pefile==2024.8.26
+pywin32==306
+WMI==1.5.1
