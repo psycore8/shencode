@@ -75,7 +75,7 @@ def main(command_line=None):
     parser_inject.add_argument("-f", "--filename", help="raw input file with shellcode to inject")
     parser_inject.add_argument("-p", "--processname", help="raw input file with shellcode to inject")
     parser_inject.add_argument("-s", "--startprocess", action="store_true", help="raw input file with shellcode to inject")
-    parser_output = subparsers.add_parser("output", help="create formatted output by filename")
+  parser_output = subparsers.add_parser("output", help="create formatted output by filename")
   parser_output.add_argument("-f", "--filename", help="raw input file with shellcode")
   parser_output.add_argument("-s", "--syntax", help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
   parser_output.add_argument("-l", "--lines", action="store_true", help="adds a line numbering after each 8 bytes")
