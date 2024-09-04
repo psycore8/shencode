@@ -1,3 +1,7 @@
+"""
+
+"""
+
 import argparse
 import os
 
@@ -6,9 +10,13 @@ import utils.msf as msf
 import utils.shellcode as sc
 import utils.obfuscating as obf
 
-Version = '0.4.1'
+Version = '0.4.2'
 
-msfvenom_path = "c:\\metasploit-framework\\bin\\msfvenom.bat"
+if os.name == 'nt':
+  msfvenom_path = "c:\\metasploit-framework\\bin\\msfvenom.bat"
+elif os.name == 'posix':
+  msfvenom_path = 'msfvenom'
+  
 dll_paths = ['C:\\Windows\\System32\\kernel32.dll', 
              'C:\\Windows\\System32\\ws2_32.dll', 
              'C:\\Windows\\System32\\wininet.dll', 
@@ -48,8 +56,9 @@ def main(command_line=None):
   parser_encode = subparsers.add_parser("encode", help="encode windows function hashes to ROL")
   parser_encode.add_argument("-f", "--filename", help="raw input file with shellcode")
   parser_encode.add_argument("-o", "--outputfile", help="raw input file with shellcode")
-  parser_encode.add_argument("-r", "--ror2rol", action="store_true", help="change ROR13 to ROL encoding")
-  parser_encode.add_argument("-rk", "--key", help="ROL key for encoding")
+  if os.name == 'nt':
+    parser_encode.add_argument("-r", "--ror2rol", action="store_true", help="change ROR13 to ROL encoding")
+    parser_encode.add_argument("-rk", "--key", help="ROL key for encoding")
   # remove arguments -d -s 
   #parser_encode.add_argument("-d", "--decompile", action="store_true", help="decompile modified bytes")
   #parser_encode.add_argument("-s", "--showmod",   action="store_true", help="display modifications")
@@ -61,11 +70,12 @@ def main(command_line=None):
   parser_encode.add_argument("-o", "--outputfile", help="outputfile")
   parser_encode.add_argument("-fb", "--first-byte", help="extract from here")
   parser_encode.add_argument("-lb", "--last-byte", help="extract until here")
-  parser_inject = subparsers.add_parser("inject", help="inject shellcode")
-  parser_inject.add_argument("-f", "--filename", help="raw input file with shellcode to inject")
-  parser_inject.add_argument("-p", "--processname", help="raw input file with shellcode to inject")
-  parser_inject.add_argument("-s", "--startprocess", action="store_true", help="raw input file with shellcode to inject")
-  parser_output = subparsers.add_parser("output", help="create formatted output by filename")
+  if os.name == 'nt':
+    parser_inject = subparsers.add_parser("inject", help="inject shellcode")
+    parser_inject.add_argument("-f", "--filename", help="raw input file with shellcode to inject")
+    parser_inject.add_argument("-p", "--processname", help="raw input file with shellcode to inject")
+    parser_inject.add_argument("-s", "--startprocess", action="store_true", help="raw input file with shellcode to inject")
+    parser_output = subparsers.add_parser("output", help="create formatted output by filename")
   parser_output.add_argument("-f", "--filename", help="raw input file with shellcode")
   parser_output.add_argument("-s", "--syntax", help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
   parser_output.add_argument("-l", "--lines", action="store_true", help="adds a line numbering after each 8 bytes")
