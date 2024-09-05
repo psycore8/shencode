@@ -94,6 +94,7 @@ Please change the metasploit path in line 10. This will be fixed in the future.
 
 ## Parameter
 
+Please [refer to the wiki](https://github.com/psycore8/shencode/wiki) for a full parameter list.
 
 | **Command** | **Subcommand** | **Short** | **Description**                                                                       |     |
 | ----------- | -------------- | --------- | ------------------------------------------------------------------------------------- | --- |
