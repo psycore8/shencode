@@ -2,3 +2,4 @@
 *.raw
 dev/
 shencode Repository.md
+__pycache__
