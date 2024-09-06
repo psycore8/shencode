@@ -8,7 +8,7 @@ I am developing under Windows. This release brings some compatibility fixes for 
 
 ## Features
 
-### Version 0.4.2
+### Version 0.4.3
 
 - create
 	- create shellcodes with msfvenom
