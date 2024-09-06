@@ -32,7 +32,6 @@ I am developing under Windows. This release brings some compatibility fixes for 
 - automatical compile feature
 - integrate more frameworks
 - integrate more encoder
-- Use PATH for better msfvenom integration
 
 ## How to use
 
@@ -88,9 +87,7 @@ unsigned char buf[] =
 
 ## Config
 
-Please change the metasploit path in line 10. This will be fixed in the future.
-
-`msfvenom_path = "c:\\metasploit-framework\\bin\\msfvenom.bat"`
+Make sure your metasploit binary folder is in your PATH variable
 
 ## Parameter
 

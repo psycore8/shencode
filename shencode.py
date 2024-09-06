@@ -10,12 +10,13 @@ import utils.msf as msf
 import utils.shellcode as sc
 import utils.obfuscating as obf
 
-Version = '0.4.2'
+Version = '0.4.3'
 
-if os.name == 'nt':
-  msfvenom_path = "c:\\metasploit-framework\\bin\\msfvenom.bat"
-elif os.name == 'posix':
-  msfvenom_path = 'msfvenom'
+#if os.name == 'nt':
+# make sure your metasploit binary folder is in your PATH variable
+msfvenom_path = "msfvenom"
+#elif os.name == 'posix':
+  #msfvenom_path = 'msfvenom'
   
 dll_paths = ['C:\\Windows\\System32\\kernel32.dll', 
              'C:\\Windows\\System32\\ws2_32.dll', 
@@ -59,9 +60,6 @@ def main(command_line=None):
   if os.name == 'nt':
     parser_encode.add_argument("-r", "--ror2rol", action="store_true", help="change ROR13 to ROL encoding")
     parser_encode.add_argument("-rk", "--key", help="ROL key for encoding")
-  # remove arguments -d -s 
-  #parser_encode.add_argument("-d", "--decompile", action="store_true", help="decompile modified bytes")
-  #parser_encode.add_argument("-s", "--showmod",   action="store_true", help="display modifications")
   parser_encode.add_argument("-x", "--xor",   action="store_true", help="use additional XOR encoding")
   parser_encode.add_argument("-xk", "--xorkey", help="XOR key for encoding")
   parser_encode.add_argument("-u", "--uuid",   action="store_true", help="Obfuscate Shellcode as UUID")
