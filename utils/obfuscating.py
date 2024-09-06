@@ -24,7 +24,7 @@ class obf_uuid:
     def CreateVar():
         obf_uuid.Obf_String = ''
         blocks = obf_uuid.split_string_into_blocks(obf_uuid.Shellcode, 32)
-        obf_uuid.Obf_String = f'string sID[{len(blocks)}] = '
+        obf_uuid.Obf_String = f'std::vector<std::string> sID = '
         obf_uuid.Obf_String += '{\n'
         for block in blocks:
             s = obf_uuid.string_to_uuid(block.decode())
