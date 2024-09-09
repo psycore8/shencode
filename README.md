@@ -4,7 +4,7 @@ A multi purpose tool for shellcode operations
 
 I am developing under Windows. This release brings some compatibility fixes for Kali Linux. `inject` and `ROR2ROL` are Windows dependent. All other features are now available for Kali and maybe other Posix OS.
 
-![[shencode-042.png]]
+![](shencode-042.png)
 
 ## Features
 
