@@ -12,11 +12,11 @@ import utils.obfuscating as obf
 
 Version = '0.4.3'
 
-#if os.name == 'nt':
+if os.name == 'nt':
 # make sure your metasploit binary folder is in your PATH variable
-msfvenom_path = "msfvenom"
-#elif os.name == 'posix':
-  #msfvenom_path = 'msfvenom'
+  msfvenom_path = "msfvenom.bat"
+elif os.name == 'posix':
+  msfvenom_path = 'msfvenom'
   
 dll_paths = ['C:\\Windows\\System32\\kernel32.dll', 
              'C:\\Windows\\System32\\ws2_32.dll', 
@@ -62,6 +62,7 @@ def main(command_line=None):
     parser_encode.add_argument("-rk", "--key", help="ROL key for encoding")
   parser_encode.add_argument("-x", "--xor",   action="store_true", help="use additional XOR encoding")
   parser_encode.add_argument("-xk", "--xorkey", help="XOR key for encoding")
+  parser_encode.add_argument("-q", "--qrcode",   action="store_true", help="store your payload in QR Code picture")
   parser_encode.add_argument("-u", "--uuid",   action="store_true", help="Obfuscate Shellcode as UUID")
   parser_encode = subparsers.add_parser("extract", help="extract shellcode from/to pattern")
   parser_encode.add_argument("-f", "--filename", help="inputfile")
@@ -98,7 +99,6 @@ def main(command_line=None):
         print(f"{nstate.FAIL} Key must be between 33 and 255")
         exit()
       ror2rol = sc.ror2rol
-      # ror2rol.process(dll_paths, filename, out_file, args.showmod, args.decompile, args.key)
       ror2rol.process(dll_paths, filename, out_file, args.key)
 
     if args.xor:
@@ -132,6 +132,30 @@ def main(command_line=None):
         print(f"{nstate.FAIL} file not found, exit")
       print(f"{nstate.OKBLUE} try to generate UUIDs")  
       print(ou.CreateVar())
+
+    if args.qrcode:
+      short_fn = os.path.basename(filename)
+      oq = obf.obf_qrcode
+      if oq.open_file(filename):
+        print(f'{nstate.OKGREEN} reading {short_fn} successful!')
+      else:
+        print(f'{nstate.FAIL} file not found, exit')
+      oq.SetOutputFile(out_file)
+      # if not oq.SetOutputFile(out_file):
+      #   print(f"{nstate.FAIL} output Filename was not set --> {obf.obf_qrcode.OutputFilename}") 
+      #   exit()
+      # else:
+      #   print(f"{nstate.OKGREEN} filename was set to {obf.obf_qrcode.OutputFilename}") 
+      print(f'Shellcode Size: {len(obf.obf_qrcode.Shellcode)}')
+      #print(f'Output: {obf.obf_qrcode.Out_File}')
+      oq.process()
+      path = out_file
+      cf = os.path.isfile(path)
+      if cf == True:
+        print(f'{nstate.OKGREEN} QR-Code creation successful: {out_file}')
+      else:
+        print(f'{nstate.FAIL} error creating QR-Code')
+        exit()
 
   elif args.command == "extract":
     if args.outputfile == "":
@@ -189,7 +213,6 @@ def main(command_line=None):
    if args.write:
      assist.FileManipulation.WriteToTemplate(args.write, scFormat)
      print(f"{nstate.OKGREEN} Output written in buf {args.write}")
-
   print(f"{nstate.OKGREEN} DONE!")
 
 if __name__ == "__main__":

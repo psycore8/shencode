@@ -1,4 +1,8 @@
 import uuid
+import qrcode
+import qrcode.constants
+
+#from qrcode.image.pure import PyPNGImage
 
 class obf_uuid:
     Shellcode = ''
@@ -31,4 +35,38 @@ class obf_uuid:
             obf_uuid.Obf_String += f'\"{s}\",\n'
         obf_uuid.Obf_String = obf_uuid.Obf_String[:-2] + ' };'
         return obf_uuid.Obf_String
+    
+class obf_qrcode:
+    Shellcode = ''
+    OutputFilename = ''
+    def open_file(filename):
+        try:
+            for b in open(filename, 'rb').read():
+                obf_qrcode.Shellcode += b.to_bytes(1, 'big').hex()
+            return True
+        except FileNotFoundError:
+            return False
+            
+    def SetOutputFile(outfile):
+        #print(f'DBG: {outfile}')
+        #if len(outfile) <= 1:
+            obf_qrcode.OutputFilename = outfile
+        #else:
+            #return False
+            #exit()
+            
+    def process():
+        #qr = qrcode.make(obf_qrcode.Shellcode, image_factory=PyPNGImage)
+        #qr.save(obf_qrcode.Out_File)
+        qr = qrcode.QRCode(version=3, box_size=20, border=10, error_correction=qrcode.constants.ERROR_CORRECT_H)
+        payload_bytes = obf_qrcode.Shellcode.encode('utf-8')
+        qr.add_data(payload_bytes)
+        #qr.add_data('https://www.nosociety.de')
+        qr.make(fit=True)
+        img = qr.make_image(fill_color='white', back_color='black')
+        #qrload = qrcode.make(obf_qrcode.Shellcode)
+        #type(qrload)
+        img.save(obf_qrcode.OutputFilename)
+        #qrload.save('myqr.png')
+
 
