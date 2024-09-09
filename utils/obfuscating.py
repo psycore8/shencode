@@ -56,17 +56,11 @@ class obf_qrcode:
             #exit()
             
     def process():
-        #qr = qrcode.make(obf_qrcode.Shellcode, image_factory=PyPNGImage)
-        #qr.save(obf_qrcode.Out_File)
         qr = qrcode.QRCode(version=3, box_size=20, border=10, error_correction=qrcode.constants.ERROR_CORRECT_H)
         payload_bytes = obf_qrcode.Shellcode.encode('utf-8')
         qr.add_data(payload_bytes)
-        #qr.add_data('https://www.nosociety.de')
         qr.make(fit=True)
         img = qr.make_image(fill_color='white', back_color='black')
-        #qrload = qrcode.make(obf_qrcode.Shellcode)
-        #type(qrload)
         img.save(obf_qrcode.OutputFilename)
-        #qrload.save('myqr.png')
 
 
