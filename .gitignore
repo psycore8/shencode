@@ -1,0 +1,7 @@
+*.bin
+*.raw
+dev/
+wiki/
+shencode Repository.md
+__pycache__
+.venv/
