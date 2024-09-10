@@ -16,7 +16,7 @@ I am developing under Windows. This release brings some compatibility fixes for 
 	- `ROR13` to `ROL` with custom key (only Windows)
 	- `QR-Code`: hide OpCodes as QR-Code image
 	- `XOR` encryption
-	- `UUID` obfuscation
+	- `UUID` obfuscation - Please, check out my [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_shellcode_als_uuids_tarnen_-_teil_1) about this encoder
 - extract
 	- extract shellcode from position `x` to `y`
 - inject
