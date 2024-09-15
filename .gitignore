@@ -5,3 +5,4 @@ wiki/
 shencode Repository.md
 __pycache__
 .venv/
+_dev.bat

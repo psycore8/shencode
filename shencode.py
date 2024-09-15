@@ -1,5 +1,5 @@
 """
-
+- Fix: cs output, missing "," at EOL (assist)
 """
 
 import argparse
@@ -10,7 +10,7 @@ import utils.msf as msf
 import utils.shellcode as sc
 import utils.obfuscating as obf
 
-Version = '0.4.3'
+Version = '0.4.4'
 
 if os.name == 'nt':
 # make sure your metasploit binary folder is in your PATH variable
