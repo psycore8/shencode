@@ -1,12 +1,12 @@
 from os import path as osp
 
+
 class xor:
     Input_File = ''
     Output_File = ''
     Shellcode = ''
     Template_File = ''
     XOR_Key = ''
-
     def LoadHeader():
         try: 
             with open(xor.Template_File, "rb") as file:

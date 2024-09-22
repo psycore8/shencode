@@ -5,6 +5,7 @@
 import argparse
 import os
 
+import utils.arguments as arguments
 import utils.assist as assist
 import utils.msf as msf
 import utils.obfuscating as obf
@@ -46,18 +47,20 @@ def main(command_line=None):
   print(f" |:  1   |                         |:  1   |                        ")
   print(f" |::.. . |                         |::.. . |                        ")
   print(f" `-------\'                         `-------\'                      ")
-  print(f"Version {Version} by psycore8 -{nstate.ENDC} {nstate.LINK}https://www.nosociety.de{nstate.ENDC}") 
+  print(f"Version {Version} by psycore8 -{nstate.ENDC} {nstate.LINK}https://www.nosociety.de{nstate.ENDC}")
+  # print(f'{command_line}')
+  # ap = arguments.parser()
+  # ap.parser_add() 
   parser = argparse.ArgumentParser(description="create and obfuscate shellcodes")
   parser.add_argument("-o", "--output", choices=["c","casm","cs","ps1","py","hex","inspect"], help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
   subparsers = parser.add_subparsers(dest='command')
   parser_create = subparsers.add_parser("create", help="create a shellcode")
-  #parser_create.add_argument("-p", "--payload", help="payload to use e.g. windows/shell_reverse_tcp")
-  #parser_create.add_argument("-lh", "--lhost", help="LHOST Argument")
-  #parser_create.add_argument("-lp", "--lport", help="LPORT Argument")
-  # modules: create_msf, create_xstub 
+  # parser_create.add_argument("-p", "--payload", help="payload to use e.g. windows/shell_reverse_tcp")
+  # parser_create.add_argument("-lh", "--lhost", help="LHOST Argument")
+  # parser_create.add_argument("-lp", "--lport", help="LPORT Argument")
   parser_create.add_argument("-c", "--msf-cmd", type=str, help="msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"")
   parser_create.add_argument('-x', '--xor-stub', action='store_true', help='create payload from a raw file, encode with xor, add to xor stub')
-  parser_create.add_argument('-f','--xor-filename',help='Input file to us with xor stub')
+  parser_create.add_argument('-f','--xor-filename',help='Input file to use with xor stub')
   parser_create.add_argument('-o', '--xor-outputfile', help='outputfile for xor stub')
   parser_create.add_argument('-k', '--xor-key', help='the XOR key to use')
   parser_encode = subparsers.add_parser("encode", help="encode windows function hashes to ROL")
@@ -87,6 +90,7 @@ def main(command_line=None):
   parser_output.add_argument("-w", "--write", help="write output to the given filename (replacing $%BUFFER%$ placeholder in the file")
   
   args = parser.parse_args(command_line)
+  # OutputFormat = arguments.parser.args.output
   OutputFormat = args.output
   
   if args.command == "create":
