@@ -1,5 +1,5 @@
 from datetime import datetime
-import sys
+import sys, utils.arg
 import shutil, fileinput
 
 class helper:
@@ -11,6 +11,19 @@ class helper:
     
 class bin2sc:
   ShowLines = False
+  Author = 'psycore8'
+  Description = 'create formatted output by filename'
+  Version = '1.0.0'
+
+  def init():
+    spName = 'formatout'
+    spArgList = [
+      ['-i', '--input', '', '', 'Input file for formatted output'],
+      ['-s', '--syntax', 'c,casm,cs,ps1,py,hex,inspect', '', 'formatting the shellcode in C, Casm, C#, Powershell, python or hex'],
+      ['-l', '--lines', '', 'store_true', 'adds a line numbering after each 8 bytes'],
+      ['-w', '--write', '', '', 'write output to the given filename (replacing $%BUFFER%$ placeholder in the file']
+    ]
+    utils.arg.CreateSubParser(spName, bin2sc.Description, spArgList)
 
   def process(filename,output,lines):
     sc_output = ""

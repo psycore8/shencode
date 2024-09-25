@@ -5,12 +5,17 @@
 import argparse
 import os
 
+import utils.arg as arg
 import utils.assist as assist
 import utils.msf as msf
 import utils.shellcode as sc
 import utils.obfuscating as obf
 
+<<<<<<< Updated upstream
 Version = '0.4.3'
+=======
+Version = '0.4.99'
+>>>>>>> Stashed changes
 
 if os.name == 'nt':
 # make sure your metasploit binary folder is in your PATH variable
@@ -49,11 +54,24 @@ def main(command_line=None):
   parser = argparse.ArgumentParser(description="create and obfuscate shellcodes")
   parser.add_argument("-o", "--output", choices=["c","casm","cs","ps1","py","hex","inspect"], help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
   subparsers = parser.add_subparsers(dest='command')
+<<<<<<< Updated upstream
   parser_create = subparsers.add_parser("create", help="create a shellcode using msfvenom")
   parser_create.add_argument("-p", "--payload", help="payload to use e.g. windows/shell_reverse_tcp")
   parser_create.add_argument("-lh", "--lhost", help="LHOST Argument")
   parser_create.add_argument("-lp", "--lport", help="LPORT Argument")
   parser_create.add_argument("-c", "--cmd", type=str, help="msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"")
+=======
+  parser_create = subparsers.add_parser("create", help="create a shellcode")
+  # parser_create.add_argument("-p", "--payload", help="payload to use e.g. windows/shell_reverse_tcp")
+  # parser_create.add_argument("-lh", "--lhost", help="LHOST Argument")
+  # parser_create.add_argument("-lp", "--lport", help="LPORT Argument")
+ # modules: create_msf, create_xstub 
+  parser_create.add_argument("-c", "--msf-cmd", type=str, help="msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"")
+  parser_create.add_argument('-x', '--xor-stub', action='store_true', help='create payload from a raw file, encode with xor, add to xor stub')
+  parser_create.add_argument('-f','--xor-filename',help='Input file to us with xor stub')
+  parser_create.add_argument('-o', '--xor-outputfile', help='outputfile for xor stub')
+  parser_create.add_argument('-k', '--xor-key', help='the XOR key to use')
+>>>>>>> Stashed changes
   parser_encode = subparsers.add_parser("encode", help="encode windows function hashes to ROL")
   parser_encode.add_argument("-f", "--filename", help="raw input file with shellcode")
   parser_encode.add_argument("-o", "--outputfile", help="raw input file with shellcode")
@@ -82,12 +100,49 @@ def main(command_line=None):
   
   args = parser.parse_args(command_line)
   OutputFormat = args.output
+
+  #args = arg.args
   
   if args.command == "create":
+<<<<<<< Updated upstream
     print(f'{args.cmd}')
     print(f"{nstate.OKBLUE} create payload")
     cs = msf.msfvenom
     cs.CreateShellcodeEx(msfvenom_path, args.cmd)
+=======
+    if args.cmd:
+      print(f'{arg.args.cmd}')
+      print(f"{nstate.OKBLUE} create payload")
+      cs = msf.msfvenom
+      cs.CreateShellcodeEx(msfvenom_path, args.cmd)
+    elif args.xor_stub:
+      stub.xor.Input_File = args.filename
+      stub.xor.XOR_Key = args.xor_key
+      stub.xor.Output_File = args.outputfile
+      stub.xor.Template_File = 'tpl\\xor-stub.tpl'
+      xor = sc.xor
+      print(f"{nstate.OKBLUE} Reading shellcode")
+      try: 
+        with open(args.filename, "rb") as file:
+          shellcode = file.read()
+      except FileNotFoundError:
+          print(f"{nstate.FAIL} File not found or cannot be opened.")
+          exit()
+      modified_shellcode = xor.xor_crypt_bytes(shellcode, int(args.xor_key))
+      outputfile = 'xor.tmp'
+      with open(outputfile, 'wb') as file:
+        file.write(modified_shellcode)
+      path = outputfile
+      cf = os.path.isfile(path)
+      if cf == True:
+        print(f"{nstate.OKGREEN} XOR encoded shellcode created in {outputfile}")
+      else:
+        print(f"{nstate.FAIL} XOR encoded Shellcode error, aborting script execution")
+        exit()
+      stub.xor.Input_File = outputfile
+      stub.xor.process()
+
+>>>>>>> Stashed changes
 
   elif args.command == "encode":
     filename = args.filename

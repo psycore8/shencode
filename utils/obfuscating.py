@@ -1,13 +1,25 @@
 import uuid
 import qrcode
 import qrcode.constants
+import utils.arg
 
 #from qrcode.image.pure import PyPNGImage
 
 class obf_uuid:
+    Author = 'psycore8'
+    Description = 'obfuscate shellcodes as UUID strings'
+    Version = '1.0.0'
     Shellcode = ''
     Obf_String = ''
     VarCounter = 0
+    def init():
+        spName = 'uuid'
+        spArgList = [
+            ['-i', '--input', '', '', 'Input file for UUID encoding'],
+            ['-o', '--output', '', '', 'Outputfile for UUID encoding']
+        ]
+        utils.arg.CreateSubParser(spName, obf_uuid.Description, spArgList)
+
     def string_to_uuid(string_value):
         formatted_string = f"{string_value[:8]}-{string_value[8:12]}-{string_value[12:16]}-{string_value[16:20]}-{string_value[20:]}"
         return formatted_string
@@ -37,8 +49,20 @@ class obf_uuid:
         return obf_uuid.Obf_String
     
 class obf_qrcode:
+    Author = 'psycore8'
+    Description = 'obfuscate shellcodes as QR-Codes'
+    Version = '1.0.0'
     Shellcode = ''
     OutputFilename = ''
+
+    def init():
+        spName = 'qrcode'
+        spArgList = [
+            ['-i', '--input', '', '', 'Input file for QR-Code encoding'],
+            ['-o', '--output', '', '', 'Outputfile for QR-Code encoding']
+        ]
+        utils.arg.CreateSubParser(spName, obf_qrcode.Description, spArgList)
+
     def open_file(filename):
         try:
             for b in open(filename, 'rb').read():
