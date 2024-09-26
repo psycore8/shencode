@@ -11,6 +11,7 @@ https://systemweakness.com/win32api-with-python3-part-iii-injection-6dd3c1b99c90
 """
 
 import pefile
+import utils.arg
 import os
 import base64
 import ctypes, sys
@@ -19,7 +20,21 @@ from shencode import nstate
 from itertools import cycle
 
 class ror2rol:
+  Author = 'bordergate, psycore8'
+  Description = 'change ROR13 to ROL encoding in metasploit payloads'
+  Version = '1.0.0'
   hash_dict = dict()
+
+  def init():
+    spName = 'ror2rol'
+    spArgList = [
+          ['-i', '--input', '', '', 'Input file for ROR13 to ROL conversion'],
+          ['-o', '--output', '', '', 'Outputfile for ROR13 to ROL conversion'],
+          ['-k', '--key', '', '', 'Key to process ROR13 to ROL']
+        ]
+    utils.arg.CreateSubParser(spName, ror2rol.Description, spArgList)
+
+
   def lookup_functions(dll_path):
     pe = pefile.PE(dll_path)
     export_dir = pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_EXPORT']]
@@ -175,7 +190,8 @@ class ror2rol:
       #md = Cs(CS_ARCH_X86, CS_MODE_64)
       #for i in md.disasm(modified_shellcode, 0x1000):
         #print("0x%x:\t%s\t%s\t%s" %(i.address, ' '.join('{:02x}'.format(x) for x in i.bytes), i.mnemonic, i.op_str))
-
+        
+#xor migrated
 class xor:
    def xor_crypt_string(data, key, encode = False, decode = False):
      if decode:

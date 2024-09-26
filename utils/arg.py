@@ -5,7 +5,7 @@ subcommands = {}
 subparser = parser.add_subparsers(dest='command')
 
 def CreateMainParser():
-    parser.add_argument("--test", help="Test Switch")
+    parser.add_argument("--version", action='store_true', help="show version info")
 
 def CreateSubParser(
         SubParserName,SubParserHelp,ArgumentList=list):
@@ -14,7 +14,7 @@ def CreateSubParser(
     for row in ArgumentList:
         if len(row[2]) > 0 and len(row[3]) == 0:
             spChoices = row[2].split(',')
-            print(f'{spChoices}')
+            #print(f'{spChoices}')
             subcommands['parser_name'].add_argument(
                 row[0],
                 row[1],
@@ -22,7 +22,7 @@ def CreateSubParser(
                 help=row[4]
                 )
         elif len(row[2]) == 0 and len(row[3]) > 0:
-            print(f'{row[3]}')
+            #print(f'{row[3]}')
             subcommands['parser_name'].add_argument(
                 row[0],
                 row[1],

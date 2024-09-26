@@ -2,17 +2,12 @@
 
 A multi purpose tool for shellcode operations
 
-I am developing under Windows. This release brings some compatibility fixes for Kali Linux. `inject` and `ROR2ROL` are Windows dependent. All other features are now available for Kali and maybe other Posix OS.
 
-![](shencode-042.png)
+![[shencode-050.png]]
 
 ## Features
 
-<<<<<<< Updated upstream
-### Version 0.4.3
-=======
 ### Version 0.5.0
->>>>>>> Stashed changes
 
 - create
 	- create shellcodes with msfvenom
@@ -34,9 +29,14 @@ I am developing under Windows. This release brings some compatibility fixes for 
 
 ## ToDo
 
-- automatical compile feature
-- integrate more frameworks
-- integrate more encoder
+- Migrate: `extract, inject, msf, stub, ror2rol, bin2sc`
+- class.nstate global class
+- Update README
+- Update Wiki
+- Code cleanup
+- Update requirements.txt
+- ~~Migrate: `uuid, qrcode, xor`~~
+- ~~Dynamic argparser~~
 
 ## How to use
 
@@ -98,35 +98,6 @@ Make sure your metasploit binary folder is in your PATH variable
 ## Parameter
 
 Please [refer to the wiki](https://github.com/psycore8/shencode/wiki) for a full parameter list.
-
-| **Command** | **Subcommand** | **Short** | **Description**                                                                       | Requires  |
-| ----------- | -------------- | --------- | ------------------------------------------------------------------------------------- | --------- |
-| create      |                |           | create a shellcode using msfvenom                                                     |           |
-|             | --cmd          | -c        | msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"        |           |
-| encode      |                |           | Shellcode encoding                                                                    |           |
-|             | --filename     | -f        | raw input file with shellcode                                                         |           |
-|             | --outputfile   | -o        | raw output file                                                                       |           |
-|             | --ror2rol      | -r        | encode windows function hashes to ROL                                                 | -f -o -rk |
-|             | --key          | -rk       | ROL key for encoding                                                                  |           |
-|             | --qrcode       | -q        | Create a QR Code from Shellcode                                                       | -f        |
-|             | --xor          | -x        | use additional XOR encoding                                                           | -f -o -xk |
-|             | --xorkey       | -xk       | XOR key for encoding                                                                  |           |
-|             | --uuid         | -u        | Obfuscate Shellcode as UUID                                                           | -f        |
-| extract     |                |           |                                                                                       |           |
-|             | --filename     | -f        | binary input file                                                                     |           |
-|             | --outputfile   | -o        | name of the outputfile                                                                |           |
-|             | --first-byte   | -fb       | first byte to extract                                                                 | -f -o     |
-|             | --last-byte    | -lb       | last byte to extract                                                                  |           |
-| inject      |                |           | inject shellcode                                                                      |           |
-|             | --filename     | -f        | raw input file with shellcode to inject                                               |           |
-|             | --processname  | -p        | process name to inject                                                                |           |
-|             | --startprocess | -s        | if set, process will be started                                                       |           |
-| output      |                |           | create formatted output by filename                                                   |           |
-|             | --filename     | -f        | raw input file with shellcode                                                         |           |
-|             | --lines        | -l        | adding line offsets                                                                   | -f -s     |
-|             | --syntax       | -s        | formatting the shellcode, choose between `c, casm, cs, hex, inspect, ps1, py`         |           |
-|             | --write        | -w        | write output to the given filename (replacing  `!++BUFFER++!` placeholder in the file |           |
-| --output    |                |           | formatting the shellcode in C, Casm, C#, Powershell, python or hex                    |           |
 
 ## References
 

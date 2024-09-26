@@ -1,3 +1,5 @@
+# migrated
+
 import uuid
 import qrcode
 import qrcode.constants
