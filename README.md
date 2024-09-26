@@ -3,7 +3,7 @@
 A multi purpose tool for shellcode operations
 
 
-![[shencode-050.png]]
+![](shencode-050.png)
 
 ## Features
 
@@ -11,6 +11,7 @@ A multi purpose tool for shellcode operations
 
 - create
 	- create shellcodes with msfvenom
+	- create in-memory XOR Decoder (for technical details, visit this [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder))
 - encode
 	- `ROR13` to `ROL` with custom key (only Windows)
 	- `QR-Code`: hide OpCodes as QR-Code image
