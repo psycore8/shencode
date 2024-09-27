@@ -9,34 +9,59 @@ A multi purpose tool for shellcode operations
 
 ### Version 0.5.0
 
-- create
-	- create shellcodes with msfvenom
-	- create in-memory XOR Decoder (for technical details, visit this [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder))
-- encode
-	- `ROR13` to `ROL` with custom key (only Windows)
-	- `QR-Code`: hide OpCodes as QR-Code image
-	- `XOR` encryption
+- general
+	- `extract` - extract from/to offset
+	- `formatout` - display raw shellcodes in `C++, C#` and more
+	- `inject` - inject shellcode into process (Windows only)
+	- `msfvenom` - create payloads  with msfvenom
+- encoder
+	- `xorenc` - Encode payload with custom XOR key
+	- `xorpoly` - polymorphic x64 in-memory decoder (for details, visit this [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder))
+- obfuscator
+	- `QR-Code` hide OpCodes as QR-Code image
+	- `ROR13` to `ROL` with custom key (Windows only)
 	- `UUID` obfuscation - Please, check out my [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_shellcode_als_uuids_tarnen_-_teil_1) about this encoder
-- extract
-	- extract shellcode from position `x` to `y`
-- inject
-	- inject shellcode into a remote process (only Windows)
-- output
-	- raw shellcode to file
-	- formatting options: `C++, C#, C-ASM, PS, PY, HEX`
-	- new `inspect` option helps to find offsets
-	- output in console windows
-	- output in template
+
+- ~~create~~
+	- ~~create shellcodes with msfvenom~~
+	- ~~create in-memory XOR Decoder (for technical details, visit this [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder))~~
+- ~~encode~~
+	- ~~`ROR13` to `ROL` with custom key (only Windows)~~
+	- ~~`QR-Code`: hide OpCodes as QR-Code image~~
+	- ~~`XOR` encryption~~
+	- ~~`UUID` obfuscation - Please, check out my [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_shellcode_als_uuids_tarnen_-_teil_1) about this encoder~~
+- ~~extract~~
+	- ~~extract shellcode from position `x` to `y`~~
+- ~~inject~~
+	- ~~inject shellcode into a remote process (only Windows)~~
+- ~~output~~
+	- ~~raw shellcode to file~~
+	- ~~formatting options: `C++, C#, C-ASM, PS, PY, HEX`~~
+	- ~~new `inspect` option helps to find offsets~~
+	- ~~output in console windows~~
+	- ~~output in template~~
+
+## Release Notes
+
+#### Improvements
+
+- `core` - each feature is now a module
+- `core` - dynamic argument parsing
+- `module` - nstate class is available for all modules
+- `formatout` - colored line numbers
 
 ## ToDo
 
-- Migrate: `extract, inject, msf, stub, ror2rol, bin2sc`
-- class.nstate global class
+- ~~class.nstate global class~~
 - Update README
 - Update Wiki
-- Code cleanup
+- Code cleanup:
+	- ~~del assist.py~~
+	- ~~del shellcode.py~~
+	- ~~del obfuscating.py~~
+	- ~~del stub.py~~
 - Update requirements.txt
-- ~~Migrate: `uuid, qrcode, xor`~~
+- ~~Migrate: `extract, bin2sc, inject, msf, ror2rol, xorpoly, uuid, qrcode, xor`~~
 - ~~Dynamic argparser~~
 
 ## How to use

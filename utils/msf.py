@@ -2,7 +2,7 @@
 #import sys
 import utils.arg
 import subprocess
-import utils.assist as assist
+#import utils.assist as assist
 
 class msfvenom:
   Author = 'psycore8'
