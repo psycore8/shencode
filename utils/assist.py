@@ -114,7 +114,7 @@ class bin2sc:
         shellcode += ','
       if ctr == maxlen:
         Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag)
-        shellcode += f',\n{Line_Format}'
+        shellcode += f'\n{Line_Format}'
         LineFactor += 1
         ctr = 0
       ctr += 1
