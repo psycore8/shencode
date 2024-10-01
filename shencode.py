@@ -82,7 +82,6 @@ def main(command_line=None):
   
   args = parser.parse_args(command_line)
   OutputFormat = args.output
-
   
   if args.command == "create":
     print(f'{args.cmd}')
@@ -218,4 +217,3 @@ def main(command_line=None):
 
 if __name__ == "__main__":
   main()
-  
