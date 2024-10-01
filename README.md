@@ -31,20 +31,6 @@ A multi purpose tool for shellcode operations
 - `module` - nstate class is available for all modules
 - `formatout` - colored line numbers
 
-## ToDo
-
-- ~~class.nstate global class~~
-- Update README
-- ~~Update Wiki~~
-- ~~Code cleanup:~~
-	- ~~del assist.py~~
-	- ~~del shellcode.py~~
-	- ~~del obfuscating.py~~
-	- ~~del stub.py~~
-- Update requirements.txt
-- ~~Migrate: `extract, bin2sc, inject, msf, ror2rol, xorpoly, uuid, qrcode, xor`~~
-- ~~Dynamic argparser~~
-
 ## How to use
 
 Check out the [ShenCode Wiki](https://github.com/psycore8/shencode/wiki/) for more information.
