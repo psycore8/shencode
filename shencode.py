@@ -5,7 +5,6 @@
 import argparse
 import os
 
-import utils.arg as arg
 import utils.assist as assist
 import utils.msf as msf
 import utils.shellcode as sc
@@ -84,7 +83,6 @@ def main(command_line=None):
   args = parser.parse_args(command_line)
   OutputFormat = args.output
 
-  #args = arg.args
   
   if args.command == "create":
     print(f'{args.cmd}')
@@ -220,3 +218,4 @@ def main(command_line=None):
 
 if __name__ == "__main__":
   main()
+  
