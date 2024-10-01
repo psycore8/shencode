@@ -10,8 +10,8 @@ class uuid_obfuscator:
     def init():
         spName = 'uuid'
         spArgList = [
-            ['-i', '--input', '', '', 'Input file for UUID encoding'],
-            ['-o', '--output', '', '', 'Outputfile for UUID encoding']
+            ['-i', '--input', '', '', 'Input file for UUID encoding']#,
+            #['-o', '--output', '', '', 'Outputfile for UUID encoding']
         ]
         utils.arg.CreateSubParser(spName, uuid_obfuscator.Description, spArgList)
 

@@ -1,5 +1,5 @@
 import utils.arg
-import shutil, fileinput
+import shutil, fileinput, base64
 from utils.helper import nstate as nstate
 
 class format:
@@ -12,7 +12,7 @@ class format:
     spName = 'formatout'
     spArgList = [
       ['-i', '--input', '', '', 'Input file for formatted output'],
-      ['-s', '--syntax', 'c,casm,cs,ps1,py,hex,inspect', '', 'formatting the shellcode in C, Casm, C#, Powershell, python or hex'],
+      ['-s', '--syntax', 'c,casm,cs,ps1,py,hex,base64,inspect', '', 'formatting the shellcode in C, Casm, C#, Powershell, python or hex'],
       ['-l', '--lines', '', 'store_true', 'adds a line numbering after each 8 bytes'],
       ['-w', '--write', '', '', 'write output to the given filename (replacing $%BUFFER%$ placeholder in the file']
     ]
@@ -47,6 +47,8 @@ class format:
       sc_output = format.process_py(filename)
     if output == "hex":
       sc_output = format.process_hex(filename)
+    if output == "base64":
+      sc_output = format.process_base64(filename)
     if output == "inspect":
       sc_output = format.process_inspect(filename)
     return sc_output
@@ -195,6 +197,13 @@ class format:
     for b in open(filename, 'rb').read():
       shellcode += b.to_bytes(1, 'big').hex()
     return shellcode
+  
+  def process_base64(filename):
+    shellcode = ''
+    for b in open(filename, 'rb').read():
+      shellcode += b.to_bytes(1, 'big').hex()
+    b64_data = base64.b64encode(shellcode.encode('utf-8'))
+    return b64_data.decode('utf-8')
   
   def process_inspect(filename):
     retln = format.ReturnLineNumber

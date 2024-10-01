@@ -26,12 +26,7 @@ class qrcode_obfuscator:
             return False
             
     def SetOutputFile(outfile):
-        #print(f'DBG: {outfile}')
-        #if len(outfile) <= 1:
             qrcode_obfuscator.OutputFilename = outfile
-        #else:
-            #return False
-            #exit()
             
     def process():
         qr = qrcode.QRCode(version=3, box_size=20, border=10, error_correction=qrcode.constants.ERROR_CORRECT_H)
