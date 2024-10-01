@@ -7,7 +7,7 @@ A multi purpose tool for shellcode operations
 
 ## Features
 
-### Version 0.5.0
+### Version 0.5.1
 
 - general
 	- `extract` - [extract](https://github.com/psycore8/shencode/wiki/extract) from/to offset
