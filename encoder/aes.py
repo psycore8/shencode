@@ -88,9 +88,9 @@ class aes_encoder:
         path = outputfile
         cf = os.path.isfile(path)
         if cf == True:
-            print(f"{nstate.OKGREEN} AES encrypted shellcode created in {outputfile}")
+            print(f"{nstate.OKGREEN} [AES-ENC] file created in {outputfile}")
         else:
-            print(f"{nstate.FAIL} AES encrption error, aborting script execution")
+            print(f"{nstate.FAIL} [AES-ENC] encrption error, aborting script execution")
             exit()
 
     def decode():
@@ -119,9 +119,9 @@ class aes_encoder:
         path = outputfile
         cf = os.path.isfile(path)
         if cf == True:
-            print(f"{nstate.OKGREEN} AES encrypted shellcode created in {outputfile}")
+            print(f"{nstate.OKGREEN} [AES-DEC] file created in {outputfile}")
         else:
-            print(f"{nstate.FAIL} AES encrption error, aborting script execution")
+            print(f"{nstate.FAIL} [AES-DEC] encrption error, aborting script execution")
             exit()
 
     def debug():

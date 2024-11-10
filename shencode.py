@@ -95,7 +95,7 @@ def main(command_line=None):
     if arguments.debug:
       aes.aes_encoder.debug()
     else:
-      print(f'{nstate.OKBLUE} AES Encryption Module')
+      print(f'{nstate.OKBLUE} [AES] Module')
       aes.aes_encoder.Input_File = arguments.input
       aes.aes_encoder.Output_File = arguments.output
       PasswordBytes = arguments.key
