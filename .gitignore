@@ -2,7 +2,7 @@
 *.raw
 dev/
 wiki/
-shencode Repository.md
+shencode_Repository.md
 __pycache__
 .venv/
-_dev.bat
+_dev*

@@ -3,11 +3,10 @@
 A multi purpose tool for shellcode operations
 
 
-![](shencode-050.png)
-
+![](shencode-051.png)
 ## Features
 
-### Version 0.5.0
+### Version 0.5.1
 
 - general
 	- `extract` - [extract](https://github.com/psycore8/shencode/wiki/extract) from/to offset
@@ -15,6 +14,7 @@ A multi purpose tool for shellcode operations
 	- `inject` - [inject shellcode](https://github.com/psycore8/shencode/wiki/inject) into process (Windows only)
 	- `msfvenom` - [create payloads](https://github.com/psycore8/shencode/wiki/msfvenom)  with msfvenom
 - encoder
+	- `aesenc` - [Encrypt](https://github.com/psycore8/shencode/wiki/aesenc) payload with AES
 	- `xorenc` - [Encode payload](https://github.com/psycore8/shencode/wiki/xorenc) with custom XOR key
 	- `xorpoly` - [polymorphic x64](https://github.com/psycore8/shencode/wiki/xorpoly) in-memory decoder (for details, visit this [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder))
 - obfuscator
@@ -26,10 +26,9 @@ A multi purpose tool for shellcode operations
 
 #### Improvements
 
-- `core` - each feature is now a module
-- `core` - dynamic argument parsing
-- `module` - nstate class is available for all modules
-- `formatout` - colored line numbers
+- `formatout` - fixed unterminated %-sign in `-h` output
+- `aesenc` - module to en-/decrypt shellcodes with AES
+- `sha1` - checksum module for files (internal use only)
 
 ## How to use
 

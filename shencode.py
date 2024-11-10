@@ -5,15 +5,17 @@ import utils.arg as arg
 from utils.helper import nstate as nstate
 import utils.extract as extract
 import utils.formatout as formatout
+import utils.hashes as hashes
 import utils.injection as injection
 import utils.msf as msf
+import encoder.aes as aes
 import encoder.xorpoly as xorpoly
 import encoder.xor as xor
 import obfuscator.qrcode as qrcode
 import obfuscator.rolhash as rolhash
 import obfuscator.uuid as uuid
 
-Version = '0.5.0'
+Version = '0.5.1'
 
 # make sure your metasploit binary folder is in your PATH variable
 if os.name == 'nt':
@@ -37,6 +39,7 @@ def main(command_line=None):
   ##########################
 
   arg.CreateMainParser()
+  aes.aes_encoder.init()
   extract.extract_shellcode.init()
   formatout.format.init()
   if os.name == 'nt':
@@ -87,6 +90,29 @@ def main(command_line=None):
       exit()
     xorpoly.xor.Input_File = outputfile
     xorpoly.xor.process()
+
+  elif arguments.command == 'aesenc':
+    if arguments.debug:
+      aes.aes_encoder.debug()
+    else:
+      print(f'{nstate.OKBLUE} [AES] Module')
+      aes.aes_encoder.Input_File = arguments.input
+      aes.aes_encoder.Output_File = arguments.output
+      PasswordBytes = arguments.key
+      aes.aes_encoder.Password = PasswordBytes.encode('utf-8')
+      if arguments.mode == 'encode':
+        aes.aes_encoder.encode()
+        sha1_input = hashes.sha1.calculate_sha1(aes.aes_encoder.Input_File)
+        sha1_output = hashes.sha1.calculate_sha1(aes.aes_encoder.Output_File)
+        print(f'{nstate.OKGREEN} [AES-ENC] Input: {aes.aes_encoder.Input_File} - {sha1_input}')
+        print(f'{nstate.OKGREEN} [AES-ENC] Output: {aes.aes_encoder.Output_File} - {sha1_output}')
+      elif arguments.mode == 'decode':
+        aes.aes_encoder.decode()
+        #aes.aes_encoder.encode()
+        sha1_input = hashes.sha1.calculate_sha1(aes.aes_encoder.Input_File)
+        sha1_output = hashes.sha1.calculate_sha1(aes.aes_encoder.Output_File)
+        print(f'{nstate.OKGREEN} [AES-DEC] Input: {aes.aes_encoder.Input_File} - {sha1_input}')
+        print(f'{nstate.OKGREEN} [AES-DEC] Output: {aes.aes_encoder.Output_File} - {sha1_output}')
 
   elif arguments.command == 'uuid':
       short_fn = os.path.basename(arguments.input)
