@@ -14,7 +14,7 @@ class format:
       ['-i', '--input', '', '', 'Input file for formatted output'],
       ['-s', '--syntax', 'c,casm,cs,ps1,py,hex,base64,inspect', '', 'formatting the shellcode in C, Casm, C#, Powershell, python or hex'],
       ['-l', '--lines', '', 'store_true', 'adds a line numbering after each 8 bytes'],
-      ['-w', '--write', '', '', 'write output to the given filename (replacing $%BUFFER%$ placeholder in the file']
+      ['-w', '--write', '', '', 'write output to the given filename (replacing $%%BUFFER%%$ placeholder in the file']
     ]
     utils.arg.CreateSubParser(spName, format.Description, spArgList)
 
