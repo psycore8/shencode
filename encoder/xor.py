@@ -5,7 +5,12 @@ from itertools import cycle
 class xor_encoder:
     Author = 'psycore8'
     Description = 'XOR encoder for payloads'
-    Version = '1.0.0'
+    Version = '1.1.0'
+
+    def __init__(self, input_file, output_file, xor_key):
+        self.input_file = input_file
+        self.output_file = output_file
+        self.xor_key = xor_key
 
     def init():
         spName = 'xorenc'
@@ -27,7 +32,7 @@ class xor_encoder:
             return data_bytes.decode("utf-8")
         return xored
    
-    def xor_crypt_bytes(data, key):
+    def xor_crypt_bytes(self, data, key):
         out = [x ^ key for x in data]
         print(out)
         return bytes(out)

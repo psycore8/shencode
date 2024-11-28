@@ -5,12 +5,14 @@ from os import path as osp
 class xor:
     Author = 'psycore8'
     Description = 'create payload from a raw file, encode with xor, add to xor stub'
-    Version = '1.0.0'
-    Input_File = ''
-    Output_File = ''
-    Shellcode = ''
-    Template_File = ''
-    XOR_Key = ''
+    Version = '1.1.0'
+
+    def __init__(self, input_file, output_file, shellcode, template_file, xor_key):
+       self.input_file = input_file
+       self.output_file = output_file
+       self.shellcode = shellcode
+       self.template_file = template_file
+       self.xor_key = xor_key
 
     def init():
       spName = 'xorpoly'
@@ -21,24 +23,24 @@ class xor:
       ]
       utils.arg.CreateSubParser(spName, xor.Description, spArgList)
 
-    def LoadHeader():
+    def LoadHeader(self):
         try: 
-            with open(xor.Template_File, "rb") as file:
-                xor.Shellcode = file.read()
+            with open(self.template_file, "rb") as file:
+                self.shellcode = file.read()
         except FileNotFoundError:
-          print(f'{nstate.FAIL} File {xor.Template_File} not found or cannot be opened.')
+          print(f'{nstate.FAIL} File {self.template_file} not found or cannot be opened.')
           exit()
-        size = len(xor.Shellcode)
+        size = len(self.shellcode)
         print(f'{nstate.OKBLUE} Header loaded, size of shellcode {size} bytes')
 
-    def AppendShellcode():
+    def AppendShellcode(self):
         try: 
-            with open(xor.Input_File, "rb") as file:
-                xor.Shellcode += file.read()
+            with open(self.input_file, "rb") as file:
+                self.shellcode += file.read()
         except FileNotFoundError:
-          print(f'{nstate.FAIL} File {xor.Input_File} not found or cannot be opened.')
+          print(f'{nstate.FAIL} File {self.input_file} not found or cannot be opened.')
           exit()
-        size = len(xor.Shellcode)
+        size = len(self.shellcode)
         print(f'{nstate.OKBLUE} XORed payload added, size of shellcode {size} bytes')
 
     def replace_bytes_at_offset(data, offset, new_bytes):
@@ -47,10 +49,10 @@ class xor:
         data.append(int(new_bytes))
         return bytes(data)
 
-    def WriteToFile():
-      outputfile = xor.Output_File
+    def WriteToFile(self):
+      outputfile = self.output_file #xor.Output_File
       with open(outputfile, 'wb') as file:
-        file.write(xor.Shellcode)
+        file.write(self.shellcode)
       path = outputfile
       cf = osp.isfile(path)
       if cf == True:
@@ -59,12 +61,12 @@ class xor:
         print(f"{nstate.FAIL} XOR encoded Shellcode error, aborting script execution")
         exit()
 
-    def process():
-       Offset = 5
-       xor.LoadHeader()
-       xor.AppendShellcode()
-       xor.Shellcode = xor.replace_bytes_at_offset(xor.Shellcode, 5, xor.XOR_Key)
-       xor.WriteToFile()
+    def process(self):
+       #Offset = 5
+       xor.LoadHeader(self)
+       xor.AppendShellcode(self)
+       self.shellcode = xor.replace_bytes_at_offset(self.shellcode, 5, self.xor_key)
+       xor.WriteToFile(self)
 
     
         

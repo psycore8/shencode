@@ -6,7 +6,7 @@ A multi purpose tool for shellcode operations
 ![](shencode-051.png)
 ## Features
 
-### Version 0.5.1
+### Version 0.6.0
 
 - general
 	- `extract` - [extract](https://github.com/psycore8/shencode/wiki/extract) from/to offset
@@ -15,6 +15,7 @@ A multi purpose tool for shellcode operations
 	- `msfvenom` - [create payloads](https://github.com/psycore8/shencode/wiki/msfvenom)  with msfvenom
 - encoder
 	- `aesenc` - [Encrypt](https://github.com/psycore8/shencode/wiki/aesenc) payload with AES
+	- `byteswap` - New XOR Encryption, Swapping Bytes ([Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping))
 	- `xorenc` - [Encode payload](https://github.com/psycore8/shencode/wiki/xorenc) with custom XOR key
 	- `xorpoly` - [polymorphic x64](https://github.com/psycore8/shencode/wiki/xorpoly) in-memory decoder (for details, visit this [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder))
 - obfuscator
@@ -26,9 +27,16 @@ A multi purpose tool for shellcode operations
 
 #### Improvements
 
-- `formatout` - fixed unterminated %-sign in `-h` output
-- `aesenc` - module to en-/decrypt shellcodes with AES
-- `sha1` - checksum module for files (internal use only)
+- `byteswap` - New XOR Encryption, Swapping Bytes
+- `core` - Output optimizations
+- `core` - Better class implementations
+- `core` - fFxed Linux import error
+- `formatout` - Missing comma at EOL of C# output
+- `formatout` - `--no-break` disable line break in output
+- `extract` - Replaced `--first-byte` with `--start-offset` argument
+- `extract` - Replaced `--last-byte` with `--end-offset` argument
+- `extract` - Short arguments are `-so / -eo` 
+- `qrcode` - Fixed non functional implementation
 
 ## How to use
 

@@ -6,7 +6,8 @@ class format:
   ShowLines = False
   Author = 'psycore8'
   Description = 'create formatted output by filename'
-  Version = '1.0.0'
+  Version = '1.1.0'
+  no_line_break = False
 
   def init():
     spName = 'formatout'
@@ -14,6 +15,7 @@ class format:
       ['-i', '--input', '', '', 'Input file for formatted output'],
       ['-s', '--syntax', 'c,casm,cs,ps1,py,hex,base64,inspect', '', 'formatting the shellcode in C, Casm, C#, Powershell, python or hex'],
       ['-l', '--lines', '', 'store_true', 'adds a line numbering after each 8 bytes'],
+      ['-n', '--no-break', '', 'store_true', 'no line break during output'],
       ['-w', '--write', '', '', 'write output to the given filename (replacing $%%BUFFER%%$ placeholder in the file']
     ]
     utils.arg.CreateSubParser(spName, format.Description, spArgList)
@@ -84,7 +86,10 @@ class format:
       shellcode += '\\x' + b.to_bytes(1, 'big').hex()
       if ctr == maxlen:
         Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag)
-        shellcode += f'\" \n{Line_Format}\"'
+        if format.no_line_break:
+          shellcode += f'\" {Line_Format}\"'
+        else:
+          shellcode += f'\" \n{Line_Format}\"'
         LineFactor += 1
         ctr = 0
       ctr += 1
@@ -135,7 +140,10 @@ class format:
         shellcode += ','
       if ctr == maxlen:
         Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag)
-        shellcode += f'\n{Line_Format}'
+        if format.no_line_break:
+          shellcode += f',{Line_Format}'
+        else:
+          shellcode += f',\n{Line_Format}'
         LineFactor += 1
         ctr = 0
       ctr += 1
