@@ -3,6 +3,8 @@
 dev/
 wiki/
 shencode_Repository.md
+shencode Repository.md
 __pycache__
 .venv/
 _dev*
+_dev.bat

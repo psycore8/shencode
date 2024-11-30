@@ -5,9 +5,14 @@ import qrcode.constants
 class qrcode_obfuscator:
     Author = 'psycore8'
     Description = 'obfuscate shellcodes as QR-Codes'
-    Version = '1.0.0'
-    Shellcode = ''
-    OutputFilename = ''
+    Version = '1.1.0'
+    # Shellcode = ''
+    # OutputFilename = ''
+
+    def __init__(self, input_file, output_file, shellcode):
+         self.input_file = input_file
+         self.output_file = output_file
+         self.shellcode = shellcode
 
     def init():
         spName = 'qrcode'
@@ -17,21 +22,21 @@ class qrcode_obfuscator:
         ]
         utils.arg.CreateSubParser(spName, qrcode_obfuscator.Description, spArgList)
 
-    def open_file(filename):
+    def open_file(self):
         try:
-            for b in open(filename, 'rb').read():
-                qrcode_obfuscator.Shellcode += b.to_bytes(1, 'big').hex()
+            for b in open(self.input_file, 'rb').read():
+                self.shellcode += b.to_bytes(1, 'big').hex()
             return True
         except FileNotFoundError:
             return False
             
-    def SetOutputFile(outfile):
-            qrcode_obfuscator.OutputFilename = outfile
+    #def SetOutputFile(outfile):
+    #        qrcode_obfuscator.OutputFilename = outfile
             
-    def process():
+    def process(self):
         qr = qrcode.QRCode(version=3, box_size=20, border=10, error_correction=qrcode.constants.ERROR_CORRECT_H)
-        payload_bytes = qrcode_obfuscator.Shellcode.encode('utf-8')
+        payload_bytes = self.shellcode.encode('utf-8')
         qr.add_data(payload_bytes)
         qr.make(fit=True)
         img = qr.make_image(fill_color='white', back_color='black')
-        img.save(qrcode_obfuscator.OutputFilename)
+        img.save(self.output_file)

