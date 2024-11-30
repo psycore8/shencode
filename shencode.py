@@ -22,8 +22,10 @@ Version = '0.6.0'
 # make sure your metasploit binary folder is in your PATH variable
 if os.name == 'nt':
   msfvenom_path = "msfvenom.bat"
+  tpl_path = 'tpl\\'
 elif os.name == 'posix':
   msfvenom_path = 'msfvenom'
+  tpl_path = 'tpl/'
   
 def main(command_line=None):
   print(f"{nstate.HEADER}")
@@ -70,7 +72,7 @@ def main(command_line=None):
     cs.CreateShellcodeEx(msfvenom_path)
 
   elif arguments.command == 'xorpoly':
-    poly = xorpoly.xor(arguments.input, arguments.output, b'', b'', 'tpl\\xor-stub.tpl', arguments.key)
+    poly = xorpoly.xor(arguments.input, arguments.output, b'', b'', f'{tpl_path}xor-stub.tpl', arguments.key)
     xor_enc = xor.xor_encoder('', '', 0)
     filecheck, outstrings = FileCheck.CheckSourceFile(poly.input_file, 'XOR-POLY')
     for string in outstrings:
@@ -87,7 +89,7 @@ def main(command_line=None):
       print(f'{string}')
 
   elif arguments.command == 'byteswap':
-    swapper = byteswap.xor(arguments.input, arguments.output, 'tpl\\byteswap-short.tpl', arguments.key)
+    swapper = byteswap.xor(arguments.input, arguments.output, f'{tpl_path}byteswap-short.tpl', arguments.key)
     filecheck, outstrings = FileCheck.CheckSourceFile(swapper.input_file, 'XOR-SWAP')
     for string in outstrings:
       print(f'{string}')
