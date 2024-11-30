@@ -6,8 +6,16 @@ class format:
   ShowLines = False
   Author = 'psycore8'
   Description = 'create formatted output by filename'
-  Version = '1.1.0'
+  Version = '1.2.1'
   no_line_break = False
+
+  def __init__(self, input_file, syntax, show_lines, no_break, write_out):
+    self.input_file = input_file
+    self.syntax = syntax
+    self.show_lines = show_lines
+    self.no_break = no_break
+    self.write_out =write_out
+    
 
   def init():
     spName = 'formatout'
@@ -20,12 +28,12 @@ class format:
     ]
     utils.arg.CreateSubParser(spName, format.Description, spArgList)
 
-  def DuplicateFile(filename):
+  def DuplicateFile(self, filename):
     dst = 'buf'+filename
     shutil.copyfile(filename, dst)
     return dst
   
-  def WriteToTemplate(filename, shellcode):
+  def WriteToTemplate(self, filename, shellcode):
     TemplateFile = format.DuplicateFile(filename)
     TplPlaceholder = '!++BUFFER++!'
     TextReplace = shellcode
@@ -33,29 +41,27 @@ class format:
       for line in file:
         print(line.replace(TplPlaceholder, TextReplace), end='')
 
-  def process(filename,output,lines):
+  def process(self):
     sc_output = ""
-    if lines:
-      format.ShowLines = True
-    if output == "c":
-      sc_output = format.process_c(filename)
-    if output == "casm":
-      sc_output = format.process_casm(filename)
-    if output == "cs":
-      sc_output = format.process_cs(filename)
-    if output == "ps1":
-      sc_output = format.process_ps1(filename)
-    if output == "py":
-      sc_output = format.process_py(filename)
-    if output == "hex":
-      sc_output = format.process_hex(filename)
-    if output == "base64":
-      sc_output = format.process_base64(filename)
-    if output == "inspect":
-      sc_output = format.process_inspect(filename)
+    if self.syntax == "c":
+      sc_output = self.process_c()
+    if self.syntax == "casm":
+      sc_output = self.process_casm()
+    if self.syntax == "cs":
+      sc_output = self.process_cs()
+    if self.syntax == "ps1":
+      sc_output = self.process_ps1()
+    if self.syntax == "py":
+      sc_output = self.process_py()
+    if self.syntax == "hex":
+      sc_output = self.process_hex()
+    if self.syntax == "base64":
+      sc_output = self.process_base64()
+    if self.syntax == "inspect":
+      sc_output = self.process_inspect()
     return sc_output
       
-  def ReturnLineNumber(LineFactor, Sum_Output_Bytes, IsFlagSet = False, IsRow1 = False):
+  def ReturnLineNumber(self, LineFactor, Sum_Output_Bytes, IsFlagSet = False, IsRow1 = False):
     if not IsFlagSet:
       return ''
       exit()
@@ -70,24 +76,20 @@ class format:
       exit()
     return LineNumber
 
-  def process_c(filename):
-    retln = format.ReturnLineNumber
+  def process_c(self):
+    retln = self.ReturnLineNumber
     Sum_Output_Bytes = 16
-    if format.ShowLines:
-      LineFlag = True
-    else:
-      LineFlag = False
     ctr = 1
     maxlen = 16
     LineFactor = 1
-    Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag, True)
+    Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines, True)
     shellcode = f'{Line_Format}\"'
-    for b in open(filename, 'rb').read():
+    for b in open(self.input_file, 'rb').read():
       shellcode += '\\x' + b.to_bytes(1, 'big').hex()
       if ctr == maxlen:
-        Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag)
-        if format.no_line_break:
-          shellcode += f'\" {Line_Format}\"'
+        Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines)
+        if self.no_break:
+          shellcode += f'{Line_Format}'
         else:
           shellcode += f'\" \n{Line_Format}\"'
         LineFactor += 1
@@ -96,25 +98,24 @@ class format:
     shellcode += '\";'
     return shellcode
  
-  def process_casm(filename):
-    retln = format.ReturnLineNumber
+  def process_casm(self):
+    retln = self.ReturnLineNumber
     Sum_Output_Bytes = 16
-    if format.ShowLines:
-      LineFlag = True
-    else:
-      LineFlag = False
     ctr = 1
     maxlen = 16
     LineFactor = 1
-    Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag, True)
+    Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines, True)
     shellcode = f'{Line_Format}\".byte '
-    for b in open(filename, 'rb').read():
+    for b in open(self.input_file, 'rb').read():
       shellcode += '0x' + b.to_bytes(1, 'big').hex()
       if ctr != maxlen:
         shellcode += ','
       if ctr == maxlen:
-        Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag)
-        shellcode += f'\\n\\t\"\n{Line_Format}\".byte '
+        Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines)
+        if self.no_break:
+          shellcode += f',{Line_Format}'
+        else:
+          shellcode += f'\\n\\t\"\n{Line_Format}\".byte '
         LineFactor += 1
         ctr = 0
       ctr += 1
@@ -122,25 +123,21 @@ class format:
     shellcode += '\n\"ret\\n\\t\"'
     return shellcode
  
-  def process_cs(filename):
-    retln = format.ReturnLineNumber
+  def process_cs(self):
+    retln = self.ReturnLineNumber
     Sum_Output_Bytes = 16
-    if format.ShowLines:
-      LineFlag = True
-    else:
-      LineFlag = False
     ctr = 1
     maxlen = 16
     LineFactor = 1
-    Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag, True)
+    Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines, True)
     shellcode = f'{Line_Format}'
-    for b in open(filename, 'rb').read():
+    for b in open(self.input_file, 'rb').read():
       shellcode += '0x' + b.to_bytes(1, 'big').hex()
       if ctr != maxlen:
         shellcode += ','
       if ctr == maxlen:
-        Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag)
-        if format.no_line_break:
+        Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines)
+        if self.no_break:
           shellcode += f',{Line_Format}'
         else:
           shellcode += f',\n{Line_Format}'
@@ -150,82 +147,77 @@ class format:
     shellcode = shellcode[:-1]
     return shellcode
 
-  def process_ps1(filename):
-    retln = format.ReturnLineNumber
+  def process_ps1(self):
+    retln = self.ReturnLineNumber
     Sum_Output_Bytes = 16
-    #if output.ShowLines:
-      #LineFlag = True
-    #else:
-    LineFlag = False
     ctr = 1
     maxlen = 16
     LineFactor = 1
-    Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag, True)
+    Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines, True)
     shellcode = f'{Line_Format}[Byte[]] $buf = '
-    for b in open(filename, "rb").read():
+    for b in open(self.input_file, "rb").read():
       shellcode += '0x' + b.to_bytes(1, 'big').hex()
       if ctr != maxlen:
         shellcode += ','
       if ctr == maxlen:
-        Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag)
-        shellcode += f'\n{Line_Format}'
+        Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines)
+        if self.no_break:
+          shellcode += f',{Line_Format}'
+        else:
+          shellcode += f',\n{Line_Format}'
         LineFactor += 1
         ctr = 0
       ctr += 1
     shellcode = shellcode[:-1]
     return shellcode
 
-  def process_py(filename):
-    retln = format.ReturnLineNumber
+  def process_py(self):
+    retln = self.ReturnLineNumber
     Sum_Output_Bytes = 16
-    #if output.ShowLines:
-      #LineFlag = True
-    #else:
-    LineFlag = False
     ctr = 1
     maxlen = 12
     LineFactor = 1
-    Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag, True)
+    Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines, True)
     shellcode = f'{Line_Format}buf =  b\'\'\nbuf += b\'\\'
-    for b in open(filename, 'rb').read():
+    for b in open(self.input_file, 'rb').read():
      shellcode += 'x' + b.to_bytes(1, 'big').hex()
      if ctr != maxlen:
        shellcode += '\\'
      if ctr == maxlen:
-       Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag)
-       shellcode += f'\'\n{Line_Format}buf += b\'\\'
+       Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines)
+       if self.no_break:
+          shellcode += f'\\{Line_Format}'
+       else:
+          shellcode += f'\'\n{Line_Format}buf += b\'\\'
        LineFactor += 1
        ctr = 0
      ctr += 1
     shellcode = shellcode[:-1] + '\''
     return shellcode
  
-  def process_hex(filename):
+  def process_hex(self):
     shellcode = ''
-    for b in open(filename, 'rb').read():
+    for b in open(self.input_file, 'rb').read():
       shellcode += b.to_bytes(1, 'big').hex()
     return shellcode
   
-  def process_base64(filename):
+  def process_base64(self):
     shellcode = ''
-    for b in open(filename, 'rb').read():
+    for b in open(self.input_file, 'rb').read():
       shellcode += b.to_bytes(1, 'big').hex()
     b64_data = base64.b64encode(shellcode.encode('utf-8'))
     return b64_data.decode('utf-8')
   
-  def process_inspect(filename):
-    retln = format.ReturnLineNumber
+  def process_inspect(self):
+    retln = self.ReturnLineNumber
     Sum_Output_Bytes = 8
-    #if output.ShowLines:
     LineFlag = True
-    #else:
-      #LineFlag = False
     ctr = 1
     maxlen = 8
     LineFactor = 1
     Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag, True)
     shellcode = f'{Line_Format}'
-    for b in open(filename, 'rb').read():
+    for b in open(self.input_file, 'rb').read():
       shellcode += b.to_bytes(1, 'big').hex()
       if ctr != maxlen:
         shellcode += ' '

@@ -11,11 +11,19 @@ import os
 class aes_encoder:
     Author = 'psycore8'
     Description = 'AES encoder for payloads'
-    Version = '1.0.0'
-    Input_File = ''
-    Output_File = ''
-    Password = b''
-    DataBytes = b''
+    Version = '1.1.0'
+    # Input_File = ''
+    # Output_File = ''
+    # Password = b''
+    # DataBytes = b''
+
+    def __init__(self, mode, input_file, output_file, key, data_bytes:bytes):
+        self.mode = mode
+        self.input_file = input_file
+        self.output_file = output_file
+        self.key = key
+        self.data_bytes = data_bytes
+        
 
     def init():
         spName = 'aesenc'
@@ -24,11 +32,11 @@ class aes_encoder:
           ['-i', '--input', '', '', 'Input file for AES encoding'],
           ['-o', '--output', '', '', 'Outputfile for AES encoding'],
           ['-k', '--key', '', '', 'Key for AES encoding'],
-          ['-debug', '--debug', '', 'store_true', 'debug']
+          #['-debug', '--debug', '', 'store_true', 'debug']
         ]
         utils.arg.CreateSubParser(spName, aes_encoder.Description, spArgList)
 
-    def generate_key(password: bytes, salt: bytes) -> bytes:
+    def generate_key(self, password: bytes, salt: bytes) -> bytes:
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,  # 256-bit Schlüssel
@@ -38,11 +46,11 @@ class aes_encoder:
         )
         return kdf.derive(password)
     
-    def aes_encrypt(data: bytes, password: bytes) -> (bytes, bytes, bytes):
+    def aes_encrypt(self, data: bytes, password: bytes) -> (bytes, bytes, bytes):
         # Salt und Initialisierungsvektor (IV) generieren
         salt = os.urandom(16)
         iv = os.urandom(16)
-        key = aes_encoder.generate_key(password, salt)
+        key = self.generate_key(password, salt)
 
         # Paddings für Blockgröße (AES Blockgröße = 128 Bit)
         padder = padding.PKCS7(algorithms.AES.block_size).padder()
@@ -55,8 +63,8 @@ class aes_encoder:
 
         return encrypted_data, salt, iv
     
-    def aes_decrypt(encrypted_data: bytes, password: bytes, salt: bytes, iv: bytes) -> bytes:
-        key = aes_encoder.generate_key(password, salt)
+    def aes_decrypt(self, encrypted_data: bytes, password: bytes, salt: bytes, iv: bytes) -> bytes:
+        key = self.generate_key(password, salt)
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
         decryptor = cipher.decryptor()
         padded_data = decryptor.update(encrypted_data) + decryptor.finalize()
@@ -67,76 +75,76 @@ class aes_encoder:
 
         return data
     
-    def encode():
-        outputfile = aes_encoder.Output_File
-        inputfile = aes_encoder.Input_File
-        password = aes_encoder.Password
+    def encode(self):
+        # outputfile = self.output_file
+        # inputfile = self.input_file
+        # password = self.key
         try:
-            with open(inputfile, 'rb') as file:
-                aes_encoder.DataBytes = file.read()
+            with open(self.input_file, 'rb') as file:
+                self.data_bytes = file.read()
         except FileNotFoundError:
-            print(f'{nstate.FAIL} File {aes_encoder.Input_File} not found or cannot be opened.')
+            print(f'{nstate.FAIL} File {self.input_file} not found or cannot be opened.')
             exit()
-        size = len(aes_encoder.DataBytes)
-        print(f'{nstate.OKBLUE} File {aes_encoder.Input_File} loaded, size of shellcode {size} bytes')
-        enc_data, salt, iv = aes_encoder.aes_encrypt(aes_encoder.DataBytes, password)
+        size = len(self.data_bytes)
+        print(f'{nstate.OKBLUE} File {self.input_file} loaded, size of shellcode {size} bytes')
+        enc_data, salt, iv = self.aes_encrypt(self.data_bytes, self.key)
         #print(f'{AESData}')
-        with open(outputfile, "wb") as f:
+        with open(self.output_file, "wb") as f:
             pickle.dump((enc_data, salt, iv), f)
         # with open(outputfile, 'wb') as file:
         #     file.write(AESData)
-        path = outputfile
-        cf = os.path.isfile(path)
+        #path = outputfile
+        cf = os.path.isfile(self.output_file)
         if cf == True:
-            print(f"{nstate.OKGREEN} [AES-ENC] file created in {outputfile}")
+            print(f"{nstate.OKGREEN} [AES-ENC] file created in {self.output_file}")
         else:
             print(f"{nstate.FAIL} [AES-ENC] encrption error, aborting script execution")
             exit()
 
-    def decode():
-        outputfile = aes_encoder.Output_File
-        inputfile = aes_encoder.Input_File
-        password = aes_encoder.Password
+    def decode(self):
+        # outputfile = aes_encoder.Output_File
+        # inputfile = aes_encoder.Input_File
+        # password = aes_encoder.Password
         enc_data = b''
         salt = 0
         iv = 0
         try:
-            with open(inputfile, "rb") as f:
+            with open(self.input_file, "rb") as f:
                 #AESData[0], AESData[1], AESData[2] = pickle.load(f)
                 enc_data, salt, iv = pickle.load(f)
         except FileNotFoundError:
-            print(f'{nstate.FAIL} File {inputfile} not found or cannot be opened.')
+            print(f'{nstate.FAIL} File {self.input_file} not found or cannot be opened.')
             exit()
         size = len(enc_data)
-        print(f'{nstate.OKBLUE} File {inputfile} loaded, filesize {size} bytes')
-        Shellcode = aes_encoder.aes_decrypt(enc_data, password, salt, iv)
+        print(f'{nstate.OKBLUE} File {self.input_file} loaded, filesize {size} bytes')
+        Shellcode = self.aes_decrypt(enc_data, self.key, salt, iv)
         #AESData = aes_encoder.aes_encrypt(aes_encoder.DataBytes, password)
         #print(f'{AESData}')
         #with open(outputfile, "wb") as f:
         #    pickle.dump((AESData[0], AESData[1], AESData[2]), f)
-        with open(outputfile, 'wb') as file:
+        with open(self.output_file, 'wb') as file:
              file.write(Shellcode)
-        path = outputfile
-        cf = os.path.isfile(path)
+        #path = outputfile
+        cf = os.path.isfile(self.output_file)
         if cf == True:
-            print(f"{nstate.OKGREEN} [AES-DEC] file created in {outputfile}")
+            print(f"{nstate.OKGREEN} [AES-DEC] file created in {self.output_file}")
         else:
             print(f"{nstate.FAIL} [AES-DEC] encrption error, aborting script execution")
             exit()
 
-    def debug():
-        aes_encoder.Input_File = 'dev\\aes-debug-plain.txt'
-        aes_encoder.Output_File = 'dev\\aes-debug-crypt.txt'
-        file_processing = 'dev\\aes-debug-final.txt'
-        aes_encoder.Password = b'debugger'
-        data = b'SecretText'
+    # def debug():
+    #     aes_encoder.Input_File = 'dev\\aes-debug-plain.txt'
+    #     aes_encoder.Output_File = 'dev\\aes-debug-crypt.txt'
+    #     file_processing = 'dev\\aes-debug-final.txt'
+    #     aes_encoder.Password = b'debugger'
+    #     data = b'SecretText'
 
-        crypted_data, salt, iv = aes_encoder.aes_encrypt(data, aes_encoder.Password)
+    #     crypted_data, salt, iv = aes_encoder.aes_encrypt(data, aes_encoder.Password)
 
-        print(f'AES Data: {crypted_data}')
-        print(f'AES Salt: {salt}')
-        print(f'AES IV: {iv}')
+    #     print(f'AES Data: {crypted_data}')
+    #     print(f'AES Salt: {salt}')
+    #     print(f'AES IV: {iv}')
 
-        decrypted_data = aes_encoder.aes_decrypt(crypted_data, aes_encoder.Password, salt, iv)
+    #     decrypted_data = aes_encoder.aes_decrypt(crypted_data, aes_encoder.Password, salt, iv)
 
-        print(f'AES Plaim: {decrypted_data}')
+    #     print(f'AES Plaim: {decrypted_data}')

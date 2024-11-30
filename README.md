@@ -1,6 +1,6 @@
 # ShenCode
 
-A multi purpose tool for shellcode operations
+A multi purpose tool for shellcode operations.
 
 
 ![](shencode-051.png)
@@ -30,13 +30,14 @@ A multi purpose tool for shellcode operations
 - `byteswap` - New XOR Encryption, Swapping Bytes
 - `core` - Output optimizations
 - `core` - Better class implementations
-- `core` - fFxed Linux import error
+- `core` - Fixed Linux import error
 - `formatout` - Missing comma at EOL of C# output
 - `formatout` - `--no-break` disable line break in output
 - `extract` - Replaced `--first-byte` with `--start-offset` argument
 - `extract` - Replaced `--last-byte` with `--end-offset` argument
 - `extract` - Short arguments are `-so / -eo` 
 - `qrcode` - Fixed non functional implementation
+- `xorpoly` - Code optimizations
 
 ## How to use
 
@@ -44,6 +45,8 @@ Check out the [ShenCode Wiki](https://github.com/psycore8/shencode/wiki/) for mo
 
 ## References
 
+- [Byte-Swapping](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping)
+- [In-Memory Decoder](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder)
 - [Function Name Hashing](https://www.bordergate.co.uk/function-name-hashing/)
 - [Win32API with python3 injection](https://systemweakness.com/win32api-with-python3-part-iii-injection-6dd3c1b99c90)
 - [Violent python: XOR Encryption](https://samsclass.info/124/proj14/VPxor.htm)

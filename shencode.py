@@ -17,7 +17,7 @@ import obfuscator.qrcode as qrcode
 import obfuscator.rolhash as rolhash
 import obfuscator.uuid as uuid
 
-Version = '0.5.2'
+Version = '0.6.0'
 
 # make sure your metasploit binary folder is in your PATH variable
 if os.name == 'nt':
@@ -34,7 +34,8 @@ def main(command_line=None):
   print(f" |:  1   |                         |:  1   |                        ")
   print(f" |::.. . |                         |::.. . |                        ")
   print(f" `-------\'                         `-------\'                      ")
-  print(f"Version {Version} by psycore8 -{nstate.ENDC} {nstate.LINK}https://www.nosociety.de{nstate.ENDC}") 
+  print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
+  #print(f"Version {Version} by psycore8 -{nstate.ENDC} {nstate.LINK}https://www.nosociety.de{nstate.ENDC}") 
 
   ##########################
   ### BEGIN INIT SECTION ###
@@ -65,51 +66,28 @@ def main(command_line=None):
 
   if arguments.command == 'msfvenom':
     print(f"{nstate.OKBLUE} create payload")
-    cs = msf.msfvenom
-    cs.CreateShellcodeEx(msfvenom_path, arguments.cmd)
+    cs = msf.msfvenom(arguments.cmd)
+    cs.CreateShellcodeEx(msfvenom_path)
 
-  ### Check Code ###
   elif arguments.command == 'xorpoly':
-    poly = xorpoly.xor(arguments.input, arguments.output, b'', 'tpl\\xor-stub.tpl', arguments.key)
-    #xorpoly.xor.Input_File = arguments.input
-    #xorpoly.xor.SetInputFile(arguments.input)
-    #xorpoly.xor.XOR_Key = arguments.key
-    #xorpoly.xor.Output_File = arguments.output
-    #xorpoly.xor.Template_File = 'tpl\\xor-stub.tpl'
-    #filecheck, outstrings = FileCheck.CheckSourceFile(xorpoly.xor.Input_File, 'XOR-POLY')
+    poly = xorpoly.xor(arguments.input, arguments.output, b'', b'', 'tpl\\xor-stub.tpl', arguments.key)
+    xor_enc = xor.xor_encoder('', '', 0)
     filecheck, outstrings = FileCheck.CheckSourceFile(poly.input_file, 'XOR-POLY')
     for string in outstrings:
       print(f'{string}')
     if filecheck:
-      with open(arguments.input, "rb") as file:
+      with open(poly.input_file, "rb") as file:
         shellcode = file.read()
     else:
       exit()
-    modified_shellcode = xor.xor_encoder.xor_crypt_bytes(shellcode, int(arguments.key))
-    outputfile = 'xor.tmp'
-    with open(outputfile, 'wb') as file:
-      file.write(modified_shellcode)
-    filecheck, outstrings = FileCheck.CheckWrittenFile(outputfile, 'XOR-POLY')
+    poly.xored_shellcode = xor_enc.xor_crypt_bytes(shellcode, int(poly.xor_key))
+    poly.process()
+    filecheck, outstrings = FileCheck.CheckWrittenFile(poly.output_file, 'XOR-POLY')
     for string in outstrings:
       print(f'{string}')
-    if filecheck:
-      poly.input_file = outputfile
-      #xorpoly.xor.Input_File = outputfile
-      # poly.LoadHeader()
-      # poly.AppendShellcode()
-      # poly.shellcode = poly.replace_bytes_at_offset(poly.Shellcode, 5, poly.XOR_Key)
-      # poly.WriteToFile()
-      poly.process()
-      #xorpoly.xor.process()
-    else:
-      exit()
 
   elif arguments.command == 'byteswap':
     swapper = byteswap.xor(arguments.input, arguments.output, 'tpl\\byteswap-short.tpl', arguments.key)
-    # byteswap.xor.Input_File = arguments.input
-    # byteswap.xor.XOR_Key = arguments.key
-    # byteswap.xor.Output_File = arguments.output
-    # byteswap.xor.Template_File = 'tpl\\byteswap-short.tpl'
     filecheck, outstrings = FileCheck.CheckSourceFile(swapper.input_file, 'XOR-SWAP')
     for string in outstrings:
       print(f'{string}')
@@ -119,44 +97,38 @@ def main(command_line=None):
     else:
       exit()
     swapper.process()
-    #outputfile = swapper.output_file
     filecheck, outstrings = FileCheck.CheckWrittenFile(swapper.output_file, 'XOR-SWAP')
     for string in outstrings:
       print(f'{string}')
 
   elif arguments.command == 'aesenc':
-    if arguments.debug:
-      aes.aes_encoder.debug()
-    else:
-      print(f'{nstate.OKBLUE} [AES] Module')
-      aes.aes_encoder.Input_File = arguments.input
-      aes.aes_encoder.Output_File = arguments.output
-      PasswordBytes = arguments.key
-      aes.aes_encoder.Password = PasswordBytes.encode('utf-8')
-      if arguments.mode == 'encode':
-        print(f'{nstate.OKBLUE} [AES] ENCRYPT')
-        filecheck, outstrings = FileCheck.CheckSourceFile(aes.aes_encoder.Input_File, 'AES-ENC')
+    aes_enc = aes.aes_encoder(arguments.mode, arguments.input, arguments.output, arguments.key, b'')
+    print(f'{nstate.OKBLUE} [AES] Module')
+    aes_enc.key = aes_enc.key.encode('utf-8')
+    if aes_enc.mode == 'encode':
+      print(f'{nstate.OKBLUE} [AES] ENCRYPT')
+      filecheck, outstrings = FileCheck.CheckSourceFile(aes_enc.input_file, 'AES-ENC')
+      for string in outstrings:
+        print(f'{string}')
+      if filecheck:
+        aes_enc.encode()
+        filecheck, outstrings = FileCheck.CheckWrittenFile(aes_enc.output_file, 'AES-ENC')
         for string in outstrings:
           print(f'{string}')
-        if filecheck:
-          aes.aes_encoder.encode()
-          filecheck, outstrings = FileCheck.CheckWrittenFile(aes.aes_encoder.Output_File, 'AES-ENC')
-          for string in outstrings:
-            print(f'{string}')
-        else:
-          exit()
-      elif arguments.mode == 'decode':
-        print(f'{nstate.OKBLUE} [AES] DECRYPT')
-        filecheck, outstrings = FileCheck.CheckSourceFile(aes.aes_encoder.Input_File, 'AES-DEC')
+      else:
+        exit()
+    elif aes_enc.mode == 'decode':
+      print(f'{nstate.OKBLUE} [AES] DECRYPT')
+      filecheck, outstrings = FileCheck.CheckSourceFile(aes_enc.input_file, 'AES-DEC')
+      for string in outstrings:
+        print(f'{string}')
+      if filecheck:
+        aes_enc.decode()
+        filecheck, outstrings = FileCheck.CheckWrittenFile(aes_enc.output_file, 'AES-DEC')
         for string in outstrings:
           print(f'{string}')
-        if filecheck:
-          aes.aes_encoder.decode()
-          filecheck, outstrings = FileCheck.CheckWrittenFile(aes.aes_encoder.Output_File, 'AES-DEC')
-          for string in outstrings:
-            print(f'{string}')
-        else:
-          exit()
+      else:
+        exit()
 
   elif arguments.command == 'uuid':
       short_fn = os.path.basename(arguments.input)
@@ -184,26 +156,32 @@ def main(command_line=None):
       print(f'{string}')
 
   elif arguments.command == 'formatout':
-      filename = arguments.input
-      OutputFormat = arguments.syntax
-      lines = arguments.lines
-      formatout.format.no_line_break = arguments.no_break
-      print(filename)
-      print(f"{nstate.OKBLUE} processing shellcode format... NoLineBreak: {formatout.format.no_line_break}")
-      fo = formatout.format
-      scFormat = fo.process(filename,OutputFormat,lines)
+      fout = formatout.format(arguments.input, arguments.syntax, arguments.lines, arguments.no_break, arguments.write)
+      print(fout.input_file)
+      print(f"{nstate.OKBLUE} processing shellcode format... NoLineBreak: {fout.no_break}")
+      scFormat = fout.process()
       print(scFormat)
       if arguments.write:
-        fo.FileManipulation.WriteToTemplate(arguments.write, scFormat)
-        print(f"{nstate.OKGREEN} Output written in buf {arguments.write}")
+        fout.WriteToTemplate(fout.write_out, scFormat)
+        print(f"{nstate.OKGREEN} Output written in buf {fout.write_out}")
       print(f"{nstate.OKGREEN} DONE!")
 
   elif arguments.command == 'ror2rol':
-      ror_key = int(arguments.key)
-      if (ror_key < 32) or (ror_key > 255):
-        print(f"{nstate.FAIL} Key must be between 33 and 255")
+      r2l = rolhash.ror2rol_obfuscator(arguments.input, arguments.output, arguments.key)
+      filecheck, outstrings = FileCheck.CheckSourceFile(r2l.input_file, 'ROR2ROL')
+      for string in outstrings:
+        print(f'{string}')
+      if filecheck:
+        ror_key = int(r2l.key)
+        if (ror_key < 32) or (ror_key > 255):
+          print(f"{nstate.FAIL} Key must be between 33 and 255")
+          exit()
+        r2l.process()
+      else:
         exit()
-      rolhash.ror2rol_obfuscator.process(arguments.input, arguments.output, arguments.key)
+      filecheck, outstrings = FileCheck.CheckWrittenFile(r2l.output_file, 'ROR2ROL')
+      for string in outstrings:
+        print(f'{string}')
 
   elif arguments.command == 'xorenc':
       xor_encoder = xor.xor_encoder(arguments.input, arguments.output, arguments.key)
@@ -217,7 +195,6 @@ def main(command_line=None):
       else:
         exit()
       modified_shellcode = xor_encoder.xor_crypt_bytes(shellcode, int(xor_encoder.xor_key))
-      #outputfile = arguments.output
       with open(xor_encoder.output_file, 'wb') as file:
         file.write(modified_shellcode)
       filecheck, outstrings = FileCheck.CheckWrittenFile(xor_encoder.output_file, 'XOR-ENC')
@@ -227,19 +204,15 @@ def main(command_line=None):
         exit()
 
   elif arguments.command == 'inject':
+    code_injection = injection.inject(arguments.input, arguments.start, arguments.process, '')
     print(f"{nstate.OKBLUE} Reading shellcode")
-    filename = arguments.input
-    try: 
-      with open(filename, "rb") as file:
-        shellcode = file.read()
-    except FileNotFoundError:
-        print(f"{nstate.FAIL} File not found or cannot be opened.")
-        exit()
-    inject = injection.inject
-    inject.Shellcode = shellcode
-    inject.StartProcess = arguments.start
-    inject.Target_Process = arguments.process
-    inject.start_injection()
+    filecheck, outstrings = FileCheck.CheckSourceFile(code_injection.input_file, 'iNJECT')
+    for strings in outstrings:
+      print(f'{strings}')
+    if filecheck:
+      with open(code_injection.input_file, "rb") as file:
+        code_injection.shellcode = file.read()
+        code_injection.start_injection()
 
   elif arguments.command == 'extract':
     ext = extract.extract_shellcode(arguments.input, arguments.output, arguments.start_offset, arguments.end_offset)
