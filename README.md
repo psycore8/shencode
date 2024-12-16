@@ -42,7 +42,7 @@
 
 ## How to use
 
-Check out the [ShenCode Wiki](https://github.com/psycore8/shencode/wiki/) for more information.
+Check out the [ShenCode Wiki](https://heckhausen.it/shencode/wiki/) for more information.
 
 ## References
 
