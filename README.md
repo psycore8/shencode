@@ -23,6 +23,10 @@
 	- `ROR13` to `ROL` [conversion with custom key](https://github.com/psycore8/shencode/wiki/ror2rol) (Windows only)
 	- `UUID` [obfuscation](https://github.com/psycore8/shencode/wiki/uuid) - Please, check out my [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_shellcode_als_uuids_tarnen_-_teil_1) about this encoder
 
+## How to use
+
+Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more information.
+
 ## Release Notes
 
 #### Improvements
@@ -39,11 +43,7 @@
 - `extract` - Short arguments are `-so / -eo` 
 - `qrcode` - Fixed non functional implementation
 - `xorpoly` - Code optimizations
-
-## How to use
-
-Check out the [ShenCode Wiki](https://heckhausen.it/shencode/wiki/) for more information.
-
+- 
 ## References
 
 - [Byte-Swapping](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping)
