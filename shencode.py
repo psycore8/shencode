@@ -13,11 +13,12 @@ import encoder.aes as aes
 import encoder.byteswap as byteswap
 import encoder.xorpoly as xorpoly
 import encoder.xor as xor
+import obfuscator.mrwhite as mrwhite
 import obfuscator.qrcode as qrcode
 import obfuscator.rolhash as rolhash
 import obfuscator.uuid as uuid
 
-Version = '0.6.0'
+Version = '0.6.1'
 
 # make sure your metasploit binary folder is in your PATH variable
 if os.name == 'nt':
@@ -51,6 +52,7 @@ def main(command_line=None):
   if os.name == 'nt':
     injection.inject.init()
   msf.msfvenom.init()
+  mrwhite.ByteToChemicalMapping.init()
   qrcode.qrcode_obfuscator.init()
   if os.name == 'nt':
     rolhash.ror2rol_obfuscator.init()
@@ -142,6 +144,20 @@ def main(command_line=None):
         print(f"{nstate.FAIL} file not found, exit")
       print(f"{nstate.OKBLUE} try to generate UUIDs")  
       print(uuid_obf.CreateVar())
+
+  elif arguments.command == 'bytes2chem':
+      # Instanz der Klasse
+    mapper = mrwhite.ByteToChemicalMapping(arguments.input, arguments.output)
+
+    # Beispiel-Byte-Sequenz
+    byte_sequence = [0, 1, 2, 255, 28, 128, 37]  # Beispielbytes
+
+    # Bytes zu chemischen Verbindungen zuordnen
+    result = mapper.byte_to_chemical(byte_sequence)
+
+    # Ausgabe
+    for byte, compound in zip(byte_sequence, result):
+        print(f"Byte {byte}: {compound}")
 
   elif arguments.command == 'qrcode':
     qr = qrcode.qrcode_obfuscator(arguments.input, arguments.output, '')
