@@ -6,6 +6,7 @@ from utils.helper import FileCheck
 import utils.extract as extract
 import utils.formatout as formatout
 import utils.hashes as hashes
+import utils.header
 if os.name == 'nt':
   import utils.injection as injection
 import utils.msf as msf
@@ -13,7 +14,7 @@ import encoder.aes as aes
 import encoder.byteswap as byteswap
 import encoder.xorpoly as xorpoly
 import encoder.xor as xor
-import obfuscator.mrwhite as mrwhite
+import obfuscator.feed as feed
 import obfuscator.qrcode as qrcode
 import obfuscator.rolhash as rolhash
 import obfuscator.uuid as uuid
@@ -30,13 +31,15 @@ elif os.name == 'posix':
   
 def main(command_line=None):
   print(f"{nstate.HEADER}")
-  print(f"  _______   __                      _______              __         ")
-  print(f" |   _   | |  |--. .-----. .-----. |   _   | .-----. .--|  | .-----.")
-  print(f" |   1___| |     | |  -__| |     | |.  1___| |  _  | |  _  | |  -__|")
-  print(f" |____   | |__|__| |_____| |__|__| |.  |___  |_____| |_____| |_____|")
-  print(f" |:  1   |                         |:  1   |                        ")
-  print(f" |::.. . |                         |::.. . |                        ")
-  print(f" `-------\'                         `-------\'                      ")
+  print(f'{utils.header.get_header()}')
+  # print(f"{nstate.HEADER}")
+  # print(f"  _______   __                      _______              __         ")
+  # print(f" |   _   | |  |--. .-----. .-----. |   _   | .-----. .--|  | .-----.")
+  # print(f" |   1___| |     | |  -__| |     | |.  1___| |  _  | |  _  | |  -__|")
+  # print(f" |____   | |__|__| |_____| |__|__| |.  |___  |_____| |_____| |_____|")
+  # print(f" |:  1   |                         |:  1   |                        ")
+  # print(f" |::.. . |                         |::.. . |                        ")
+  # print(f" `-------\'                         `-------\'                      ")
   print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
   #print(f"Version {Version} by psycore8 -{nstate.ENDC} {nstate.LINK}https://www.nosociety.de{nstate.ENDC}") 
 
@@ -52,7 +55,7 @@ def main(command_line=None):
   if os.name == 'nt':
     injection.inject.init()
   msf.msfvenom.init()
-  mrwhite.ByteToChemicalMapping.init()
+  feed.feed_obfuscator.init()
   qrcode.qrcode_obfuscator.init()
   if os.name == 'nt':
     rolhash.ror2rol_obfuscator.init()
@@ -145,19 +148,21 @@ def main(command_line=None):
       print(f"{nstate.OKBLUE} try to generate UUIDs")  
       print(uuid_obf.CreateVar())
 
-  elif arguments.command == 'bytes2chem':
-      # Instanz der Klasse
-    mapper = mrwhite.ByteToChemicalMapping(arguments.input, arguments.output)
-
-    # Beispiel-Byte-Sequenz
-    byte_sequence = [0, 1, 2, 255, 28, 128, 37]  # Beispielbytes
-
-    # Bytes zu chemischen Verbindungen zuordnen
-    result = mapper.byte_to_chemical(byte_sequence)
-
-    # Ausgabe
-    for byte, compound in zip(byte_sequence, result):
-        print(f"Byte {byte}: {compound}")
+  elif arguments.command == 'feed':
+    feed_obf = feed.feed_obfuscator(arguments.input, arguments.output)
+    
+    filecheck, outstrings = FileCheck.CheckSourceFile(feed_obf.input_file, 'OBF-RSS')
+    for string in outstrings:
+      print(string)
+    if filecheck:
+      feed_obf.open_file()
+      feed_obf.convert_bytes_to_fake_id()
+      feed_obf.generate_feed()
+    else:
+      exit()
+    filecheck, outstrings = FileCheck.CheckSourceFile(feed_obf.output_file, 'OBF-RSS')
+    for string in outstrings:
+      print(string)
 
   elif arguments.command == 'qrcode':
     qr = qrcode.qrcode_obfuscator(arguments.input, arguments.output, '')

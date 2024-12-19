@@ -9,5 +9,5 @@ rem doskey shen-ror=python3.12 shencode.py ror2rol $*
 rem doskey shen-uid=python3.12 shencode.py uuid $*
 rem doskey shen-xop=python3.12 shencode.py xorpoly $*
 rem doskey shen-xoe=python3.12 shencode.py xorenc $*
-doskey shc=python3.12 shencode.py $*
+doskey shc=python shencode.py $*
 doskey /MACROS
