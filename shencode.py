@@ -6,6 +6,7 @@ from utils.helper import FileCheck
 import utils.extract as extract
 import utils.formatout as formatout
 import utils.hashes as hashes
+import utils.header
 if os.name == 'nt':
   import utils.injection as injection
 import utils.msf as msf
@@ -13,11 +14,12 @@ import encoder.aes as aes
 import encoder.byteswap as byteswap
 import encoder.xorpoly as xorpoly
 import encoder.xor as xor
+import obfuscator.feed as feed
 import obfuscator.qrcode as qrcode
 import obfuscator.rolhash as rolhash
 import obfuscator.uuid as uuid
 
-Version = '0.6.0'
+Version = '0.6.1'
 
 # make sure your metasploit binary folder is in your PATH variable
 if os.name == 'nt':
@@ -29,15 +31,9 @@ elif os.name == 'posix':
   
 def main(command_line=None):
   print(f"{nstate.HEADER}")
-  print(f"  _______   __                      _______              __         ")
-  print(f" |   _   | |  |--. .-----. .-----. |   _   | .-----. .--|  | .-----.")
-  print(f" |   1___| |     | |  -__| |     | |.  1___| |  _  | |  _  | |  -__|")
-  print(f" |____   | |__|__| |_____| |__|__| |.  |___  |_____| |_____| |_____|")
-  print(f" |:  1   |                         |:  1   |                        ")
-  print(f" |::.. . |                         |::.. . |                        ")
-  print(f" `-------\'                         `-------\'                      ")
+  print(f'{utils.header.get_header()}')
   print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
-  #print(f"Version {Version} by psycore8 -{nstate.ENDC} {nstate.LINK}https://www.nosociety.de{nstate.ENDC}") 
+
 
   ##########################
   ### BEGIN INIT SECTION ###
@@ -51,6 +47,7 @@ def main(command_line=None):
   if os.name == 'nt':
     injection.inject.init()
   msf.msfvenom.init()
+  feed.feed_obfuscator.init()
   qrcode.qrcode_obfuscator.init()
   if os.name == 'nt':
     rolhash.ror2rol_obfuscator.init()
@@ -142,6 +139,28 @@ def main(command_line=None):
         print(f"{nstate.FAIL} file not found, exit")
       print(f"{nstate.OKBLUE} try to generate UUIDs")  
       print(uuid_obf.CreateVar())
+
+  elif arguments.command == 'feed':
+    feed_obf = feed.feed_obfuscator(arguments.input, arguments.output, arguments.uri)
+
+    if feed_obf.uri:
+      feed_obf.reassemble_shellcode()
+      filecheck, outstrings = FileCheck.CheckSourceFile(feed_obf.output_file, 'OBF-RSS')
+      for string in outstrings:
+        print(string)
+      exit()
+    filecheck, outstrings = FileCheck.CheckSourceFile(feed_obf.input_file, 'OBF-RSS')
+    for string in outstrings:
+      print(string)
+    if filecheck:
+      feed_obf.open_file()
+      feed_obf.convert_bytes_to_fake_id()
+      feed_obf.generate_feed()
+    else:
+      exit()
+    filecheck, outstrings = FileCheck.CheckSourceFile(feed_obf.output_file, 'OBF-RSS')
+    for string in outstrings:
+      print(string)
 
   elif arguments.command == 'qrcode':
     qr = qrcode.qrcode_obfuscator(arguments.input, arguments.output, '')
