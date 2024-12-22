@@ -6,7 +6,7 @@
 
 ## Features
 
-### Version 0.6.0
+### Version 0.6.1
 
 - general
 	- `extract` - [extract](https://github.com/psycore8/shencode/wiki/extract) from/to offset
@@ -19,6 +19,7 @@
 	- `xorenc` - [Encode payload](https://github.com/psycore8/shencode/wiki/xorenc) with custom XOR key
 	- `xorpoly` - [polymorphic x64](https://github.com/psycore8/shencode/wiki/xorpoly) in-memory decoder (for details, visit this [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder))
 - obfuscator
+	- `Feed` - 
 	- `QR-Code` hide OpCodes as [QR-Code image](https://github.com/psycore8/shencode/wiki/qrcode)
 	- `ROR13` to `ROL` [conversion with custom key](https://github.com/psycore8/shencode/wiki/ror2rol) (Windows only)
 	- `UUID` [obfuscation](https://github.com/psycore8/shencode/wiki/uuid) - Please, check out my [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_shellcode_als_uuids_tarnen_-_teil_1) about this encoder
@@ -29,21 +30,10 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
-#### Improvements
-
-- `byteswap` - New XOR Encryption, Swapping Bytes
+- `feed`
 - `core` - Tested on Linux and Windows
-- `core` - Output optimizations
-- `core` - Better class implementations
-- `core` - Fixed Linux import error
-- `formatout` - Missing comma at EOL of C# output
-- `formatout` - `--no-break` disable line break in output
-- `extract` - Replaced `--first-byte` with `--start-offset` argument
-- `extract` - Replaced `--last-byte` with `--end-offset` argument
-- `extract` - Short arguments are `-so / -eo` 
-- `qrcode` - Fixed non functional implementation
-- `xorpoly` - Code optimizations
-- 
+- `core` - header...
+
 ## References
 
 - [Byte-Swapping](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping)

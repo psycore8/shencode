@@ -149,8 +149,14 @@ def main(command_line=None):
       print(uuid_obf.CreateVar())
 
   elif arguments.command == 'feed':
-    feed_obf = feed.feed_obfuscator(arguments.input, arguments.output)
-    
+    feed_obf = feed.feed_obfuscator(arguments.input, arguments.output, arguments.uri)
+
+    if feed_obf.uri:
+      feed_obf.reassemble_shellcode()
+      filecheck, outstrings = FileCheck.CheckSourceFile(feed_obf.output_file, 'OBF-RSS')
+      for string in outstrings:
+        print(string)
+      exit()
     filecheck, outstrings = FileCheck.CheckSourceFile(feed_obf.input_file, 'OBF-RSS')
     for string in outstrings:
       print(string)
