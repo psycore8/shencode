@@ -3,9 +3,9 @@ import subprocess
 
 class msfvenom:
 
-    Author = 'psycore8'
-    Description = 'Generate payloads with metasploit'
-    Version = '1.1.0'
+  Author = 'psycore8'
+  Description = 'Generate payloads with metasploit'
+  Version = '1.1.0'
   
   def __init__(self, command_line):
     self.command_line = command_line
