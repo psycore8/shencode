@@ -2,27 +2,27 @@
 
 **A versatile tool for working with shellcodes.**
 
-![](shencode-060.png)
+![|800](shencode-061.png)
 
 ## Features
 
 ### Version 0.6.1
 
 - general
-	- `extract` - [extract](https://github.com/psycore8/shencode/wiki/extract) from/to offset
-	- `formatout` - [display raw shellcodes](https://github.com/psycore8/shencode/wiki/formatout) in `C++, C#` and more
-	- `inject` - [inject shellcode](https://github.com/psycore8/shencode/wiki/inject) into process (Windows only)
-	- `msfvenom` - [create payloads](https://github.com/psycore8/shencode/wiki/msfvenom)  with msfvenom
+	- `extract` - [extract](https://www.heckhausen.it/shencode/wiki/extract) from/to offset
+	- `formatout` - [display raw shellcodes](https://www.heckhausen.it/shencode/wiki/formatout) in `C++, C#` and more
+	- `inject` - [inject shellcode](https://www.heckhausen.it/shencode/wiki/inject) into process (Windows only)
+	- `msfvenom` - [create payloads](https://www.heckhausen.it/shencode/wiki/msfvenom)  with msfvenom
 - encoder
-	- `aesenc` - [Encrypt](https://github.com/psycore8/shencode/wiki/aesenc) payload with AES
-	- `byteswap` - New XOR Encryption, [Swapping Bytes](https://github.com/psycore8/shencode/wiki/byteswap) ([Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping))
-	- `xorenc` - [Encode payload](https://github.com/psycore8/shencode/wiki/xorenc) with custom XOR key
-	- `xorpoly` - [polymorphic x64](https://github.com/psycore8/shencode/wiki/xorpoly) in-memory decoder (for details, visit this [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder))
+	- `aesenc` - [Encrypt](https://www.heckhausen.it/shencode/wiki/aesenc) payload with AES
+	- `byteswap` - New XOR Encryption, [Swapping Bytes](https://www.heckhausen.it/shencode/wiki/byteswap) ([Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping))
+	- `xorenc` - [Encode payload](https://www.heckhausen.it/shencode/wiki/xorenc) with custom XOR key
+	- `xorpoly` - [polymorphic x64](https://www.heckhausen.it/shencode/wiki/xorpoly) in-memory decoder (for details, visit this [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder))
 - obfuscator
-	- `Feed` - 
-	- `QR-Code` hide OpCodes as [QR-Code image](https://github.com/psycore8/shencode/wiki/qrcode)
-	- `ROR13` to `ROL` [conversion with custom key](https://github.com/psycore8/shencode/wiki/ror2rol) (Windows only)
-	- `UUID` [obfuscation](https://github.com/psycore8/shencode/wiki/uuid) - Please, check out my [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_shellcode_als_uuids_tarnen_-_teil_1) about this encoder
+	- `Feed` - Splits Bytes in a [feed.xml file](https://www.heckhausen.it/shencode/wiki/feed) as article IDs
+	- `QR-Code` hide OpCodes as [QR-Code image](https://www.heckhausen.it/shencode/wiki/qrcode)
+	- `ROR13` to `ROL` [conversion with custom key](https://www.heckhausen.it/shencode/wiki/ror2rol) (Windows only)
+	- `UUID` [obfuscation](https://www.heckhausen.it/shencode/wiki/uuid) - Please, check out my [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_shellcode_als_uuids_tarnen_-_teil_1) about this encoder
 
 ## How to use
 
@@ -30,9 +30,8 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
-- `feed`
-- `core` - Tested on Linux and Windows
-- `core` - header...
+- `feed` - A new obfuscation module
+- `core` - added some different logos for startup
 
 ## References
 

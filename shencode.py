@@ -32,16 +32,8 @@ elif os.name == 'posix':
 def main(command_line=None):
   print(f"{nstate.HEADER}")
   print(f'{utils.header.get_header()}')
-  # print(f"{nstate.HEADER}")
-  # print(f"  _______   __                      _______              __         ")
-  # print(f" |   _   | |  |--. .-----. .-----. |   _   | .-----. .--|  | .-----.")
-  # print(f" |   1___| |     | |  -__| |     | |.  1___| |  _  | |  _  | |  -__|")
-  # print(f" |____   | |__|__| |_____| |__|__| |.  |___  |_____| |_____| |_____|")
-  # print(f" |:  1   |                         |:  1   |                        ")
-  # print(f" |::.. . |                         |::.. . |                        ")
-  # print(f" `-------\'                         `-------\'                      ")
   print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
-  #print(f"Version {Version} by psycore8 -{nstate.ENDC} {nstate.LINK}https://www.nosociety.de{nstate.ENDC}") 
+
 
   ##########################
   ### BEGIN INIT SECTION ###
