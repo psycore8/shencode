@@ -7,7 +7,11 @@
 ## Features
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 ### Version 0.6.0
+=======
+### Version 0.6.2
+>>>>>>> Stashed changes
 =======
 ### Version 0.6.2
 >>>>>>> Stashed changes
@@ -34,8 +38,11 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 ## Release Notes
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 #### Improvements
 =======
+=======
+>>>>>>> Stashed changes
 - `inject` - Suspend and Resume Technique
 - `inject` - VirtuakProtectEx Technique
 - `feed` - A new obfuscation module
