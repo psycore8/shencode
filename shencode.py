@@ -17,7 +17,11 @@ import obfuscator.qrcode as qrcode
 import obfuscator.rolhash as rolhash
 import obfuscator.uuid as uuid
 
+<<<<<<< Updated upstream
 Version = '0.6.0'
+=======
+Version = '0.6.2'
+>>>>>>> Stashed changes
 
 # make sure your metasploit binary folder is in your PATH variable
 if os.name == 'nt':

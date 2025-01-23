@@ -6,7 +6,11 @@
 
 ## Features
 
+<<<<<<< Updated upstream
 ### Version 0.6.0
+=======
+### Version 0.6.2
+>>>>>>> Stashed changes
 
 - general
 	- `extract` - [extract](https://github.com/psycore8/shencode/wiki/extract) from/to offset
@@ -29,7 +33,14 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
+<<<<<<< Updated upstream
 #### Improvements
+=======
+- `inject` - Suspend and Resume Technique
+- `inject` - VirtuakProtectEx Technique
+- `feed` - A new obfuscation module
+- `core` - added some different logos for startup
+>>>>>>> Stashed changes
 
 - `byteswap` - New XOR Encryption, Swapping Bytes
 - `core` - Tested on Linux and Windows
