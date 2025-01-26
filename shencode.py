@@ -20,7 +20,7 @@ import obfuscator.qrcode as qrcode
 import obfuscator.rolhash as rolhash
 import obfuscator.uuid as uuid
 
-Version = '0.6.1'
+Version = '0.6.2'
 
 # make sure your metasploit binary folder is in your PATH variable
 if os.name == 'nt':
