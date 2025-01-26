@@ -25,6 +25,13 @@ class xor:
         ]
         utils.arg.CreateSubParser(spName, xor.Description, spArgList)
 
+        # spArgList = [
+        #     ['-i', '--input', None, None, None, str, True, 'Input file to use with byteswap stub'],
+        #     ['-o', '--output', None, None, None, str, True, 'outputfile for byteswap stub'],
+        #     ['-k', '--key', None, None, None, int, True, 'the XOR key to use']
+        # ]
+        # utils.arg.CreateSubParserEx(spName, aes_encoder.Description, spArgList)
+
     def encrypt(self, data: bytes, xor_key: int) -> bytes:
         transformed = bytearray()
         prev_enc_byte = 0

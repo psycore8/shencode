@@ -35,6 +35,15 @@ class aes_encoder:
           #['-debug', '--debug', '', 'store_true', 'debug']
         ]
         utils.arg.CreateSubParser(spName, aes_encoder.Description, spArgList)
+        # shortflag, flag, choices=, action=, default=, type=, required=, help=
+        # ['-', '--', None, None, None, None, False, ''],
+        # spArgList = [
+        #     ['-m', '--mode', ['encode', 'decode'], None, None, None, True, 'AES Operation mode, choose between encode and decode'],
+        #     ['-i', '--input', None, None, None, str, True, 'Input file for AES encoding'],
+        #     ['-o', '--output', None, None, None, str, True, 'Outputfile for AES encoding'],
+        #     ['-k', '--key', None, None, None, str, True, 'Key for AES encoding']
+        # ]
+        # utils.arg.CreateSubParserEx(spName, aes_encoder.Description, spArgList)
 
     def generate_key(self, password: bytes, salt: bytes) -> bytes:
         kdf = PBKDF2HMAC(

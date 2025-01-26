@@ -47,8 +47,15 @@ header5 = """
              |_|                                        |_|    
 """
 
+header6 = """
+0.o Babe, I've shrinked the banner!
+-----------------------------------
+| [S].[H].[E].[N].[C].[O].[D].[E] |
+-----------------------------------
+"""
+
 def get_header():
-    rnd = random.randint(1, 5)
+    rnd = random.randint(1, 6)
    # print(f'{rnd}')
     if rnd == 1:
         return header1
@@ -60,3 +67,5 @@ def get_header():
         return header4
     elif rnd == 5:
         return header5
+    elif rnd == 6:
+        return header6

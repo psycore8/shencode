@@ -10,10 +10,10 @@ class example:
   def init():
     spName = 'examplemod'
     spArgList = [
-        # shortflag, flag, choices=, action=, default=, type=, required=, help=)
-          ['-i', '--input', None, None, None, str, True, 'Input file for example module'],
-          ['-t', '--truestate', None, 'store_true', False, bool, False, 'store_true switch'],
-          ['-l', '--list', ['yes', 'no'], None, None, list, True, 'A list of choices for this argument']
+        # shortflag, flag, choices=, action=, default=, type=, required=, metavar=, help=
+          ['-i', '--input', None, None, None, str, True, None, 'Input file for example module'],
+          ['-t', '--truestate', None, 'store_true', False, bool, False, None, 'store_true switch'],
+          ['-l', '--list', ['yes', 'no'], None, None, list, True, None, 'A list of choices for this argument']
         ]
     utils.arg.CreateSubParserEx(spName, example.Description, spArgList)
 

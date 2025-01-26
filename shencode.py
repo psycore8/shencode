@@ -33,7 +33,7 @@ elif os.name == 'posix':
 def main(command_line=None):
   print(f"{nstate.HEADER}")
   print(f'{utils.header.get_header()}')
-  print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
+  print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}\n')
 
 
   ##########################
@@ -232,7 +232,7 @@ def main(command_line=None):
         exit()
 
   elif arguments.command == 'inject':
-    code_injection = injection.inject(arguments.input, arguments.start, arguments.process, '')
+    code_injection = injection.inject(arguments.input, arguments.start, arguments.process, '', arguments.resume_thread, arguments.virtual_protect)
     print(f"{nstate.OKBLUE} Reading shellcode")
     filecheck, outstrings = FileCheck.CheckSourceFile(code_injection.input_file, 'iNJECT')
     for strings in outstrings:
