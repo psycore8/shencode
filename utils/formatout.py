@@ -28,6 +28,16 @@ class format:
     ]
     utils.arg.CreateSubParser(spName, format.Description, spArgList)
 
+   # ['-', '--', None, None, None, None, None, ''],
+    # spArgList = [
+    #   ['-i', '--input', None, None, None, None, True, 'Input file for formatted output'],
+    #   ['-s', '--syntax', ['c','casm','cs','ps1','py','hex','base64','inspect'], None, None, list, True, 'formatting the shellcode in C, Casm, C#, Powershell, python or hex'],
+    #   ['-l', '--lines', None, 'store_true', None, None, False, 'adds a line numbering after each 8 bytes'],
+    #   ['-n', '--no-break', None, 'store_true', None, None, False, 'no line break during output'],
+    #   ['-w', '--write', None, None, None, str, False, 'write output to the given filename (replacing $%%BUFFER%%$ placeholder in the file'],
+    # ]
+    # utils.arg.CreateSubParserEx(spName, format.Description, spArgList)
+
   def DuplicateFile(self, filename):
     dst = 'buf'+filename
     shutil.copyfile(filename, dst)

