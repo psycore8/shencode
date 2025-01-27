@@ -71,7 +71,7 @@ def main(command_line=None):
     cs.CreateShellcodeEx(msfvenom_path)
 
   elif arguments.command == 'msfstager':
-    stager = meterpreter.stager(arguments.remote_host, arguments.port, arguments.timeout, arguments.arch)
+    stager = meterpreter.stager(arguments.remote_host, arguments.port, arguments.timeout, arguments.arch, arguments.sleep)
     stager.process()
 
 
