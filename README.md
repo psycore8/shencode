@@ -6,15 +6,7 @@
 
 ## Features
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-### Version 0.6.0
-=======
 ### Version 0.6.2
->>>>>>> Stashed changes
-=======
-### Version 0.6.2
->>>>>>> Stashed changes
 
 - general
 	- `extract` - [extract](https://github.com/psycore8/shencode/wiki/extract) from/to offset
@@ -37,31 +29,14 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
 #### Improvements
-=======
-=======
->>>>>>> Stashed changes
+
 - `inject` - Suspend and Resume Technique
 - `inject` - VirtuakProtectEx Technique
 - `feed` - A new obfuscation module
 - `core` - added some different logos for startup
->>>>>>> Stashed changes
 
-- `byteswap` - New XOR Encryption, Swapping Bytes
-- `core` - Tested on Linux and Windows
-- `core` - Output optimizations
-- `core` - Better class implementations
-- `core` - Fixed Linux import error
-- `formatout` - Missing comma at EOL of C# output
-- `formatout` - `--no-break` disable line break in output
-- `extract` - Replaced `--first-byte` with `--start-offset` argument
-- `extract` - Replaced `--last-byte` with `--end-offset` argument
-- `extract` - Short arguments are `-so / -eo` 
-- `qrcode` - Fixed non functional implementation
-- `xorpoly` - Code optimizations
-- 
+ 
 ## References
 
 - [Byte-Swapping](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping)
