@@ -54,8 +54,21 @@ header6 = """
 -----------------------------------
 """
 
+header7 = """
+ 111 1  1 1111 11  1 1111 1111 11    1111
+ 1   1  1 1    1 1 1 1    1  1 1  1  1
+ 111 1111 1111 1  11 1    1  1 1   1 1111
+   1 1  1 1    1  11 1    1  1 1  1  1
+ 111 1  1 1111 1  11 1111 1111 11    1111
+ - Resistance is futile -
+"""
+
+header8 = """
+ $h3nC0d3 killed the banner !
+"""
+
 def get_header():
-    rnd = random.randint(1, 6)
+    rnd = random.randint(1, 8)
    # print(f'{rnd}')
     if rnd == 1:
         return header1
@@ -69,3 +82,7 @@ def get_header():
         return header5
     elif rnd == 6:
         return header6
+    elif rnd == 7:
+        return header7
+    elif rnd == 8:
+        return header8
