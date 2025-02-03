@@ -1,9 +1,14 @@
-import utils.arg
+#import utils.arg
+
+CATEGORY = 'obfuscate'
+
+def register_arguments(parser):
+    parser.add_argument('-i', '--input', help='Input file for UUID encoding')
 
 class uuid_obfuscator:
     Author = 'psycore8'
     Description = 'obfuscate shellcodes as UUID strings'
-    Version = '1.1.0'
+    Version = '2.0.0'
 
     def __init__(self, input_file, shellcode, obf_string, var_counter):
         self.input_file = input_file
@@ -11,12 +16,12 @@ class uuid_obfuscator:
         self.obf_string = obf_string
         self.var_counter = var_counter
 
-    def init():
-        spName = 'uuid'
-        spArgList = [
-            ['-i', '--input', '', '', 'Input file for UUID encoding']
-        ]
-        utils.arg.CreateSubParser(spName, uuid_obfuscator.Description, spArgList)
+    # def init():
+    #     spName = 'uuid'
+    #     spArgList = [
+    #         ['-i', '--input', '', '', 'Input file for UUID encoding']
+    #     ]
+    #     utils.arg.CreateSubParser(spName, uuid_obfuscater.Description, spArgList)
 
     def string_to_uuid(self, string_value):
         formatted_string = f"{string_value[:8]}-{string_value[8:12]}-{string_value[12:16]}-{string_value[16:20]}-{string_value[20:]}"

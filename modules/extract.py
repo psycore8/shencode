@@ -1,11 +1,20 @@
-import utils.arg
+#import utils.arg
 from utils.helper import nstate as nstate
 from os import path as os_path
+
+CATEGORY = 'core'
+
+def register_arguments(parser):
+    parser.add_argument('-i', '--input', help='Input file for example module')
+    parser.add_argument('-o', '--output', help='Output file with extracted bytes')
+    parser.add_argument('-so', '--start-offset', help='begin extraction from this offset')
+    parser.add_argument('-eo', '--end-offset', help='extract until here')
+
 
 class extract_shellcode:
     Author =      'psycore8'
     Description = 'extract shellcode from/to offset'
-    Version =     '1.1.0'
+    Version =     '2.0.0'
 
     def __init__(self, input_file, output_file, start_offset, end_offset):
         self.input_file = input_file
@@ -13,15 +22,15 @@ class extract_shellcode:
         self.start_offset = start_offset
         self.end_offset = end_offset
 
-    def init():
-        spName = 'extract'
-        spArgList = [
-            ['-i', '--input', '', '', 'Input file for example module'],
-            ['-o', '--output', '', '', 'Output file with extracted bytes'],
-            ['-so', '--start-offset', '', '', 'begin extraction from this offset'],
-            ['-eo', '--end-offset', '', '', 'extract until here']
-            ]
-        utils.arg.CreateSubParser(spName, extract_shellcode.Description, spArgList)
+    # def init():
+    #     spName = 'extract'
+    #     spArgList = [
+    #         ['-i', '--input', '', '', 'Input file for example module'],
+    #         ['-o', '--output', '', '', 'Output file with extracted bytes'],
+    #         ['-so', '--start-offset', '', '', 'begin extraction from this offset'],
+    #         ['-eo', '--end-offset', '', '', 'extract until here']
+    #         ]
+    #     utils.arg.CreateSubParser(spName, extract_shellcode.Description, spArgList)
 
     def process(self):
         print(f"{nstate.OKBLUE} try to open file")

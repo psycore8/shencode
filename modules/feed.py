@@ -1,12 +1,20 @@
-import utils.arg
+#import utils.arg
 import datetime
 import feedparser
 from lxml import etree
 
+CATEGORY = 'obfuscate'
+
+def register_arguments(parser):
+    parser.add_argument('-i', '--input', help='Input file for UUID encoding')
+    parser.add_argument('-o', '--output', help='Outputfile for ROR13 to ROL conversion')
+    parser.add_argument('-r', '--reassemble', action='store_true', help='Reassemble fake feed to Shellcode')
+    parser.add_argument('-u', '--uri', help='URI to fake feed')
+
 class feed_obfuscator:
     Author = 'psycore8'
     Description = 'obfuscate shellcodes as XML Feed'
-    Version = '1.0.0'
+    Version = '2.0.0'
     feed_fake_uri = 'https://www.microloft.com/'
     feed_fake_title = 'Developer News'
     feed_fake_subtitle = 'The latest developer news from microloft.com'
@@ -20,15 +28,15 @@ class feed_obfuscator:
         self.uri = uri
 
 
-    def init():
-        spName = 'feed'
-        spArgList = [
-            ['-i', '--input', '', '', 'Input file for feed obfucsation'],
-            ['-o', '--output', '', '', 'Output file for feed obfucsation'],
-            ['-r', '--reassemble', '', 'store_true', 'Reassemble fake feed to Shellcode'],
-            ['-u', '--uri', '', '', 'URI to fake feed']
-        ]
-        utils.arg.CreateSubParser(spName, feed_obfuscator.Description, spArgList)
+    # def init():
+    #     spName = 'feed'
+    #     spArgList = [
+    #         ['-i', '--input', '', '', 'Input file for feed obfucsation'],
+    #         ['-o', '--output', '', '', 'Output file for feed obfucsation'],
+    #         ['-r', '--reassemble', '', 'store_true', 'Reassemble fake feed to Shellcode'],
+    #         ['-u', '--uri', '', '', 'URI to fake feed']
+    #     ]
+    #     utils.arg.CreateSubParser(spName, feed_obfuscater.Description, spArgList)
 
     def open_file(self):
         try:

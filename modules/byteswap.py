@@ -1,11 +1,19 @@
-import utils.arg
+#import utils.arg
 from utils.helper import nstate as nstate
 from os import path as osp
+
+CATEGORY = 'encoder'
+
+def register_arguments(parser):
+    #parser.add_argument_group('Encoder')
+    parser.add_argument('-i', '--input', help='Input file to use with byteswap stub')
+    parser.add_argument('-o', '--output', help= 'outputfile for byteswap stub')
+    parser.add_argument('-k', '--key', help='the XOR key to use')
 
 class xor:
     Author = 'psycore8'
     Description = 'create payload from a raw file, encode with byteswap-xor, add to byteswap stub'
-    Version = '1.0.0'
+    Version = '2.0.0'
     Shellcode = ''
     Shellcode_Length = ''
     Modified_Shellcode = b''
@@ -16,14 +24,14 @@ class xor:
         self.template_file = template_file
         self.xor_key = xor_key
 
-    def init():
-        spName = 'byteswap'
-        spArgList = [
-            ['-i', '--input', '', '', 'Input file to use with byteswap stub'],
-            ['-o', '--output', '', '', 'outputfile for byteswap stub'],
-            ['-k', '--key', '', '', 'the XOR key to use']
-        ]
-        utils.arg.CreateSubParser(spName, xor.Description, spArgList)
+    # def init():
+    #     spName = 'byteswap'
+    #     spArgList = [
+    #         ['-i', '--input', '', '', 'Input file to use with byteswap stub'],
+    #         ['-o', '--output', '', '', 'outputfile for byteswap stub'],
+    #         ['-k', '--key', '', '', 'the XOR key to use']
+    #     ]
+    #     utils.arg.CreateSubParser(spName, xor.Description, spArgList)
 
         # spArgList = [
         #     ['-i', '--input', None, None, None, str, True, 'Input file to use with byteswap stub'],

@@ -1,4 +1,4 @@
-import utils.arg
+#import utils.arg
 from utils.helper import nstate as nstate
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
@@ -8,10 +8,18 @@ from cryptography.hazmat.primitives import hashes
 import pickle
 import os
 
+CATEGORY = 'encoder'
+
+def register_arguments(parser):
+    parser.add_argument('-m', '--mode', choices=['encode', 'decode'], required=True, help='AES Operation mode, choose between encode and decode')
+    parser.add_argument('-i', '--input', required=True, help='Input file for AES encoding')
+    parser.add_argument('-o', '--output', required=True, help= 'Outputfile for AES encoding')
+    parser.add_argument('-k', '--key', required=True, help='Key for AES encoding')
+
 class aes_encoder:
     Author = 'psycore8'
     Description = 'AES encoder for payloads'
-    Version = '1.1.0'
+    Version = '2.0.0'
     # Input_File = ''
     # Output_File = ''
     # Password = b''
@@ -23,18 +31,17 @@ class aes_encoder:
         self.output_file = output_file
         self.key = key
         self.data_bytes = data_bytes
-        
 
-    def init():
-        spName = 'aesenc'
-        spArgList = [
-          ['-m', '--mode', 'encode,decode', '', 'AES Operation mode, choose between encode and decode'],
-          ['-i', '--input', '', '', 'Input file for AES encoding'],
-          ['-o', '--output', '', '', 'Outputfile for AES encoding'],
-          ['-k', '--key', '', '', 'Key for AES encoding'],
-          #['-debug', '--debug', '', 'store_true', 'debug']
-        ]
-        utils.arg.CreateSubParser(spName, aes_encoder.Description, spArgList)
+    # def init():
+    #     spName = 'aesenc'
+    #     spArgList = [
+    #       ['-m', '--mode', 'encode,decode', '', 'AES Operation mode, choose between encode and decode'],
+    #       ['-i', '--input', '', '', 'Input file for AES encoding'],
+    #       ['-o', '--output', '', '', 'Outputfile for AES encoding'],
+    #       ['-k', '--key', '', '', 'Key for AES encoding'],
+    #       #['-debug', '--debug', '', 'store_true', 'debug']
+    #     ]
+    #     utils.arg.CreateSubParser(spName, aes_encoder.Description, spArgList)
         # shortflag, flag, choices=, action=, default=, type=, required=, help=
         # ['-', '--', None, None, None, None, False, ''],
         # spArgList = [
@@ -55,7 +62,7 @@ class aes_encoder:
         )
         return kdf.derive(password)
     
-    def aes_encrypt(self, data: bytes, password: bytes) -> (bytes, bytes, bytes):
+    def aes_encrypt(self, data: bytes, password: bytes):
         # Salt und Initialisierungsvektor (IV) generieren
         salt = os.urandom(16)
         iv = os.urandom(16)
@@ -85,9 +92,6 @@ class aes_encoder:
         return data
     
     def encode(self):
-        # outputfile = self.output_file
-        # inputfile = self.input_file
-        # password = self.key
         try:
             with open(self.input_file, 'rb') as file:
                 self.data_bytes = file.read()
@@ -97,12 +101,8 @@ class aes_encoder:
         size = len(self.data_bytes)
         print(f'{nstate.OKBLUE} File {self.input_file} loaded, size of shellcode {size} bytes')
         enc_data, salt, iv = self.aes_encrypt(self.data_bytes, self.key)
-        #print(f'{AESData}')
         with open(self.output_file, "wb") as f:
             pickle.dump((enc_data, salt, iv), f)
-        # with open(outputfile, 'wb') as file:
-        #     file.write(AESData)
-        #path = outputfile
         cf = os.path.isfile(self.output_file)
         if cf == True:
             print(f"{nstate.OKGREEN} [AES-ENC] file created in {self.output_file}")
@@ -111,15 +111,11 @@ class aes_encoder:
             exit()
 
     def decode(self):
-        # outputfile = aes_encoder.Output_File
-        # inputfile = aes_encoder.Input_File
-        # password = aes_encoder.Password
         enc_data = b''
         salt = 0
         iv = 0
         try:
             with open(self.input_file, "rb") as f:
-                #AESData[0], AESData[1], AESData[2] = pickle.load(f)
                 enc_data, salt, iv = pickle.load(f)
         except FileNotFoundError:
             print(f'{nstate.FAIL} File {self.input_file} not found or cannot be opened.')
@@ -127,13 +123,8 @@ class aes_encoder:
         size = len(enc_data)
         print(f'{nstate.OKBLUE} File {self.input_file} loaded, filesize {size} bytes')
         Shellcode = self.aes_decrypt(enc_data, self.key, salt, iv)
-        #AESData = aes_encoder.aes_encrypt(aes_encoder.DataBytes, password)
-        #print(f'{AESData}')
-        #with open(outputfile, "wb") as f:
-        #    pickle.dump((AESData[0], AESData[1], AESData[2]), f)
         with open(self.output_file, 'wb') as file:
              file.write(Shellcode)
-        #path = outputfile
         cf = os.path.isfile(self.output_file)
         if cf == True:
             print(f"{nstate.OKGREEN} [AES-DEC] file created in {self.output_file}")

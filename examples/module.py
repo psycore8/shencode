@@ -1,21 +1,17 @@
-import utils.arg
 from utils.helper import nstate as nstate
+
+CATEGORY = 'core'
+
+def register_arguments(parser):
+    parser.add_argument('-i', '--input', help='text1')
+    parser.add_argument('-o', '--output', help='text2')
+    parser.add_argument('-x', '--xray', action='store_true', help='text3')
+    parser.add_argument('-z', '--zulu', help='text4')
 
 class example:
   Author =      'Name'
   Description = 'some useful information about this module'
   Version =     '1.0.0'
 
-  # python shencode.py examplemod -i input.txt -l yes
-  def init():
-    spName = 'examplemod'
-    spArgList = [
-        # shortflag, flag, choices=, action=, default=, type=, required=, metavar=, help=
-          ['-i', '--input', None, None, None, str, True, None, 'Input file for example module'],
-          ['-t', '--truestate', None, 'store_true', False, bool, False, None, 'store_true switch'],
-          ['-l', '--list', ['yes', 'no'], None, None, list, True, None, 'A list of choices for this argument']
-        ]
-    utils.arg.CreateSubParserEx(spName, example.Description, spArgList)
-
-    def process():
-      print('python is nice')
+  def process():
+    print('python is nice')

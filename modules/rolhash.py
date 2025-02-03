@@ -1,12 +1,19 @@
-import utils.arg
+#import utils.arg
 import pefile
 from os import path as ospath
 from utils.helper import nstate as nstate
 
+CATEGORY = 'obfuscate'
+
+def register_arguments(parser):
+    parser.add_argument('-i', '--input', help='Input file for UUID encoding')
+    parser.add_argument('-o', '--output', help='Outputfile for ROR13 to ROL conversion')
+    parser.add_argument('-k', '--key', help='Key to process ROR13 to ROL')
+
 class ror2rol_obfuscator:
   Author = 'bordergate, psycore8'
   Description = 'change ROR13 to ROL encoding in metasploit payloads'
-  Version = '1.1.0'
+  Version = '2.0.0'
   hash_dict = dict()
   dll_paths = [ 'C:\\Windows\\System32\\kernel32.dll', 
                 'C:\\Windows\\System32\\ws2_32.dll', 
@@ -20,14 +27,14 @@ class ror2rol_obfuscator:
      self.output_file = output_file
      self.key = key
 
-  def init():
-    spName = 'ror2rol'
-    spArgList = [
-          ['-i', '--input', '', '', 'Input file for ROR13 to ROL conversion'],
-          ['-o', '--output', '', '', 'Outputfile for ROR13 to ROL conversion'],
-          ['-k', '--key', '', '', 'Key to process ROR13 to ROL']
-        ]
-    utils.arg.CreateSubParser(spName, ror2rol_obfuscator.Description, spArgList)
+  # def init():
+  #   spName = 'ror2rol'
+  #   spArgList = [
+  #         ['-i', '--input', '', '', 'Input file for ROR13 to ROL conversion'],
+  #         ['-o', '--output', '', '', 'Outputfile for ROR13 to ROL conversion'],
+  #         ['-k', '--key', '', '', 'Key to process ROR13 to ROL']
+  #       ]
+  #   utils.arg.CreateSubParser(spName, ror2rol_obfuscater.Description, spArgList)
 
 
   def lookup_functions(self, dll_path):

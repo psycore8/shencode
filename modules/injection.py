@@ -1,8 +1,17 @@
-import utils.arg
+#import utils.arg
 import os
 import ctypes
 
 from utils.helper import nstate as nstate
+
+CATEGORY = 'core'
+
+def register_arguments(parser):
+            parser.add_argument('-i', '--input', help='Input file for process injection')
+            parser.add_argument('-p', '--process', help='Processname to inject the shellcode')
+            parser.add_argument('-r', '--resume-thread', action='store_true', help='Start thread suspended and resume after speciefied time')
+            parser.add_argument('-s', '--start', action='store_true', help='If not active, start the process before injection')
+            parser.add_argument('-v', '--virtual-protect', action='store_true', help='Deny access on memory for a specified time')
 
 class inject:
     from ctypes import windll
@@ -14,7 +23,7 @@ class inject:
 
     Author = 'cpu0x00, psycore8'
     Description = 'Inject shellcode to process'
-    Version = '1.2.1'
+    Version = '2.0.0'
     delay = 5
     # Target_Process = ''
     # Shellcode = ''
@@ -28,16 +37,16 @@ class inject:
         self.resume_thread = resume_thread
         self.virtual_protect = virtual_protect
 
-    def init():
-        spName = 'inject'
-        spArgList = [
-            ['-i', '--input', '', '', 'Input file for process injection'],
-            ['-p', '--process', '', '', 'Processname to inject the shellcode'],
-            ['-r', '--resume-thread', '', 'store_true', 'Start thread suspended and resume after speciefied time'],
-            ['-s', '--start', '', 'store_true', 'If not active, start the process before injection'],
-            ['-v', '--virtual-protect', '', 'store_true', 'Deny access on memory for a specified time']
-            ]
-        utils.arg.CreateSubParser(spName, inject.Description, spArgList)
+    # def init():
+    #     spName = 'inject'
+    #     spArgList = [
+    #         ['-i', '--input', '', '', 'Input file for process injection'],
+    #         ['-p', '--process', '', '', 'Processname to inject the shellcode'],
+    #         ['-r', '--resume-thread', '', 'store_true', 'Start thread suspended and resume after speciefied time'],
+    #         ['-s', '--start', '', 'store_true', 'If not active, start the process before injection'],
+    #         ['-v', '--virtual-protect', '', 'store_true', 'Deny access on memory for a specified time']
+    #         ]
+    #     utils.arg.CreateSubParser(spName, inject.Description, spArgList)
 
         # spArgList = [
         #     # shortflag, flag, choices=, action=, default=, type=, required=, help=
