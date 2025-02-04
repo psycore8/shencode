@@ -1,4 +1,3 @@
-#import utils.arg
 from utils.helper import nstate as nstate
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
@@ -20,10 +19,6 @@ class aes_encoder:
     Author = 'psycore8'
     Description = 'AES encoder for payloads'
     Version = '2.0.0'
-    # Input_File = ''
-    # Output_File = ''
-    # Password = b''
-    # DataBytes = b''
 
     def __init__(self, mode, input_file, output_file, key, data_bytes:bytes):
         self.mode = mode
@@ -31,26 +26,6 @@ class aes_encoder:
         self.output_file = output_file
         self.key = key
         self.data_bytes = data_bytes
-
-    # def init():
-    #     spName = 'aesenc'
-    #     spArgList = [
-    #       ['-m', '--mode', 'encode,decode', '', 'AES Operation mode, choose between encode and decode'],
-    #       ['-i', '--input', '', '', 'Input file for AES encoding'],
-    #       ['-o', '--output', '', '', 'Outputfile for AES encoding'],
-    #       ['-k', '--key', '', '', 'Key for AES encoding'],
-    #       #['-debug', '--debug', '', 'store_true', 'debug']
-    #     ]
-    #     utils.arg.CreateSubParser(spName, aes_encoder.Description, spArgList)
-        # shortflag, flag, choices=, action=, default=, type=, required=, help=
-        # ['-', '--', None, None, None, None, False, ''],
-        # spArgList = [
-        #     ['-m', '--mode', ['encode', 'decode'], None, None, None, True, 'AES Operation mode, choose between encode and decode'],
-        #     ['-i', '--input', None, None, None, str, True, 'Input file for AES encoding'],
-        #     ['-o', '--output', None, None, None, str, True, 'Outputfile for AES encoding'],
-        #     ['-k', '--key', None, None, None, str, True, 'Key for AES encoding']
-        # ]
-        # utils.arg.CreateSubParserEx(spName, aes_encoder.Description, spArgList)
 
     def generate_key(self, password: bytes, salt: bytes) -> bytes:
         kdf = PBKDF2HMAC(
@@ -63,16 +38,13 @@ class aes_encoder:
         return kdf.derive(password)
     
     def aes_encrypt(self, data: bytes, password: bytes):
-        # Salt und Initialisierungsvektor (IV) generieren
         salt = os.urandom(16)
         iv = os.urandom(16)
         key = self.generate_key(password, salt)
 
-        # Paddings für Blockgröße (AES Blockgröße = 128 Bit)
         padder = padding.PKCS7(algorithms.AES.block_size).padder()
         padded_data = padder.update(data) + padder.finalize()
 
-        # AES-Cipher im CBC-Modus
         cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
         encryptor = cipher.encryptor()
         encrypted_data = encryptor.update(padded_data) + encryptor.finalize()
@@ -85,7 +57,6 @@ class aes_encoder:
         decryptor = cipher.decryptor()
         padded_data = decryptor.update(encrypted_data) + decryptor.finalize()
 
-        # Padding entfernen
         unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
         data = unpadder.update(padded_data) + unpadder.finalize()
 

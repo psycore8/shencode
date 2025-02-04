@@ -19,7 +19,8 @@ def load_modules():
 
 def create_parser():
     parser = argparse.ArgumentParser(description='dynamic module parser')
-    parser.add_argument('-v', '--version', help='Shows the shencode version')
+    #parser.add_argument('-v', '--version', help='Shows the shencode version')
+    #parser.add_argument('-b', '--banner', type=int, help='Shows a specified banner')
     subparsers = parser.add_subparsers(dest='module', required=True, help='Available modules')
 
     modules_by_category = load_modules()

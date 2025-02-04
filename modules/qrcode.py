@@ -1,4 +1,3 @@
-#import utils.arg
 import qrcode
 import qrcode.constants
 
@@ -18,14 +17,6 @@ class qrcode_obfuscator:
          self.output_file = output_file
          self.shellcode = shellcode
 
-    # def init():
-    #     spName = 'qrcode'
-    #     spArgList = [
-    #         ['-i', '--input', '', '', 'Input file for QR-Code encoding'],
-    #         ['-o', '--output', '', '', 'Outputfile for QR-Code encoding']
-    #     ]
-    #     utils.arg.CreateSubParser(spName, qrcode_obfuscater.Description, spArgList)
-
     def open_file(self):
         try:
             for b in open(self.input_file, 'rb').read():
@@ -33,10 +24,7 @@ class qrcode_obfuscator:
             return True
         except FileNotFoundError:
             return False
-            
-    #def SetOutputFile(outfile):
-    #        qrcode_obfuscator.OutputFilename = outfile
-            
+                        
     def process(self):
         qr = qrcode.QRCode(version=3, box_size=20, border=10, error_correction=qrcode.constants.ERROR_CORRECT_H)
         payload_bytes = self.shellcode.encode('utf-8')

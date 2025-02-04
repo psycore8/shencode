@@ -2,7 +2,7 @@
 
 **A versatile tool for working with shellcodes.**
 
-![](shencode-060.png)
+![](shencode-070.png)
 
 ## Features
 
@@ -30,19 +30,30 @@
 
 ## How to use
 
+##### Install
+
+```shell
+git clone https://github.com/psycore8/shencode
+cd shencode
+pip install .
+shencode -h
+```
+
+#### General usage
+
 Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more information.
 
 ## Release Notes
 
-#### Improvements
+- `general` - setup routine, which handles the different packages and modules for Windows and Linux
+- `general` - new module parser
+- `general` - new start-up banners
+- `core/inject` - Suspend and Resume Technique
+- `core/inject` - VirtualProtectEx Technique
+- `encoder/bytebert` - advanced polymorphic encoder
+- `stager/meterpreter` - a reverse TCP Meterpreter stager
+- `stager/sliver` - a HTTPS Sliver stager
 
-- `inject` - Suspend and Resume Technique
-- `inject` - VirtuakProtectEx Technique
-- `feed` - A new obfuscation module
-- `core` - added some different logos for startup
-- `general`
-
- 
 ## References
 
 - [Byte-Swapping](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping)

@@ -1,4 +1,3 @@
-#import utils.arg
 from utils.helper import nstate as nstate
 from os import path as os_path
 
@@ -22,19 +21,8 @@ class extract_shellcode:
         self.start_offset = start_offset
         self.end_offset = end_offset
 
-    # def init():
-    #     spName = 'extract'
-    #     spArgList = [
-    #         ['-i', '--input', '', '', 'Input file for example module'],
-    #         ['-o', '--output', '', '', 'Output file with extracted bytes'],
-    #         ['-so', '--start-offset', '', '', 'begin extraction from this offset'],
-    #         ['-eo', '--end-offset', '', '', 'extract until here']
-    #         ]
-    #     utils.arg.CreateSubParser(spName, extract_shellcode.Description, spArgList)
-
     def process(self):
         print(f"{nstate.OKBLUE} try to open file")
-        #filename = inputfile
         short_fn = os_path.basename(self.input_file)
         try:
             with open(self.input_file, "rb") as file:

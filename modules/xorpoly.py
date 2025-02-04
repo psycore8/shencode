@@ -1,4 +1,3 @@
-#import utils.arg
 from utils.helper import nstate as nstate
 from os import path as osp
 
@@ -21,15 +20,6 @@ class xor:
        self.xored_shellcode = xored_shellcode
        self.template_file = template_file
        self.xor_key = xor_key
-
-    # def init():
-    #   spName = 'xorpoly'
-    #   spArgList = [
-    #     ['-i', '--input', '', '', 'Input file to use with xor stub'],
-    #     ['-o', '--output', '', '', 'outputfile for xor stub'],
-    #     ['-k', '--key', '', '', 'the XOR key to use']
-    #   ]
-    #   utils.arg.CreateSubParser(spName, xor.Description, spArgList)
 
     def LoadHeader(self):
         try: 

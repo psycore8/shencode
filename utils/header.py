@@ -67,9 +67,22 @@ header8 = """
  $h3nC0d3 killed the banner !
 """
 
-def get_header():
-    rnd = random.randint(1, 8)
-   # print(f'{rnd}')
+header9 = """
+______________                _________       _________      
+__  ___/___  /_ _____ _______ __  ____/______ ______  /_____ 
+_____ \\ __  __ \\_  _ \\__  __ \\_  /     _  __ \\_  __  / _  _ \\
+____/ / _  / / //  __/_  / / // /___   / /_/ // /_/ /  /  __/
+/____/  /_/ /_/ \\___/ /_/ /_/ \\____/   \\____/ \\__,_/   \\___/ 
+                                                             
+"""
+
+def get_header(num_banner=int):
+    # if num_banner == 0:
+    #     rnd = random.randint(1, 9)
+    # else:
+    #     rnd = num_banner
+    rnd = random.randint(1, 9)
+    #print(f'{rnd}')
     if rnd == 1:
         return header1
     elif rnd == 2:
@@ -86,3 +99,5 @@ def get_header():
         return header7
     elif rnd == 8:
         return header8
+    elif rnd == 9:
+        return header9

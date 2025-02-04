@@ -1,4 +1,3 @@
-#import utils.arg
 from utils.helper import nstate as nstate
 from time import sleep
 import ctypes.wintypes
@@ -31,18 +30,6 @@ class stage():
         self.timeout = timeout
         self.architecture = architecture
         self.sleeptime = sleeptime
-
-    # def init():
-    #     spName = 'meterpreter-stage'
-    #     # flag, name, choices=, action=, default=, type, required, help)
-    #     spArgList = [
-    #         ['-a', '--arch', ['x64', 'x86'], None, 'x64', str, False, 'Architecture to use, x64 is the default'],
-    #         ['-p', '--port', None, None, 4444, int, True, 'Remote port to connect to'],
-    #         ['-r', '--remote-host', None, None, None, str, True, 'Remote host to connect to'],
-    #         ['-s', '--sleep', None, None, 0, int, True, 'Sleep for x seconds before the stage is executed'],
-    #         ['-t', '--timeout', None, None, 30, int, False, 'Connect timeout in seconds, 30 seconds is the default']
-    #     ]
-    #     utils.arg.CreateSubParserEx(spName, stage.Description, spArgList)
 
     def CreateSocket(self):
         print(f'{nstate.OKBLUE} Creating Socket...')

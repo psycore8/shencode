@@ -41,14 +41,11 @@ class bb_encoder:
         self.output_file = output_file
         self.random_padding = random_padding
 
-    # def init():
-    #     spName = 'bytebert'
-    #     spArgList = [
-    #         ['-i', '--input', '', '', 'Input file to use with byteswap stub'],
-    #         ['-o', '--output', '', '', 'outputfile for byteswap stub'],
-    #         ['-v', '--variable-padding', '', 'store_true', 'Inserts a random NOP to differ the padding']
-    #     ]
-    #     utils.arg.CreateSubParser(spName, xor.Description, spArgList)
+    def CheckNasm(self)->bool:
+        if osp.exists('nasm.exe'):
+            return True
+        else:
+            return False
 
     def encrypt(self, data: bytes, xor_key: int) -> bytes:
         transformed = bytearray()
@@ -122,12 +119,16 @@ class bb_encoder:
         extract_shellcode.process()
         
     def process(self):
-       self.LoadShellcode()
-       self.LoadHeader()
-       self.ConvertShellCodeToStr()
-       self.AppendShellcode()
-       self.WriteToFile(self.Modified_Shellcode, self.output_file)
-       self.CompileObjectFile()
+        self.LoadShellcode()
+        self.LoadHeader()
+        self.ConvertShellCodeToStr()
+        self.AppendShellcode()
+        self.WriteToFile(self.Modified_Shellcode, self.output_file)
+        if self.CheckNasm():
+            self.CompileObjectFile()
+        else:
+            print(f'{nstate.FAIL} nasm.exe not found! Please download and place it in the shencode directory')
+            print(f'{nstate.INFO} You can compile it by hand: nasm.exe -f win64 {self.output_file} -o {self.OutputFile_Root}.o')
        #self.ExtractShellCode()
 
     def generate_win64_stub(self):

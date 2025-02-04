@@ -1,11 +1,9 @@
-#import utils.arg
 from utils.helper import nstate as nstate
 from os import path as osp
 
 CATEGORY = 'encoder'
 
 def register_arguments(parser):
-    #parser.add_argument_group('Encoder')
     parser.add_argument('-i', '--input', help='Input file to use with byteswap stub')
     parser.add_argument('-o', '--output', help= 'outputfile for byteswap stub')
     parser.add_argument('-k', '--key', help='the XOR key to use')
@@ -23,22 +21,6 @@ class xor:
         self.output_file = output_file
         self.template_file = template_file
         self.xor_key = xor_key
-
-    # def init():
-    #     spName = 'byteswap'
-    #     spArgList = [
-    #         ['-i', '--input', '', '', 'Input file to use with byteswap stub'],
-    #         ['-o', '--output', '', '', 'outputfile for byteswap stub'],
-    #         ['-k', '--key', '', '', 'the XOR key to use']
-    #     ]
-    #     utils.arg.CreateSubParser(spName, xor.Description, spArgList)
-
-        # spArgList = [
-        #     ['-i', '--input', None, None, None, str, True, 'Input file to use with byteswap stub'],
-        #     ['-o', '--output', None, None, None, str, True, 'outputfile for byteswap stub'],
-        #     ['-k', '--key', None, None, None, int, True, 'the XOR key to use']
-        # ]
-        # utils.arg.CreateSubParserEx(spName, aes_encoder.Description, spArgList)
 
     def encrypt(self, data: bytes, xor_key: int) -> bytes:
         transformed = bytearray()

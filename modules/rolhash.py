@@ -1,4 +1,3 @@
-#import utils.arg
 import pefile
 from os import path as ospath
 from utils.helper import nstate as nstate
@@ -26,16 +25,6 @@ class ror2rol_obfuscator:
      self.input_file = input_file
      self.output_file = output_file
      self.key = key
-
-  # def init():
-  #   spName = 'ror2rol'
-  #   spArgList = [
-  #         ['-i', '--input', '', '', 'Input file for ROR13 to ROL conversion'],
-  #         ['-o', '--output', '', '', 'Outputfile for ROR13 to ROL conversion'],
-  #         ['-k', '--key', '', '', 'Key to process ROR13 to ROL']
-  #       ]
-  #   utils.arg.CreateSubParser(spName, ror2rol_obfuscater.Description, spArgList)
-
 
   def lookup_functions(self, dll_path):
     pe = pefile.PE(dll_path)

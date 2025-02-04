@@ -1,28 +1,10 @@
 import os
 
-#import utils.arg as arg
-#import utils.args2 as args2
 from utils.args import parse_arguments
 from utils.helper import nstate as nstate
 from utils.helper import FileCheck
-#import utils.extract as extract
-#import utils.formatout as formatout
 import utils.hashes as hashes
 import utils.header
-#import stager.meterpreter as meterpreter
-#import stager.sliver as sliver
-#if os.name == 'nt':
-#  import utils.injection as injection
-#import utils.msf as msf
-#import encoder.aes as aes
-#import encoder.byteswap as byteswap
-#import encoder.xorpoly as xorpoly
-#import encoder.xor as xor
-#import obfuscater.feed as feed
-#import obfuscater.qrcode as qrcode
-#import obfuscater.rolhash as rolhash
-#import obfuscater.uuid as uuid
-
 
 ## Migrate Mods
 import modules.aes as aes
@@ -31,6 +13,7 @@ import modules.byteswap as byteswap
 import modules.extract as extract
 import modules.feed as feed
 import modules.formatout as formatout
+import utils.helper
 if os.name == 'nt':
   import modules.injection as injection
   import modules.meterpreter as meterpreter
@@ -44,6 +27,12 @@ import modules.xor as xor
 import modules.xorpoly as xorpoly
 
 Version = '0.7.0'
+banner = 0
+
+print(f"{nstate.HEADER}")
+print(f'{utils.header.get_header(banner)}')
+print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}\n')
+arguments = parse_arguments()
 
 # make sure your metasploit binary folder is in your PATH variable
 if os.name == 'nt':
@@ -54,39 +43,6 @@ elif os.name == 'posix':
   tpl_path = 'tpl/'
   
 def main(command_line=None):
-
-
-  ##########################
-  ### BEGIN INIT SECTION ###
-  ##########################
-
-  # arg.CreateMainParser()
-  # arg.group = 'Encoder'
-  # aes.aes_encoder.init()
-  # byteswap.xor.init()
-  # extract.extract_shellcode.init()
-  # formatout.format.init()
-  # if os.name == 'nt':
-  #   injection.inject.init()
-  # arg.group = 'Stager'
-  # meterpreter.stage.init()
-  # msf.msfvenom.init()
-  # feed.feed_obfuscator.init()
-  # qrcode.qrcode_obfuscator.init()
-  # if os.name == 'nt':
-  #   rolhash.ror2rol_obfuscator.init()
-  # sliver.stage.init()
-  # uuid.uuid_obfuscator.init()
-  # xorpoly.xor.init()
-  # xor.xor_encoder.init()
-  # arguments = arg.ParseArgs(command_line)
-
-  ##########################
-  #### END INIT SECTION ####
-  ##########################
-  
-
-  # MAIN
 
   if arguments.command == 'msfvenom':
     print(f"{nstate.OKBLUE} create payload")
@@ -289,9 +245,10 @@ def main(command_line=None):
     print(f'ShenCode {Version}')
 
 if __name__ == "__main__":
-    print(f"{nstate.HEADER}")
-    print(f'{utils.header.get_header()}')
-    print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}\n')
-    arguments = parse_arguments()
+    # if arguments.banner > 0:
+    #   print(f'{arguments.banner}')
+    #   banner = arguments.banner
+
+    #utils.helper.FirstRun.CheckFirstRunState()
     #print(args)
     main()

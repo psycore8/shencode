@@ -1,4 +1,3 @@
-#import utils.arg
 import base64
 from itertools import cycle
 
@@ -18,15 +17,6 @@ class xor_encoder:
         self.input_file = input_file
         self.output_file = output_file
         self.xor_key = xor_key
-
-    # def init():
-    #     spName = 'xorenc'
-    #     spArgList = [
-    #       ['-i', '--input', '', '', 'Input file for XOR encoding'],
-    #       ['-o', '--output', '', '', 'Outputfile for XOR encoding'],
-    #       ['-k', '--key', '', '', 'Key for XOR encoding']
-    #     ]
-    #     utils.arg.CreateSubParser(spName, xor_encoder.Description, spArgList)
 
     def xor_crypt_string(data, key, encode = False, decode = False):
         if decode:

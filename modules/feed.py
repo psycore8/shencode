@@ -1,4 +1,3 @@
-#import utils.arg
 import datetime
 import feedparser
 from lxml import etree
@@ -27,17 +26,6 @@ class feed_obfuscator:
         self.output_file = output_file
         self.uri = uri
 
-
-    # def init():
-    #     spName = 'feed'
-    #     spArgList = [
-    #         ['-i', '--input', '', '', 'Input file for feed obfucsation'],
-    #         ['-o', '--output', '', '', 'Output file for feed obfucsation'],
-    #         ['-r', '--reassemble', '', 'store_true', 'Reassemble fake feed to Shellcode'],
-    #         ['-u', '--uri', '', '', 'URI to fake feed']
-    #     ]
-    #     utils.arg.CreateSubParser(spName, feed_obfuscater.Description, spArgList)
-
     def open_file(self):
         try:
             for b in open(self.input_file, 'rb').read():
@@ -49,8 +37,6 @@ class feed_obfuscator:
     def convert_bytes_to_fake_id(self, block_size=16):
         s = self.shellcode.encode('utf-8')
         self.feed_fake_ids.extend([s[i:i + block_size] for i in range(0, len(s), block_size)])
-        #print(f'{self.feed_fake_ids}')
-
 
     def generate_feed(self):
         date_time = datetime.datetime.now()

@@ -14,13 +14,6 @@ class msfvenom:
   
   def __init__(self, command_line):
     self.command_line = command_line
-
-  # def init():
-  #   spName = 'msfvenom'
-  #   spArgList = [
-  #     ['-c', '--cmd', '', '', 'msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"']
-  #   ]
-  #   utils.arg.CreateSubParser(spName, msfvenom.Description, spArgList)
   
   def CreateShellcodeEx(self, msfvenom_path):
     msf_args = self.command_line.split()

