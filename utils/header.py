@@ -83,6 +83,7 @@ def get_header(num_banner=int):
     #     rnd = num_banner
     rnd = random.randint(1, 9)
     #print(f'{rnd}')
+
     if rnd == 1:
         return header1
     elif rnd == 2:
@@ -101,3 +102,4 @@ def get_header(num_banner=int):
         return header8
     elif rnd == 9:
         return header9
+

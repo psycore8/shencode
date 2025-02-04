@@ -44,6 +44,10 @@ elif os.name == 'posix':
   
 def main(command_line=None):
 
+  print(f"{nstate.HEADER}")
+  print(f'{utils.header.get_header()}')
+  print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
+
   if arguments.command == 'msfvenom':
     print(f"{nstate.OKBLUE} create payload")
     cs = msf.msfvenom(arguments.cmd)

@@ -14,6 +14,7 @@ class feed_obfuscator:
     Author = 'psycore8'
     Description = 'obfuscate shellcodes as XML Feed'
     Version = '2.0.0'
+
     feed_fake_uri = 'https://www.microloft.com/'
     feed_fake_title = 'Developer News'
     feed_fake_subtitle = 'The latest developer news from microloft.com'
@@ -37,6 +38,7 @@ class feed_obfuscator:
     def convert_bytes_to_fake_id(self, block_size=16):
         s = self.shellcode.encode('utf-8')
         self.feed_fake_ids.extend([s[i:i + block_size] for i in range(0, len(s), block_size)])
+        #print(f'{self.feed_fake_ids}')
 
     def generate_feed(self):
         date_time = datetime.datetime.now()
