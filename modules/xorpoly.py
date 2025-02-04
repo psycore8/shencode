@@ -1,11 +1,17 @@
-import utils.arg
 from utils.helper import nstate as nstate
 from os import path as osp
+
+CATEGORY = 'encoder'
+
+def register_arguments(parser):
+    parser.add_argument('-i', '--input', help='Input file for XOR stub')
+    parser.add_argument('-o', '--output', help= 'Outputfile for XOR stub')
+    parser.add_argument('-k', '--key', help='Key for XOR stub')
 
 class xor:
     Author = 'psycore8'
     Description = 'create payload from a raw file, encode with xor, add to xor stub'
-    Version = '1.1.0'
+    Version = '2.0.0'
 
     def __init__(self, input_file, output_file, shellcode, xored_shellcode, template_file, xor_key):
        self.input_file = input_file
@@ -14,15 +20,6 @@ class xor:
        self.xored_shellcode = xored_shellcode
        self.template_file = template_file
        self.xor_key = xor_key
-
-    def init():
-      spName = 'xorpoly'
-      spArgList = [
-        ['-i', '--input', '', '', 'Input file to use with xor stub'],
-        ['-o', '--output', '', '', 'outputfile for xor stub'],
-        ['-k', '--key', '', '', 'the XOR key to use']
-      ]
-      utils.arg.CreateSubParser(spName, xor.Description, spArgList)
 
     def LoadHeader(self):
         try: 

@@ -1,12 +1,20 @@
-import utils.arg
 import shutil, fileinput, base64
 from utils.helper import nstate as nstate
+
+CATEGORY = 'core'
+
+def register_arguments(parser):
+      parser.add_argument('-i', '--input', help='Input file for formatted output')
+      parser.add_argument('-s', '--syntax', choices=['c','casm','cs','ps1','py','hex','base64','inspect'], help='formatting the shellcode in C, Casm, C#, Powershell, python or hex')
+      parser.add_argument('-l', '--lines', action='store_true', help='adds a line numbering after each 8 bytes')
+      parser.add_argument('-n', '--no-break', action='store_true', help='no line break during output')
+      parser.add_argument('-w', '--write', help='write output to the given filename (replacing $%%BUFFER%%$ placeholder in the file')
 
 class format:
   ShowLines = False
   Author = 'psycore8'
   Description = 'create formatted output by filename'
-  Version = '1.2.1'
+  Version = '2.0.0'
   no_line_break = False
 
   def __init__(self, input_file, syntax, show_lines, no_break, write_out):
@@ -15,18 +23,6 @@ class format:
     self.show_lines = show_lines
     self.no_break = no_break
     self.write_out =write_out
-    
-
-  def init():
-    spName = 'formatout'
-    spArgList = [
-      ['-i', '--input', '', '', 'Input file for formatted output'],
-      ['-s', '--syntax', 'c,casm,cs,ps1,py,hex,base64,inspect', '', 'formatting the shellcode in C, Casm, C#, Powershell, python or hex'],
-      ['-l', '--lines', '', 'store_true', 'adds a line numbering after each 8 bytes'],
-      ['-n', '--no-break', '', 'store_true', 'no line break during output'],
-      ['-w', '--write', '', '', 'write output to the given filename (replacing $%%BUFFER%%$ placeholder in the file']
-    ]
-    utils.arg.CreateSubParser(spName, format.Description, spArgList)
 
   def DuplicateFile(self, filename):
     dst = 'buf'+filename

@@ -8,3 +8,6 @@ __pycache__
 .venv/
 _dev*
 _dev.bat
+ShenCode.egg-info
+nasm.exe
+build/

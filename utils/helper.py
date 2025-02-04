@@ -1,5 +1,5 @@
 from utils.hashes import sha1
-from os import path, stat
+from os import name, path, rename, stat
 
 class nstate:
     HEADER = '\033[95m'
@@ -77,3 +77,33 @@ class FileCheck:
                  f'{nstate.INFO} {nstate.clGRAY}[{module_message}]{nstate.ENDC} File: -',
                  f'{nstate.INFO} {nstate.clGRAY}[{module_message}]{nstate.ENDC} Hash: {nstate.BOLD}{nstate.clLIGHTBLUE}-{nstate.ENDC}' ]
         return cf, s
+    
+class FirstRun:
+    def CheckFirstRunState():
+        file = 'os.done'
+        if not path.exists(file):
+            if name == 'nt':
+                FirstRun.WinOnlyModules(True)
+                with open(file, 'w') as file:
+                    file.write(f'Operating System: {name}')
+            else:
+                FirstRun.WinOnlyModules(False)
+                with open(file, 'w') as file:
+                    file.write(f'Operating System: {name}')
+            print(f'{nstate.OKGREEN} OS Check passed!')
+
+    def WinOnlyModules(ActivationState:bool):
+        Mod_Dir = 'modules'
+        FileList = [ 'injection', 'meterpreter', 'sliver', 'rolhash' ]
+        if ActivationState:
+            for file in FileList:
+                src_file = f'{Mod_Dir}\\{file}.px'
+                dst_file = f'{Mod_Dir}\\{file}.py'
+                if path.exists(src_file):
+                    rename(src_file,dst_file)
+        elif not ActivationState:
+            for file in FileList:
+                src_file = f'{Mod_Dir}/{file}.py'
+                dst_file = f'{Mod_Dir}/{file}.px'
+                if path.exists(src_file):
+                    rename(src_file,dst_file)

