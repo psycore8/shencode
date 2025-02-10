@@ -26,7 +26,7 @@ import modules.uuid as uuid
 import modules.xor as xor
 import modules.xorpoly as xorpoly
 
-Version = '0.7.0'
+Version = '0.7.1'
 banner = 0
 
 print(f"{nstate.HEADER}")
@@ -44,9 +44,9 @@ elif os.name == 'posix':
   
 def main(command_line=None):
 
-  print(f"{nstate.HEADER}")
-  print(f'{utils.header.get_header()}')
-  print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
+  # print(f"{nstate.HEADER}")
+  # print(f'{utils.header.get_header()}')
+  # print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
 
   if arguments.command == 'msfvenom':
     print(f"{nstate.OKBLUE} create payload")
@@ -174,7 +174,7 @@ def main(command_line=None):
       print(f'{string}')
 
   elif arguments.command == 'formatout':
-      fout = formatout.format(arguments.input, arguments.syntax, arguments.lines, arguments.no_break, arguments.write)
+      fout = formatout.format(arguments.input, arguments.syntax, arguments.lines, arguments.no_break, arguments.write, arguments.bytes_per_row)
       print(fout.input_file)
       print(f"{nstate.OKBLUE} processing shellcode format... NoLineBreak: {fout.no_break}")
       scFormat = fout.process()

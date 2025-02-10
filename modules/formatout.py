@@ -7,6 +7,7 @@ def register_arguments(parser):
       parser.add_argument('-i', '--input', help='Input file for formatted output')
       parser.add_argument('-s', '--syntax', choices=['c','casm','cs','ps1','py','hex','base64','inspect'], help='formatting the shellcode in C, Casm, C#, Powershell, python or hex')
       parser.add_argument('-l', '--lines', action='store_true', help='adds a line numbering after each 8 bytes')
+      parser.add_argument('-b', '--bytes-per-row', required=False, default=16, type=int, help='Define how many bytes per row will be displayed')
       parser.add_argument('-n', '--no-break', action='store_true', help='no line break during output')
       parser.add_argument('-w', '--write', help='write output to the given filename (replacing $%%BUFFER%%$ placeholder in the file')
 
@@ -14,15 +15,16 @@ class format:
   ShowLines = False
   Author = 'psycore8'
   Description = 'create formatted output by filename'
-  Version = '2.0.0'
+  Version = '2.0.1'
   no_line_break = False
 
-  def __init__(self, input_file, syntax, show_lines, no_break, write_out):
+  def __init__(self, input_file, syntax, show_lines, no_break, write_out, bytes_per_row):
     self.input_file = input_file
     self.syntax = syntax
     self.show_lines = show_lines
     self.no_break = no_break
     self.write_out =write_out
+    self.bytes_per_row = bytes_per_row
 
   def DuplicateFile(self, filename):
     dst = 'buf'+filename
@@ -74,9 +76,9 @@ class format:
 
   def process_c(self):
     retln = self.ReturnLineNumber
-    Sum_Output_Bytes = 16
+    Sum_Output_Bytes = self.bytes_per_row
     ctr = 1
-    maxlen = 16
+    maxlen = self.bytes_per_row
     LineFactor = 1
     Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines, True)
     shellcode = f'{Line_Format}\"'
@@ -96,9 +98,9 @@ class format:
  
   def process_casm(self):
     retln = self.ReturnLineNumber
-    Sum_Output_Bytes = 16
+    Sum_Output_Bytes = self.bytes_per_row
     ctr = 1
-    maxlen = 16
+    maxlen = self.bytes_per_row
     LineFactor = 1
     Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines, True)
     shellcode = f'{Line_Format}\".byte '
@@ -121,9 +123,9 @@ class format:
  
   def process_cs(self):
     retln = self.ReturnLineNumber
-    Sum_Output_Bytes = 16
+    Sum_Output_Bytes = self.bytes_per_row
     ctr = 1
-    maxlen = 16
+    maxlen = self.bytes_per_row
     LineFactor = 1
     Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines, True)
     shellcode = f'{Line_Format}'
@@ -145,9 +147,9 @@ class format:
 
   def process_ps1(self):
     retln = self.ReturnLineNumber
-    Sum_Output_Bytes = 16
+    Sum_Output_Bytes = self.bytes_per_row
     ctr = 1
-    maxlen = 16
+    maxlen = self.bytes_per_row
     LineFactor = 1
     Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines, True)
     shellcode = f'{Line_Format}[Byte[]] $buf = '
@@ -169,9 +171,9 @@ class format:
 
   def process_py(self):
     retln = self.ReturnLineNumber
-    Sum_Output_Bytes = 16
+    Sum_Output_Bytes = self.bytes_per_row
     ctr = 1
-    maxlen = 12
+    maxlen = self.bytes_per_row
     LineFactor = 1
     Line_Format = retln(LineFactor, Sum_Output_Bytes, self.show_lines, True)
     shellcode = f'{Line_Format}buf =  b\'\'\nbuf += b\'\\'
@@ -206,10 +208,10 @@ class format:
   
   def process_inspect(self):
     retln = self.ReturnLineNumber
-    Sum_Output_Bytes = 8
+    Sum_Output_Bytes = self.bytes_per_row
     LineFlag = True
     ctr = 1
-    maxlen = 8
+    maxlen = self.bytes_per_row
     LineFactor = 1
     Line_Format = retln(LineFactor, Sum_Output_Bytes, LineFlag, True)
     shellcode = f'{Line_Format}'
