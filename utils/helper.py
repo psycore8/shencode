@@ -14,8 +14,9 @@ class nstate:
     UNDERLINE = '\033[4m'
     LINK = '\033[94m\033[4m'
     clLIGHTBLUE = '\033[36m'
-    clRED = '\033[30m'
+    clRED = '\033[91m'
     clGRAY = '\033[90m'
+    clLIGHTMAGENTA = '\x1b[35m'
 
     def TextBlue(TextToFormat:str) -> str:
         return f'\033[94m{TextToFormat}\033[0m'

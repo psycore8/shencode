@@ -26,6 +26,8 @@ import modules.uuid as uuid
 import modules.xor as xor
 import modules.xorpoly as xorpoly
 
+import modules.modout as modout
+
 Version = '0.7.1'
 banner = 0
 
@@ -52,6 +54,13 @@ def main(command_line=None):
     print(f"{nstate.OKBLUE} create payload")
     cs = msf.msfvenom(arguments.cmd)
     cs.CreateShellcodeEx(msfvenom_path)
+
+  if arguments.command == 'modout':
+    mod = modout.format_shellcode(arguments.input, arguments.syntax, arguments.lines, arguments.bytes_per_row, arguments.decimal, arguments.no_line_break)
+    print(mod.input_file)
+    print(f"{nstate.OKBLUE} processing shellcode format... NoLineBreak: {mod.no_line_break}\n")
+    print(F'{mod.process()}')
+    print(f"{nstate.OKGREEN} DONE!")
 
   elif arguments.command == 'meterpreter':
     stager = meterpreter.stage(arguments.remote_host, arguments.port, arguments.timeout, arguments.arch, arguments.sleep)
