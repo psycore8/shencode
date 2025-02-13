@@ -1,7 +1,7 @@
 import shutil, fileinput, base64
 from utils.helper import nstate as nstate
 
-CATEGORY = 'core'
+CATEGORY = 'archive'
 
 def register_arguments(parser):
       parser.add_argument('-i', '--input', help='Input file for formatted output')

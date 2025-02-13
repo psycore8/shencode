@@ -1,5 +1,6 @@
 from utils.hashes import sha1
 from os import name, path, rename, stat
+import re
 
 class nstate:
     HEADER = '\033[95m'
@@ -23,6 +24,10 @@ class nstate:
     
     def TextLink(TextToFormat:str) -> str:
         return f'\033[94m\033[4m{TextToFormat}\033[0m'
+    
+    def remove_ansi_escape_sequences(text):
+        ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
+        return ansi_escape.sub('', text)
 
 class FileCheck:
 

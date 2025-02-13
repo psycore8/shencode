@@ -1,34 +1,48 @@
 from utils.helper import nstate as nstate
 
-CATEGORY = 'debug'
+CATEGORY = 'core'
 
 def register_arguments(parser):
       parser.add_argument('-i', '--input', help='Input file for formatted output')
       parser.add_argument('-s', '--syntax', choices=['c','casm','cs','ps1','py','hex','inspect'], help='formatting the shellcode in C, Casm, C#, Powershell, python or hex')
-      parser.add_argument('-l', '--lines', action='store_true', default=False, help='adds a line numbering after each 8 bytes')
-      parser.add_argument('-b', '--bytes-per-row', required=False, default=16, type=int, help='Define how many bytes per row will be displayed')
-      parser.add_argument('-d', '--decimal', action='store_true', required=False, default=False, help='Output decimal offsets instead of hex')
-      parser.add_argument('-n', '--no-line-break', action='store_true', default=False, help='no line break during output')
-      #parser.add_argument('-w', '--write', help='write output to the given filename (replacing $%%BUFFER%%$ placeholder in the file')
+
+      grp = parser.add_argument_group('additional')
+      grp.add_argument('-b', '--bytes-per-row', required=False, default=16, type=int, help='Define how many bytes per row will be displayed', metavar='INT')
+      grp.add_argument('-d', '--decimal', action='store_true', required=False, default=False, help='Output decimal offsets instead of hex')
+      grp.add_argument('-l', '--lines', action='store_true', default=False, help='adds a line numbering after each 8 bytes')
+      grp.add_argument('-n', '--no-line-break', action='store_true', default=False, help='no line break during output')
+      grp.add_argument('-o', '--output', required=False, type=str, default='', help='save output to file')
 
 class format_shellcode:
     Author = 'psycore8'
     Description = 'create formatted output by filename'
-    Version = '0.0.2'
+    Version = '0.1.3'
     file_bytes = bytes
     offset_color = nstate.clLIGHTMAGENTA
+    cFile = False
 
-    def __init__(self, input_file=str, syntax=str, lines=bool, bytes_per_row=int, decimal=bool, no_line_break=bool):
+
+    def __init__(self, input_file=str, syntax=str, bytes_per_row=int, decimal=bool, lines=bool, no_line_break=bool, output_file=str):
         self.input_file = input_file
         self.syntax = syntax
         self.lines = lines
         self.bytes_per_row = bytes_per_row
         self.decimal = decimal
         self.no_line_break = no_line_break
+        self.output_file = output_file
+        if not output_file == '':
+            self.cFile = True
  
     def LoadInputFile(self):
         with open(self.input_file, 'rb') as file:
             self.file_bytes = file.read()
+
+    def SaveOutputFile(self, data):
+        nstate.remove_ansi_escape_sequences(data)
+        with open(self.output_file, 'w') as file:
+            file.write(
+                nstate.remove_ansi_escape_sequences( data )
+                )
 
     def GenerateOutput(self):
         formatted_bytes = self.GenerateHeader()
@@ -55,13 +69,6 @@ class format_shellcode:
             else:
                 row_numbers = ' '.join(f'{i:02X}' for i in range(self.bytes_per_row))
                 head = f'{c}Offset(h) {row_numbers}{nstate.ENDC}\n'
-            # header = f"""
-            #         File: {self.input_file}
-            #         Size: {len(self.file_bytes)}
-
-            #         {head}
-
-            #         """
         return head
     
     def GenerateOffset(self, counter=int):
@@ -79,7 +86,10 @@ class format_shellcode:
         if self.syntax == 'inspect':
             self.lines = True
         self.LoadInputFile()
-        return self.GenerateOutput()
+        output = self.GenerateOutput()
+        if not self.output_file == '':
+            self.SaveOutputFile(output)
+        return output
         
     lang = {
         'c': {
