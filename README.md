@@ -47,14 +47,11 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
-- `general` - setup routine, which handles the different packages and modules for Windows and Linux
-- `general` - new module parser
-- `general` - new start-up banners
-- `core/inject` - Suspend and Resume Technique
-- `core/inject` - VirtualProtectEx Technique
-- `encoder/bytebert` - advanced polymorphic encoder
-- `stager/meterpreter` - a reverse TCP Meterpreter stager
-- `stager/sliver` - a HTTPS Sliver stager
+- `general` - duplicated header fix
+- `general` - optimized header code
+- `general` - optimized help output
+- `core/output` - Rewritten output module, replaces `formatout`
+- `archiv/formatout` - deprecated module, use `output` instead
 
 ## References
 
