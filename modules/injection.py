@@ -8,9 +8,11 @@ CATEGORY = 'core'
 def register_arguments(parser):
             parser.add_argument('-i', '--input', help='Input file for process injection')
             parser.add_argument('-p', '--process', help='Processname to inject the shellcode')
-            parser.add_argument('-r', '--resume-thread', action='store_true', help='Start thread suspended and resume after speciefied time')
-            parser.add_argument('-s', '--start', action='store_true', help='If not active, start the process before injection')
-            parser.add_argument('-v', '--virtual-protect', action='store_true', help='Deny access on memory for a specified time')
+
+            grp = parser.add_argument_group('additional')
+            grp.add_argument('-r', '--resume-thread', action='store_true', help='Start thread suspended and resume after speciefied time')
+            grp.add_argument('-s', '--start', action='store_true', help='If not active, start the process before injection')
+            grp.add_argument('-v', '--virtual-protect', action='store_true', help='Deny access on memory for a specified time')
 
 class inject:
     from ctypes import windll

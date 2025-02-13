@@ -18,6 +18,7 @@ if os.name == 'nt':
   import modules.injection as injection
   import modules.meterpreter as meterpreter
 import modules.msfvenom as msf
+import modules.output as output
 import modules.qrcode as qrcode
 if os.name == 'nt':
   import modules.rolhash as rolhash
@@ -26,7 +27,7 @@ import modules.uuid as uuid
 import modules.xor as xor
 import modules.xorpoly as xorpoly
 
-Version = '0.7.0'
+Version = '0.7.1'
 banner = 0
 
 print(f"{nstate.HEADER}")
@@ -44,14 +45,32 @@ elif os.name == 'posix':
   
 def main(command_line=None):
 
-  print(f"{nstate.HEADER}")
-  print(f'{utils.header.get_header()}')
-  print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
+  # print(f"{nstate.HEADER}")
+  # print(f'{utils.header.get_header()}')
+  # print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
 
   if arguments.command == 'msfvenom':
     print(f"{nstate.OKBLUE} create payload")
     cs = msf.msfvenom(arguments.cmd)
     cs.CreateShellcodeEx(msfvenom_path)
+
+  if arguments.command == 'output':
+    mod = output.format_shellcode(arguments.input, arguments.syntax, arguments.bytes_per_row, arguments.decimal, arguments.lines, arguments.no_line_break, arguments.output)
+    print(f'Input file: {mod.input_file}')
+    filecheck, outstrings = FileCheck.CheckSourceFile(mod.input_file, 'MOD-OUT')
+    for string in outstrings:
+      print(f'{string}')
+    if filecheck:
+      print(f"{nstate.OKBLUE} processing shellcode format... NoLineBreak: {mod.no_line_break}\n")
+      print(F'{mod.process()}')
+    else:
+      exit()
+    if mod.cFile:
+      print(f'Output file: {mod.output_file}')
+      filecheck, outstrings = FileCheck.CheckWrittenFile(mod.output_file, 'XOR-POLY')
+      for string in outstrings:
+        print(f'{string}')
+    print(f"{nstate.OKGREEN} DONE!")
 
   elif arguments.command == 'meterpreter':
     stager = meterpreter.stage(arguments.remote_host, arguments.port, arguments.timeout, arguments.arch, arguments.sleep)
@@ -174,7 +193,7 @@ def main(command_line=None):
       print(f'{string}')
 
   elif arguments.command == 'formatout':
-      fout = formatout.format(arguments.input, arguments.syntax, arguments.lines, arguments.no_break, arguments.write)
+      fout = formatout.format(arguments.input, arguments.syntax, arguments.lines, arguments.no_break, arguments.write, arguments.bytes_per_row)
       print(fout.input_file)
       print(f"{nstate.OKBLUE} processing shellcode format... NoLineBreak: {fout.no_break}")
       scFormat = fout.process()

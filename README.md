@@ -6,13 +6,13 @@
 
 ## Features
 
-### Version 0.7.0
+### Version 0.7.1
 
 - **core**
 	- `extract` - [extract](https://www.heckhausen.it/shencode/wiki/core/extract) from/to offset
-	- `formatout` - [display raw shellcodes](https://www.heckhausen.it/shencode/wiki/core/formatout) in `C++, C#` and more
 	- `injection` - [inject shellcode](https://www.heckhausen.it/shencode/wiki/core/injection) into process (Windows only)
 	- `msfvenom` - [create payloads](https://www.heckhausen.it/shencode/wiki/core/msfvenom)  with msfvenom
+	- `output` - [Inspect and display](https://www.heckhausen.it/shencode/wiki/core/output) files in different formats
 - **encoder**
 	- `aes` - [Encrypt](https://www.heckhausen.it/shencode/wiki/encoder/aes) payload with AES
 	- `bytebert` - advanced polymorphic encoder
@@ -27,6 +27,8 @@
 -  **stager**
 	- `meterpreter` - Initiate a `meterpreter/reverse_tcp` [stage](https://www.heckhausen.it/shencode/wiki/stager/meterpreter)
 	- `sliver` - Initiate a `https` [sliver stage](https://www.heckhausen.it/shencode/wiki/stager/sliver)
+- **archive**
+	- `formatout` - [display raw shellcodes](https://www.heckhausen.it/shencode/wiki/core/formatout) in `C++, C#` and more
 
 ## How to use
 
@@ -45,14 +47,11 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
-- `general` - setup routine, which handles the different packages and modules for Windows and Linux
-- `general` - new module parser
-- `general` - new start-up banners
-- `core/inject` - Suspend and Resume Technique
-- `core/inject` - VirtualProtectEx Technique
-- `encoder/bytebert` - advanced polymorphic encoder
-- `stager/meterpreter` - a reverse TCP Meterpreter stager
-- `stager/sliver` - a HTTPS Sliver stager
+- `general` - duplicated header fix
+- `general` - optimized header code
+- `general` - optimized help output
+- `core/output` - Rewritten output module, replaces `formatout`
+- `archiv/formatout` - deprecated module, use `output` instead
 
 ## References
 

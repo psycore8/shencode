@@ -12,8 +12,8 @@ CATEGORY = 'encoder'
 def register_arguments(parser):
     parser.add_argument('-m', '--mode', choices=['encode', 'decode'], required=True, help='AES Operation mode, choose between encode and decode')
     parser.add_argument('-i', '--input', required=True, help='Input file for AES encoding')
-    parser.add_argument('-o', '--output', required=True, help= 'Outputfile for AES encoding')
     parser.add_argument('-k', '--key', required=True, help='Key for AES encoding')
+    parser.add_argument('-o', '--output', required=True, help= 'Outputfile for AES encoding')
 
 class aes_encoder:
     Author = 'psycore8'
