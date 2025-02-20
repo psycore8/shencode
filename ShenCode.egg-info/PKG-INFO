@@ -1,3 +1,38 @@
+Metadata-Version: 2.2
+Name: ShenCode
+Version: 0.7.2
+Summary: A versatile tool for working with shellcodes
+Home-page: https://github.com/psycore8/shencode
+Author: psycore8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: capstone==5.0.3
+Requires-Dist: certifi==2024.12.14
+Requires-Dist: cffi==1.17.1
+Requires-Dist: charset-normalizer==3.4.1
+Requires-Dist: colorama==0.4.6
+Requires-Dist: cryptography==43.0.3
+Requires-Dist: feedparser==6.0.11
+Requires-Dist: idna==3.10
+Requires-Dist: lxml==5.3.0
+Requires-Dist: pefile==2024.8.26
+Requires-Dist: pycparser==2.22
+Requires-Dist: pypng==0.20220715.0
+Requires-Dist: qrcode==7.4.2
+Requires-Dist: requests==2.32.3
+Requires-Dist: setuptools==75.8.0
+Requires-Dist: sgmllib3k==1.0.0
+Requires-Dist: typing_extensions==4.12.2
+Requires-Dist: urllib3==2.3.0
+Requires-Dist: pywin32==308
+Requires-Dist: WMI==1.5.1
+Dynamic: author
+Dynamic: description
+Dynamic: description-content-type
+Dynamic: home-page
+Dynamic: requires-dist
+Dynamic: summary
+
 # ShenCode
 
 **A versatile tool for working with shellcodes.**
