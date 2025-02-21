@@ -89,21 +89,22 @@ def main(command_line=None):
     bb.process()
 
   elif arguments.command == 'xorpoly':
+    
+    xor_enc = xor.xor_encoder('', '', 0, False)
+    # filecheck, outstrings = FileCheck.CheckSourceFile(poly.input_file, 'XOR-POLY')
+    # for string in outstrings:
+    #   print(f'{string}')
+    # if filecheck:
+    #   with open(poly.input_file, "rb") as file:
+    #     shellcode = file.read()
+    # else:
+    #   exit()
     poly = xorpoly.xor(arguments.input, arguments.output, b'', b'', f'{tpl_path}xor-stub.tpl', arguments.key)
-    xor_enc = xor.xor_encoder('', '', 0)
-    filecheck, outstrings = FileCheck.CheckSourceFile(poly.input_file, 'XOR-POLY')
-    for string in outstrings:
-      print(f'{string}')
-    if filecheck:
-      with open(poly.input_file, "rb") as file:
-        shellcode = file.read()
-    else:
-      exit()
-    poly.xored_shellcode = xor_enc.xor_crypt_bytes(shellcode, int(poly.xor_key))
+    poly.xored_shellcode = xor_enc.xor_crypt_bytes(poly.shellcode, int(poly.xor_key))
     poly.process()
-    filecheck, outstrings = FileCheck.CheckWrittenFile(poly.output_file, 'XOR-POLY')
-    for string in outstrings:
-      print(f'{string}')
+    # filecheck, outstrings = FileCheck.CheckWrittenFile(poly.output_file, 'XOR-POLY')
+    # for string in outstrings:
+    #   print(f'{string}')
 
   elif arguments.command == 'byteswap':
     swapper = byteswap.xor(arguments.input, arguments.output, f'{tpl_path}byteswap-short.tpl', arguments.key)

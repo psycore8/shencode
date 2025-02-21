@@ -1,4 +1,5 @@
 from utils.helper import nstate as nstate
+from utils.helper import CheckFile, GetFileInfo
 from os import path as osp
 
 CATEGORY = 'encoder'
@@ -11,7 +12,10 @@ def register_arguments(parser):
 class xor:
     Author = 'psycore8'
     Description = 'create payload from a raw file, encode with xor, add to xor stub'
-    Version = '2.0.0'
+    Version = '2.1.0'
+    DisplayName = 'X0RP0LY-ENC'
+    data_size = 0
+    hash = ''
 
     def __init__(self, input_file, output_file, shellcode, xored_shellcode, template_file, xor_key):
        self.input_file = input_file
@@ -20,6 +24,29 @@ class xor:
        self.xored_shellcode = xored_shellcode
        self.template_file = template_file
        self.xor_key = xor_key
+       with open(self.input_file, 'rb') as file:
+          self.shellcode = file.read()
+
+    def msg(self, message_type, ErrorExit=False):
+        messages = {
+            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.input'    : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',
+            'error.output'   : f'{nstate.s_fail} File {self.output_file} not found or cannot be opened.',
+            'error.template' : f'{nstate.s_fail} File {self.template_file} not found or cannot be opened.',
+            'post.done'      : f'{nstate.s_ok} DONE!',
+            'proc.input_ok'  : f'{nstate.s_ok} File {self.input_file} loaded!\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
+            'proc.output_ok' : f'{nstate.s_ok} File {self.output_file} created!\n{nstate.s_ok} Size {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
+            'proc.stub_ok'   : f'{nstate.s_ok} Stub {self.template_file} loaded!\n{nstate.s_ok} Size {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
+            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input_file}',
+            'proc.output_try': f'{nstate.s_note} Try to write XORPOLY shellcode to file',
+            'proc.stub'      : f'{nstate.s_note} Try to load stub from {self.template_file}',
+            'proc.try'       : f'{nstate.s_note} Try to append shellcode',
+            'proc.key'       : f'{nstate.s_note} Changing key to {self.xor_key}'
+            #'proc.verbose'   : f'\n{self.out}\n'
+        }
+        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
+        if ErrorExit:
+            exit()
 
     def LoadHeader(self):
         try: 
@@ -55,11 +82,32 @@ class xor:
         exit()
 
     def process(self):
-       #Offset = 5
-       xor.LoadHeader(self)
-       xor.AppendShellcode(self)
-       self.shellcode = xor.replace_bytes_at_offset(self.shellcode, 5, self.xor_key)
-       xor.WriteToFile(self)
+        #Offset = 5
+        self.msg('pre.head')
+        self.msg('proc.stub')
+        if CheckFile(self.template_file):
+          self.data_size, self.hash = GetFileInfo(self.template_file)
+          xor.LoadHeader(self)
+          self.msg('proc.stub_ok')
+        else:
+            self.msg('error.template', True)
+        self.msg('proc.try')
+        if CheckFile(self.input_file):
+           self.data_size, self.hash = GetFileInfo(self.input_file)
+           self.msg('proc.input_ok')
+           xor.AppendShellcode(self)
+           self.msg('proc.key')
+           self.shellcode = xor.replace_bytes_at_offset(self.shellcode, 5, self.xor_key)
+        else:
+           self.msg('error.input', True)
+        self.msg('proc.output_try')
+        xor.WriteToFile(self)
+        if CheckFile(self.output_file):
+           self.data_size, self.hash = GetFileInfo(self.output_file)
+           self.msg('proc.output_ok')
+        else:
+           self.msg('error.output', True)
+        self.msg('post.done')
 
     
         
