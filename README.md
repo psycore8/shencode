@@ -47,11 +47,9 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
-- `general` - duplicated header fix
-- `general` - optimized header code
-- `general` - optimized help output
-- `core/output` - Rewritten output module, replaces `formatout`
-- `archiv/formatout` - deprecated module, use `output` instead
+- `encoder/xor` - added `--verbose` argument, which prints XORed bytes
+- `stager/sliver` - Suppressed SSL warnings
+- `stager/sliver` - added sleep before execute argument
 
 ## References
 

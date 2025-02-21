@@ -20,9 +20,7 @@
 
 ### Changes
 
-- `encoder/xor` - added `--verbose` argument, which prints XORed bytes
-- `stager/sliver` - Suppressed SSL warnings
-- `stager/sliver` - added sleep before execute argument
+
 
 #### Wiki
 
