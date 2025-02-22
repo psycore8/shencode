@@ -17,6 +17,7 @@ import utils.helper
 if os.name == 'nt':
   import modules.injection as injection
   import modules.meterpreter as meterpreter
+import modules.info as info
 import modules.msfvenom as msf
 import modules.output as output
 import modules.qrcode as qrcode
@@ -30,9 +31,13 @@ import modules.xorpoly as xorpoly
 #import modules.power as power
 
 Version = '0.7.2'
-banner = 0
+# if you want a static banner, specify it here
+banner = -1
 
 print(f"{nstate.HEADER}")
+# if banner > 0:
+#   print(f'{utils.header.get_header(banner)}')
+#   exit()
 print(f'{utils.header.get_header(banner)}')
 print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}\n')
 arguments = parse_arguments()
@@ -129,6 +134,10 @@ def main(command_line=None):
   elif arguments.command == 'extract':
     ext = extract.extract_shellcode(arguments.input, arguments.output, arguments.start_offset, arguments.end_offset)
     ext.process()
+
+  elif arguments.command == 'info':
+    inf = info.develop(Version, 'modules', arguments.modlist)
+    inf.process()
 
   elif arguments.version:
     print(f'ShenCode {Version}')
