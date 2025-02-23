@@ -13,6 +13,7 @@
 import modules.extract
 import random
 from utils.helper import nstate as nstate
+from utils.helper import CheckFile, GetFileInfo
 import utils.helper
 from os import path as osp
 from subprocess import run
@@ -20,8 +21,8 @@ from subprocess import run
 CATEGORY = 'encoder'
 
 def register_arguments(parser):
-            parser.add_argument('-i', '--input', help='Input file to use with byteswap stub')
-            parser.add_argument('-o', '--output', help='outputfile for byteswap stub')
+            parser.add_argument('-i', '--input', help='Input file to use with bytebert')
+            parser.add_argument('-o', '--output', help='outputfile for bytebert')
             parser.add_argument('-v', '--variable-padding', action='store_true', help='Inserts a random NOP to differ the padding')
 
 class bb_encoder:
@@ -38,6 +39,8 @@ class bb_encoder:
     start_offset = '100'
     end_offset = ''
     stub_size = 0
+    data_size = 0
+    hash = ''
 
     def __init__(self, input_file, output_file, random_padding=bool):
         self.input_file = input_file
@@ -48,11 +51,15 @@ class bb_encoder:
         messages = {
             'pre.head'      : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
             'proc.ssize'    : f'{nstate.s_note} Stub generated with a size of {self.stub_size} bytes',
-            'proc.rkey'     : f'{nstate.s_ok} Random key: {self.key} ({hex(self.key)})',
+            'proc.rkey'     : f'{nstate.s_note} Random key: {self.key} ({hex(self.key)})',
             'error.input'   : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',
-            'proc.psize'    : f'{nstate.s_ok} Payload size: {self.Shellcode_Length}',
+            'error.output'  : f'{nstate.s_fail} File {self.output_file} not found or cannot be opened.',
+            'proc.psize'    : f'{nstate.s_note} Payload size: {self.Shellcode_Length}',
             'proc.xor_ok'   : f'{nstate.s_note} XORed payload added!',
-            'proc.out'      : f"{nstate.s_ok} XOR encoded shellcode created in {self.output_file}",
+            'proc.out'      : f'{nstate.s_ok} File created in {self.output_file}\n{nstate.s_note} Hash: {self.hash}',
+            'proc.comp_try' : f'{nstate.s_note} Try to compile object file',
+            'proc.input_ok' : f'{nstate.s_ok} File {self.input_file} loaded\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
+            'proc.compile'  : f'{nstate.s_ok} File {self.OutputFile_Root}.o created\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
             'error.xor_ok'  : f"{nstate.s_fail} XOR encoded Shellcode error, aborting script execution",
             'error.nasm1'   : f'{nstate.s_fail} nasm.exe not found! Please download and place it in the shencode directory',
             'error.nasm2'   : f'{nstate.s_info} You can compile it by hand: nasm.exe -f win64 {self.output_file} -o {self.OutputFile_Root}.o'
@@ -123,11 +130,11 @@ class bb_encoder:
       elif isinstance(data, str):
             with open(filename, 'w') as file:
                 file.write(data)
-      cf = osp.isfile(filename)
-      if cf == True:
-        self.msg('proc.out')
-      else:
-        self.msg('error.xor_ok', True)
+    #   cf = osp.isfile(filename)
+    #   if cf == True:
+    #     self.msg('proc.out')
+    #   else:
+    #     self.msg('error.xor_ok', True)
 
     def CompileObjectFile(self):
         self.OutputFile_Root, output_file_extension = osp.splitext(self.output_file)
@@ -139,13 +146,27 @@ class bb_encoder:
         
     def process(self):
         self.msg('pre.head')
-        self.LoadShellcode()
+        if CheckFile(self.input_file):
+            self.LoadShellcode()
+            self.data_size, self.hash = GetFileInfo(self.input_file)
+            self.msg('proc.input_ok')
+        else:
+            self.msg('error.input', True)
         self.LoadHeader()
         self.ConvertShellCodeToStr()
         self.AppendShellcode()
         self.WriteToFile(self.Modified_Shellcode, self.output_file)
+        if CheckFile(self.output_file):
+            self.data_size, self.hash = GetFileInfo(self.output_file)
+            self.msg('proc.out')
+        else:
+            self.msg('error.output', True)
         if self.CheckNasm():
+            self.msg('proc.comp_try')
             self.CompileObjectFile()
+            if CheckFile(f'{self.OutputFile_Root}.o'):
+                self.data_size, self.hash = GetFileInfo(f'{self.OutputFile_Root}.o')
+                self.msg('proc.compile')
         else:
             self.msg('error.nasm1')
             self.msg('error.nasm2')

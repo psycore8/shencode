@@ -2,7 +2,7 @@
 
 **A versatile tool for working with shellcodes.**
 
-![](shencode-070.png)
+![](shencode-072.png)
 
 ## Features
 
@@ -47,7 +47,9 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
+- `general` - improved console output
 - `encoder/xor` - added `--verbose` argument, which prints XORed bytes
+- `encoder/bytebert` - optimizations
 - `stager/sliver` - Suppressed SSL warnings
 - `stager/sliver` - added sleep before execute argument
 

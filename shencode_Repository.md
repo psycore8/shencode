@@ -2,9 +2,9 @@
 
 ### ToDo
 
-- [ ] `general` - improved messaging system
-- [ ] implement messaging in all modules
-- [ ] clean main()
+- [x] `general` - improved messaging system
+- [x] implement messaging in all modules
+- [x] clean main()
 - [ ] code cleanup
 - [ ] automate main in 3 lines?
 
