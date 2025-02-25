@@ -7,6 +7,7 @@ __pycache__
 _dev.*
 psy*
 nasm.exe
+.vscode/
 
 _policy
 # Byte-compiled / optimized / DLL files

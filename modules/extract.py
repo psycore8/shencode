@@ -45,19 +45,14 @@ class extract_shellcode:
     def process(self):
         self.msg('pre.head')
         self.msg('proc.input_try')
-        #print(f"{nstate.OKBLUE} try to open file")
         short_fn = os_path.basename(self.input_file)
         try:
             with open(self.input_file, "rb") as file:
                 shellcode = file.read()
                 self.data_size, self.hash = GetFileInfo(self.input_file)
                 self.msg('proc.input_ok')
-                #print(f"{nstate.OKGREEN} reading {short_fn} successful!")
         except FileNotFoundError:
             self.msg('error.input', True)
-            #print(f"{nstate.FAIL} file not found, exit")
-            #exit()
-        #print(f"{nstate.OKBLUE} extracting shellcode from {self.start_offset} to {self.end_offset}")
         self.msg('proc.try')
         shellcode_new = shellcode[int(self.start_offset):int(self.end_offset)]
         self.msg('proc.output_try')
@@ -69,13 +64,3 @@ class extract_shellcode:
         else:
             self.msg('error.output', True)
         self.msg('post.done')
-
-        
-        # path = self.output_file
-        # cf = os_path.isfile(path)
-        # short_fn = os_path.basename(self.output_file)
-        # if cf == True:
-        #     print(f"{nstate.OKGREEN} written shellcode to {short_fn}")
-        # else:
-        #     print(f"{nstate.FAIL} error while writing")
-        #     exit()

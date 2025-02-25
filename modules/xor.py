@@ -60,7 +60,6 @@ class xor_encoder:
    
     def xor_crypt_bytes(self, data, key):
         self.out = [x ^ key for x in data]
-        #print(out)
         return bytes(self.out)
     
     def open_file(self):

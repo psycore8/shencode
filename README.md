@@ -50,8 +50,10 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 - `general` - improved console output
 - `encoder/xor` - added `--verbose` argument, which prints XORed bytes
 - `encoder/bytebert` - optimizations
-- `stager/sliver` - Suppressed SSL warnings
+- `stager/sliver` - Suppressed TLS warnings
 - `stager/sliver` - added sleep before execute argument
+- `steger/sliver` - added support for gzip compression
+- `stager/sliver` - added support for AES encrypted stages
 
 ## References
 

@@ -9,7 +9,6 @@
 # or inject via shencode
 # autocompile?
 
-#import utils.arg
 import modules.extract
 import random
 from utils.helper import nstate as nstate
@@ -130,11 +129,6 @@ class bb_encoder:
       elif isinstance(data, str):
             with open(filename, 'w') as file:
                 file.write(data)
-    #   cf = osp.isfile(filename)
-    #   if cf == True:
-    #     self.msg('proc.out')
-    #   else:
-    #     self.msg('error.xor_ok', True)
 
     def CompileObjectFile(self):
         self.OutputFile_Root, output_file_extension = osp.splitext(self.output_file)

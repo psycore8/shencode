@@ -64,7 +64,7 @@ def main(command_line=None):
     stager.process()
 
   elif arguments.command == 'sliver':
-    stager = sliver.stage(arguments.remote_host, arguments.port, arguments.sleep)
+    stager = sliver.stage(arguments.remote_host, arguments.port, arguments.sleep, arguments.aes, arguments.aes_key, arguments.aes_iv, arguments.compression, arguments.headers)
     stager.process()
 
   elif arguments.command == 'bytebert':

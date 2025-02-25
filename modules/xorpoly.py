@@ -51,19 +51,11 @@ class xor:
             exit()
 
     def LoadHeader(self):
-        #try: 
         with open(self.template_file, "rb") as file:
             self.shellcode = file.read()
-        #except FileNotFoundError:
-         # print(f'{nstate.FAIL} File {self.template_file} not found or cannot be opened.')
-        #  exit()
-        #size = len(self.shellcode)
-        #print(f'{nstate.OKBLUE} Header loaded, size of shellcode {size} bytes')
 
     def AppendShellcode(self):
         self.shellcode += self.xored_shellcode
-        #size = len(self.shellcode)
-        #print(f'{nstate.OKBLUE} XORed payload added, size of shellcode {size} bytes')
 
     def replace_bytes_at_offset(data, offset, new_bytes):
         data = bytearray(data)
@@ -75,13 +67,6 @@ class xor:
       outputfile = self.output_file #xor.Output_File
       with open(outputfile, 'wb') as file:
         file.write(self.shellcode)
-      # path = outputfile
-      # cf = osp.isfile(path)
-      # if cf == True:
-      #   print(f"{nstate.OKGREEN} XOR encoded shellcode created in {outputfile}")
-      # else:
-      #   print(f"{nstate.FAIL} XOR encoded Shellcode error, aborting script execution")
-      #   exit()
 
     def process(self):
         #Offset = 5

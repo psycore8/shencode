@@ -65,29 +65,15 @@ class xor:
         return bytes(transformed)
 
     def LoadHeader(self):
-        # try: 
             with open(self.template_file, "rb") as file:
                 self.Modified_Shellcode = file.read()
-        # except FileNotFoundError:
-        #   print(f'{nstate.FAIL} File {self.template_file} not found or cannot be opened.')
-        #   exit()
-        # size = len(self.Modified_Shellcode)
-        # print(f'{nstate.OKBLUE} Header loaded, size of shellcode {size} bytes')
 
     def LoadShellcode(self):
-        # try:
         with open(self.input_file, 'rb') as file:
             self.Shellcode = file.read()
-        # except FileNotFoundError:
-        #   print(f'{nstate.FAIL} File {self.input_file} not found or cannot be opened.')
-        #   exit()
         self.Shellcode_Length = len(self.Shellcode)
         if self.Shellcode_Length > 255:
             self.msg('error.size', True)
-           #print(f'{nstate.FAIL} Shellcode exceeds max size of 255 bytes')
-           #exit()
-        #else:
-          # print(f'{nstate.INFO} Source Shellcode size {size} bytes')
 
     def AppendShellcode(self):
         self.Modified_Shellcode += self.encrypt(self.Shellcode, int(self.xor_key))
@@ -101,16 +87,8 @@ class xor:
         return bytes(data)
 
     def WriteToFile(self):
-      #outputfile = xor.Output_File
       with open(self.output_file, 'wb') as file:
         file.write(self.Modified_Shellcode)
-    #   path = self.output_file
-    #   cf = osp.isfile(path)
-    #   if cf == True:
-    #     print(f"{nstate.OKGREEN} XOR encoded shellcode created in {self.output_file}")
-    #   else:
-    #     print(f"{nstate.FAIL} XOR encoded Shellcode error, aborting script execution")
-    #     exit()
 
     def process(self):
        self.msg('pre.head')

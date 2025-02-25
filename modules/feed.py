@@ -62,7 +62,6 @@ class feed_obfuscator:
     def convert_bytes_to_fake_id(self, block_size=16):
         s = self.shellcode.encode('utf-8')
         self.feed_fake_ids.extend([s[i:i + block_size] for i in range(0, len(s), block_size)])
-        #print(f'{self.feed_fake_ids}')
 
     def generate_feed(self):
         date_time = datetime.datetime.now()
@@ -111,7 +110,6 @@ class feed_obfuscator:
         for entry in feed.entries:
             pos = entry.id.rfind('/')
             self.shellcode += entry.id[pos + 1:]
-        #print(self.shellcode)
         out_shellcode = bytes.fromhex(self.shellcode)
         with open(self.output_file, 'wb') as file:
             file.write(out_shellcode)
