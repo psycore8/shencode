@@ -2,7 +2,38 @@ from utils.hashes import sha1
 from os import name, path, rename, stat
 import re
 
+def CheckFile(file):
+    cf = path.isfile(file)
+    if cf:
+        return True
+    else:
+        return False
+    
+def GetFSize(file):
+    fs = path.getsize(file)
+    return fs
+    
+def GetFileHash(file):
+    hash = sha1.calculate_sha1(file)
+    return f'{nstate.f_bold}{nstate.clLIGHTBLUE}{hash}{nstate.f_end}'
+
+def GetFileInfo(file):
+    size = GetFSize(file)
+    hash = f'{nstate.f_bold}{nstate.clLIGHTBLUE}{sha1.calculate_sha1(file)}{nstate.f_end}'
+    return size, hash
+
+
 class nstate:
+    ### [STATUS]-[MODNAME] : Message Extra
+    s_ok    = '\033[90m[\033[92m+\033[90m]\033[0m'
+    s_note  = '\033[90m[\033[94m*\033[90m]\033[0m'
+    s_fail  = '\033[90m[\033[91m-\033[90m]\033[0m'
+    s_info  = '\033[90m[\033[93mi\033[90m]\033[0m'
+    f_link  = '\033[94m\033[4m'
+    f_out   = '\033[90m[\033[95m#\033[90m]\033[0m'
+    f_ul    = '\033[4m'
+    f_bold  = '\033[1m'
+    f_end   = '\033[0m'
     HEADER = '\033[95m'
     OKBLUE = '\033[94m[*]\033[0m'
     OKCYAN = '\033[96m'
@@ -19,6 +50,10 @@ class nstate:
     clGRAY = '\033[90m'
     clLIGHTMAGENTA = '\x1b[35m'
 
+    def FormatModuleHeader(ModHeadText, ModVersion):
+        f = f'{nstate.f_bold}{nstate.clGRAY}[{nstate.clRED}{ModHeadText}{nstate.clGRAY}]-[{nstate.clRED}{ModVersion}{nstate.clGRAY}]{nstate.f_end}'
+        return f
+
     def TextBlue(TextToFormat:str) -> str:
         return f'\033[94m{TextToFormat}\033[0m'
     
@@ -28,6 +63,12 @@ class nstate:
     def remove_ansi_escape_sequences(text):
         ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
         return ansi_escape.sub('', text)
+    
+    def m(mtype):
+        messages = {
+            'done': '\033[92m[+]\033[0m DONE!'
+        }
+        print(messages.get(mtype, 'Unknown Message'))
 
 class FileCheck:
 

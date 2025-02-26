@@ -13,6 +13,9 @@ class ror2rol_obfuscator:
   Author = 'bordergate, psycore8'
   Description = 'change ROR13 to ROL encoding in metasploit payloads'
   Version = '2.0.0'
+  #DisplayName = 'ROLLIN''HASH'
+  data_size = 0
+  hash = ''
   hash_dict = dict()
   dll_paths = [ 'C:\\Windows\\System32\\kernel32.dll', 
                 'C:\\Windows\\System32\\ws2_32.dll', 

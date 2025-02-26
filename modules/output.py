@@ -1,4 +1,5 @@
 from utils.helper import nstate as nstate
+from utils.helper import CheckFile, GetFileHash
 
 CATEGORY = 'core'
 
@@ -16,7 +17,8 @@ def register_arguments(parser):
 class format_shellcode:
     Author = 'psycore8'
     Description = 'create formatted output by filename'
-    Version = '0.1.3'
+    DisplayName = 'MODOUT'
+    Version = '0.1.4'
     file_bytes = bytes
     offset_color = nstate.clLIGHTMAGENTA
     cFile = False
@@ -32,6 +34,21 @@ class format_shellcode:
         self.output_file = output_file
         if not output_file == '':
             self.cFile = True
+
+    def msg(self, message_type, ErrorExit=False):
+        messages = {
+            'pre.head'      : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'pre.input'     : f'{nstate.s_note} Input File: {self.input_file}',
+            'pre.hash'      : f'{nstate.s_info} File Hash: {GetFileHash(self.input_file)}',
+            'process'       : f'{nstate.s_note} processing shellcode format... NoLineBreak: {self.no_line_break}\n',
+            'post.output'   : f'{nstate.s_ok} Output file: {self.output_file}',
+            'post.done'     : f'{nstate.s_ok} DONE!',
+            'error.input'   : f'{nstate.s_fail} Input file not found' ,
+            'error.output'  : f'{nstate.s_fail} Output file not found'
+        }
+        print(messages.get(message_type, 'Unknown message type'))
+        if ErrorExit:
+            exit()
  
     def LoadInputFile(self):
         with open(self.input_file, 'rb') as file:
@@ -79,17 +96,30 @@ class format_shellcode:
             offset = f'{c}{counter:08X}:{nstate.ENDC}'
         return offset
 
-    def PostProcess(self, byte_str):
+    def PostProcess(self):
         pass
 
     def process(self):
+        self.msg('pre.head')
         if self.syntax == 'inspect':
             self.lines = True
-        self.LoadInputFile()
+        self.msg('pre.input')
+        if CheckFile(self.input_file):
+            self.LoadInputFile()
+            self.msg('pre.hash')
+        else:
+            self.msg('error.input', True)
+        self.msg('process')
         output = self.GenerateOutput()
         if not self.output_file == '':
             self.SaveOutputFile(output)
-        return output
+            if CheckFile(self.output_file):
+                self.msg('post.output')
+            else:
+                self.msg('error.output', True)
+        print(output)
+        self.msg('post.done')
+        #return output
         
     lang = {
         'c': {

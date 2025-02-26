@@ -17,6 +17,7 @@ import utils.helper
 if os.name == 'nt':
   import modules.injection as injection
   import modules.meterpreter as meterpreter
+import modules.info as info
 import modules.msfvenom as msf
 import modules.output as output
 import modules.qrcode as qrcode
@@ -27,10 +28,16 @@ import modules.uuid as uuid
 import modules.xor as xor
 import modules.xorpoly as xorpoly
 
-Version = '0.7.1'
-banner = 0
+#import modules.power as power
+
+Version = '0.7.2'
+# if you want a static banner, specify it here
+banner = -1
 
 print(f"{nstate.HEADER}")
+# if banner > 0:
+#   print(f'{utils.header.get_header(banner)}')
+#   exit()
 print(f'{utils.header.get_header(banner)}')
 print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}\n')
 arguments = parse_arguments()
@@ -44,40 +51,20 @@ elif os.name == 'posix':
   tpl_path = 'tpl/'
   
 def main(command_line=None):
-
-  # print(f"{nstate.HEADER}")
-  # print(f'{utils.header.get_header()}')
-  # print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}')
-
   if arguments.command == 'msfvenom':
-    print(f"{nstate.OKBLUE} create payload")
-    cs = msf.msfvenom(arguments.cmd)
-    cs.CreateShellcodeEx(msfvenom_path)
+    cs = msf.msfvenom(arguments.cmd, msfvenom_path)
+    cs.process()
 
-  if arguments.command == 'output':
+  elif arguments.command == 'output':
     mod = output.format_shellcode(arguments.input, arguments.syntax, arguments.bytes_per_row, arguments.decimal, arguments.lines, arguments.no_line_break, arguments.output)
-    print(f'Input file: {mod.input_file}')
-    filecheck, outstrings = FileCheck.CheckSourceFile(mod.input_file, 'MOD-OUT')
-    for string in outstrings:
-      print(f'{string}')
-    if filecheck:
-      print(f"{nstate.OKBLUE} processing shellcode format... NoLineBreak: {mod.no_line_break}\n")
-      print(F'{mod.process()}')
-    else:
-      exit()
-    if mod.cFile:
-      print(f'Output file: {mod.output_file}')
-      filecheck, outstrings = FileCheck.CheckWrittenFile(mod.output_file, 'XOR-POLY')
-      for string in outstrings:
-        print(f'{string}')
-    print(f"{nstate.OKGREEN} DONE!")
+    mod.process()
 
   elif arguments.command == 'meterpreter':
     stager = meterpreter.stage(arguments.remote_host, arguments.port, arguments.timeout, arguments.arch, arguments.sleep)
     stager.process()
 
   elif arguments.command == 'sliver':
-    stager = sliver.stage(arguments.remote_host, arguments.port)
+    stager = sliver.stage(arguments.remote_host, arguments.port, arguments.sleep, arguments.aes, arguments.aes_key, arguments.aes_iv, arguments.compression, arguments.headers)
     stager.process()
 
   elif arguments.command == 'bytebert':
@@ -86,111 +73,27 @@ def main(command_line=None):
 
   elif arguments.command == 'xorpoly':
     poly = xorpoly.xor(arguments.input, arguments.output, b'', b'', f'{tpl_path}xor-stub.tpl', arguments.key)
-    xor_enc = xor.xor_encoder('', '', 0)
-    filecheck, outstrings = FileCheck.CheckSourceFile(poly.input_file, 'XOR-POLY')
-    for string in outstrings:
-      print(f'{string}')
-    if filecheck:
-      with open(poly.input_file, "rb") as file:
-        shellcode = file.read()
-    else:
-      exit()
-    poly.xored_shellcode = xor_enc.xor_crypt_bytes(shellcode, int(poly.xor_key))
     poly.process()
-    filecheck, outstrings = FileCheck.CheckWrittenFile(poly.output_file, 'XOR-POLY')
-    for string in outstrings:
-      print(f'{string}')
 
   elif arguments.command == 'byteswap':
     swapper = byteswap.xor(arguments.input, arguments.output, f'{tpl_path}byteswap-short.tpl', arguments.key)
-    filecheck, outstrings = FileCheck.CheckSourceFile(swapper.input_file, 'XOR-SWAP')
-    for string in outstrings:
-      print(f'{string}')
-    if filecheck:
-      with open(swapper.input_file, "rb") as file:
-        shellcode = file.read()
-    else:
-      exit()
     swapper.process()
-    filecheck, outstrings = FileCheck.CheckWrittenFile(swapper.output_file, 'XOR-SWAP')
-    for string in outstrings:
-      print(f'{string}')
 
   elif arguments.command == 'aes':
     aes_enc = aes.aes_encoder(arguments.mode, arguments.input, arguments.output, arguments.key, b'')
-    print(f'{nstate.OKBLUE} [AES] Module')
-    aes_enc.key = aes_enc.key.encode('utf-8')
-    if aes_enc.mode == 'encode':
-      print(f'{nstate.OKBLUE} [AES] ENCRYPT')
-      filecheck, outstrings = FileCheck.CheckSourceFile(aes_enc.input_file, 'AES-ENC')
-      for string in outstrings:
-        print(f'{string}')
-      if filecheck:
-        aes_enc.encode()
-        filecheck, outstrings = FileCheck.CheckWrittenFile(aes_enc.output_file, 'AES-ENC')
-        for string in outstrings:
-          print(f'{string}')
-      else:
-        exit()
-    elif aes_enc.mode == 'decode':
-      print(f'{nstate.OKBLUE} [AES] DECRYPT')
-      filecheck, outstrings = FileCheck.CheckSourceFile(aes_enc.input_file, 'AES-DEC')
-      for string in outstrings:
-        print(f'{string}')
-      if filecheck:
-        aes_enc.decode()
-        filecheck, outstrings = FileCheck.CheckWrittenFile(aes_enc.output_file, 'AES-DEC')
-        for string in outstrings:
-          print(f'{string}')
-      else:
-        exit()
+    aes_enc.process()
 
   elif arguments.command == 'uuid':
-      short_fn = os.path.basename(arguments.input)
       uuid_obf = uuid.uuid_obfuscator(arguments.input, '', '', 0)
-      print(f"{nstate.OKBLUE} try to open file")
-      if uuid_obf.open_file(uuid_obf.input_file):
-        print(f"{nstate.OKGREEN} reading {short_fn} successful!")
-      else:
-        print(f"{nstate.FAIL} file not found, exit")
-      print(f"{nstate.OKBLUE} try to generate UUIDs")  
-      print(uuid_obf.CreateVar())
+      uuid_obf.process()
 
   elif arguments.command == 'feed':
-    feed_obf = feed.feed_obfuscator(arguments.input, arguments.output, arguments.uri)
-
-    if feed_obf.uri:
-      feed_obf.reassemble_shellcode()
-      filecheck, outstrings = FileCheck.CheckSourceFile(feed_obf.output_file, 'OBF-RSS')
-      for string in outstrings:
-        print(string)
-      exit()
-    filecheck, outstrings = FileCheck.CheckSourceFile(feed_obf.input_file, 'OBF-RSS')
-    for string in outstrings:
-      print(string)
-    if filecheck:
-      feed_obf.open_file()
-      feed_obf.convert_bytes_to_fake_id()
-      feed_obf.generate_feed()
-    else:
-      exit()
-    filecheck, outstrings = FileCheck.CheckSourceFile(feed_obf.output_file, 'OBF-RSS')
-    for string in outstrings:
-      print(string)
+    feed_obf = feed.feed_obfuscator(arguments.input, arguments.output, arguments.uri, arguments.reassemble)
+    feed_obf.process()
 
   elif arguments.command == 'qrcode':
     qr = qrcode.qrcode_obfuscator(arguments.input, arguments.output, '')
-    filecheck, outstrings = FileCheck.CheckSourceFile(qr.input_file, 'OBF-QRC')
-    for string in outstrings:
-      print(f'{string}')
-    if filecheck:
-      qr.open_file()
-      qr.process()
-    else:
-      exit()
-    filecheck, outstrings = FileCheck.CheckWrittenFile(qr.output_file, 'OBF-QRC')
-    for string in outstrings:
-      print(f'{string}')
+    qr.process()
 
   elif arguments.command == 'formatout':
       fout = formatout.format(arguments.input, arguments.syntax, arguments.lines, arguments.no_break, arguments.write, arguments.bytes_per_row)
@@ -221,57 +124,23 @@ def main(command_line=None):
         print(f'{string}')
 
   elif arguments.command == 'xor':
-      xor_encoder = xor.xor_encoder(arguments.input, arguments.output, arguments.key)
-      print(f"{nstate.OKBLUE} Reading shellcode")
-      filecheck, outstrings = FileCheck.CheckSourceFile(xor_encoder.input_file, 'XOR-ENC')
-      for strings in outstrings:
-        print(f'{strings}')
-      if filecheck:
-        with open(arguments.input, "rb") as file:
-          shellcode = file.read()
-      else:
-        exit()
-      modified_shellcode = xor_encoder.xor_crypt_bytes(shellcode, int(xor_encoder.xor_key))
-      with open(xor_encoder.output_file, 'wb') as file:
-        file.write(modified_shellcode)
-      filecheck, outstrings = FileCheck.CheckWrittenFile(xor_encoder.output_file, 'XOR-ENC')
-      for strings in outstrings:
-        print(f'{strings}')
-      if not filecheck:
-        exit()
+      xor_encoder = xor.xor_encoder(arguments.input, arguments.output, arguments.key, arguments.verbose)
+      xor_encoder.process()
 
   elif arguments.command == 'injection':
     code_injection = injection.inject(arguments.input, arguments.start, arguments.process, '', arguments.resume_thread, arguments.virtual_protect)
-    print(f"{nstate.OKBLUE} Reading shellcode")
-    filecheck, outstrings = FileCheck.CheckSourceFile(code_injection.input_file, 'iNJECT')
-    for strings in outstrings:
-      print(f'{strings}')
-    if filecheck:
-      with open(code_injection.input_file, "rb") as file:
-        code_injection.shellcode = file.read()
-        code_injection.start_injection()
+    code_injection.process()
 
   elif arguments.command == 'extract':
     ext = extract.extract_shellcode(arguments.input, arguments.output, arguments.start_offset, arguments.end_offset)
-    filecheck, outstrings = FileCheck.CheckSourceFile(ext.input_file, 'XTRACT')
-    for string in outstrings:
-      print(f'{string}')
-    if filecheck:
-      ext.process()
-    else:
-      exit()
-    filecheck, outstrings = FileCheck.CheckSourceFile(ext.output_file, 'XTRACT')
-    for string in outstrings:
-      print(f'{string}')
+    ext.process()
+
+  elif arguments.command == 'info':
+    inf = info.develop(Version, 'modules', arguments.modlist)
+    inf.process()
 
   elif arguments.version:
     print(f'ShenCode {Version}')
 
 if __name__ == "__main__":
-    # if arguments.banner > 0:
-    #   print(f'{arguments.banner}')
-    #   banner = arguments.banner
-
-    #utils.helper.FirstRun.CheckFirstRunState()
-    #print(args)
     main()

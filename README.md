@@ -2,11 +2,11 @@
 
 **A versatile tool for working with shellcodes.**
 
-![](shencode-070.png)
+![](shencode-072.png)
 
 ## Features
 
-### Version 0.7.1
+### Version 0.7.2
 
 - **core**
 	- `extract` - [extract](https://www.heckhausen.it/shencode/wiki/core/extract) from/to offset
@@ -47,11 +47,13 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
-- `general` - duplicated header fix
-- `general` - optimized header code
-- `general` - optimized help output
-- `core/output` - Rewritten output module, replaces `formatout`
-- `archiv/formatout` - deprecated module, use `output` instead
+- `general` - improved console output
+- `encoder/xor` - added `--verbose` argument, which prints XORed bytes
+- `encoder/bytebert` - optimizations
+- `stager/sliver` - Suppressed TLS warnings
+- `stager/sliver` - added sleep before execute argument
+- `steger/sliver` - added support for gzip compression
+- `stager/sliver` - added support for AES encrypted stages
 
 ## References
 

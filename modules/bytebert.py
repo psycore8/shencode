@@ -9,24 +9,26 @@
 # or inject via shencode
 # autocompile?
 
-#import utils.arg
 import modules.extract
 import random
 from utils.helper import nstate as nstate
+from utils.helper import CheckFile, GetFileInfo
+import utils.helper
 from os import path as osp
 from subprocess import run
 
 CATEGORY = 'encoder'
 
 def register_arguments(parser):
-            parser.add_argument('-i', '--input', help='Input file to use with byteswap stub')
-            parser.add_argument('-o', '--output', help='outputfile for byteswap stub')
+            parser.add_argument('-i', '--input', help='Input file to use with bytebert')
+            parser.add_argument('-o', '--output', help='outputfile for bytebert')
             parser.add_argument('-v', '--variable-padding', action='store_true', help='Inserts a random NOP to differ the padding')
 
 class bb_encoder:
     Author = 'psycore8'
     Description = 'ByteBert - Advanced polymorphic Encoder Stub'
-    Version = '0.1.3'
+    Version = '0.2.0'
+    DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
     Shellcode_Length = ''
@@ -35,11 +37,35 @@ class bb_encoder:
     key = 0
     start_offset = '100'
     end_offset = ''
+    stub_size = 0
+    data_size = 0
+    hash = ''
 
     def __init__(self, input_file, output_file, random_padding=bool):
         self.input_file = input_file
         self.output_file = output_file
         self.random_padding = random_padding
+
+    def msg(self, message_type, ErrorExit=False):
+        messages = {
+            'pre.head'      : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'proc.ssize'    : f'{nstate.s_note} Stub generated with a size of {self.stub_size} bytes',
+            'proc.rkey'     : f'{nstate.s_note} Random key: {self.key} ({hex(self.key)})',
+            'error.input'   : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',
+            'error.output'  : f'{nstate.s_fail} File {self.output_file} not found or cannot be opened.',
+            'proc.psize'    : f'{nstate.s_note} Payload size: {self.Shellcode_Length}',
+            'proc.xor_ok'   : f'{nstate.s_note} XORed payload added!',
+            'proc.out'      : f'{nstate.s_ok} File created in {self.output_file}\n{nstate.s_note} Hash: {self.hash}',
+            'proc.comp_try' : f'{nstate.s_note} Try to compile object file',
+            'proc.input_ok' : f'{nstate.s_ok} File {self.input_file} loaded\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
+            'proc.compile'  : f'{nstate.s_ok} File {self.OutputFile_Root}.o created\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
+            'error.xor_ok'  : f"{nstate.s_fail} XOR encoded Shellcode error, aborting script execution",
+            'error.nasm1'   : f'{nstate.s_fail} nasm.exe not found! Please download and place it in the shencode directory',
+            'error.nasm2'   : f'{nstate.s_info} You can compile it by hand: nasm.exe -f win64 {self.output_file} -o {self.OutputFile_Root}.o'
+        }
+        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
+        if ErrorExit:
+            exit()
 
     def CheckNasm(self)->bool:
         if osp.exists('nasm.exe'):
@@ -63,23 +89,23 @@ class bb_encoder:
 
     def LoadHeader(self):
         self.Modified_Shellcode = self.generate_win64_stub()
-        size = len(self.Modified_Shellcode)
-        print(f'{nstate.OKBLUE} Stub generated with a size of {size} bytes')
+        self.stub_size = len(self.Modified_Shellcode)
+        self.msg('proc.ssize')
 
     def LoadShellcode(self):
         self.key = random.randint(1, 255)
-        print(f'{nstate.OKGREEN} Random key: {self.key} ({hex(self.key)})')
+        self.msg('proc.rkey')
         try:
           with open(self.input_file, 'rb') as file:
              shellcode_bytes = file.read()
         except FileNotFoundError:
-          print(f'{nstate.FAIL} File {self.input_file} not found or cannot be opened.')
-          exit()
+          self.msg('error.input', True)
+
         self.Shellcode_Bin = self.encrypt(shellcode_bytes, self.key)
         size = len(self.Shellcode_Bin)
         self.Shellcode_Length = str(size)
         self.end_offset = str( 404 )
-        print(f'{nstate.OKGREEN} Payload size: {self.Shellcode_Length}')
+        self.msg('proc.psize')
 
     def ConvertShellCodeToStr(self):
         self.Shellcode = [f"0x{byte:02X}" for byte in self.Shellcode_Bin]
@@ -88,7 +114,7 @@ class bb_encoder:
     def AppendShellcode(self):
         self.Modified_Shellcode += self.Shellcode
         size = len(self.Modified_Shellcode)
-        print(f'{nstate.OKBLUE} XORed payload added, size of shellcode {size} bytes')
+        self.msg('proc.xor_ok')
 
     def replace_bytes_at_offset(self, data, offset, new_bytes):
         data = bytearray(data)
@@ -103,12 +129,6 @@ class bb_encoder:
       elif isinstance(data, str):
             with open(filename, 'w') as file:
                 file.write(data)
-      cf = osp.isfile(filename)
-      if cf == True:
-        print(f"{nstate.OKGREEN} XOR encoded shellcode created in {self.output_file}")
-      else:
-        print(f"{nstate.FAIL} XOR encoded Shellcode error, aborting script execution")
-        exit()
 
     def CompileObjectFile(self):
         self.OutputFile_Root, output_file_extension = osp.splitext(self.output_file)
@@ -119,17 +139,31 @@ class bb_encoder:
         extract_shellcode.process()
         
     def process(self):
-        self.LoadShellcode()
+        self.msg('pre.head')
+        if CheckFile(self.input_file):
+            self.LoadShellcode()
+            self.data_size, self.hash = GetFileInfo(self.input_file)
+            self.msg('proc.input_ok')
+        else:
+            self.msg('error.input', True)
         self.LoadHeader()
         self.ConvertShellCodeToStr()
         self.AppendShellcode()
         self.WriteToFile(self.Modified_Shellcode, self.output_file)
-        if self.CheckNasm():
-            self.CompileObjectFile()
+        if CheckFile(self.output_file):
+            self.data_size, self.hash = GetFileInfo(self.output_file)
+            self.msg('proc.out')
         else:
-            print(f'{nstate.FAIL} nasm.exe not found! Please download and place it in the shencode directory')
-            print(f'{nstate.INFO} You can compile it by hand: nasm.exe -f win64 {self.output_file} -o {self.OutputFile_Root}.o')
-       #self.ExtractShellCode()
+            self.msg('error.output', True)
+        if self.CheckNasm():
+            self.msg('proc.comp_try')
+            self.CompileObjectFile()
+            if CheckFile(f'{self.OutputFile_Root}.o'):
+                self.data_size, self.hash = GetFileInfo(f'{self.OutputFile_Root}.o')
+                self.msg('proc.compile')
+        else:
+            self.msg('error.nasm1')
+            self.msg('error.nasm2')
 
     def generate_win64_stub(self):
         multi_bit_registers = [
@@ -142,8 +176,6 @@ class bb_encoder:
 
 
         reg1, reg2, reg3 = random.sample(multi_bit_registers, 3)
-        # negotiated_key = ~self.key
-        # print(negotiated_key)
 
         if int(self.Shellcode_Length) <= 256:
            sc_size = f'mov {reg3[3]}, {self.Shellcode_Length}'

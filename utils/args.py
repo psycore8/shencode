@@ -26,7 +26,7 @@ def load_modules():
             ### to sort categories ASC rename file category-modulename.py
             # mod_name = file.split('-')[1][:-3]
             ###
-            mod_name = file[:-3]  # Entfernt ".py"
+            mod_name = file[:-3] 
             mod = importlib.import_module(f"{Modules_Dir}.{mod_name}")
             if hasattr(mod, "register_arguments") and hasattr(mod, "CATEGORY"):
                 category = mod.CATEGORY
@@ -37,7 +37,8 @@ def load_modules():
 
 def create_parser():
     parser = argparse.ArgumentParser(description='dynamic module parser', formatter_class=FixedWidthHelpFormatter)
-    parser.add_argument('-v', '--version', help='Shows the shencode version')
+    #parser.add_argument('-v', '--version', action='store_true' ,help='Shows the shencode version')
+    #parser.add_argument('--header', type=int, help='Shows a specific banner')
     subparsers = parser.add_subparsers(dest='module', required=True, help='Available modules')
 
     modules_by_category = load_modules()

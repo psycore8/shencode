@@ -5,7 +5,7 @@ extras = []
 import sys
 if sys.platform == 'win32':
     extras.append(
-        ['pywin32==306',
+        ['pywin32==308',
         'WMI==1.5.1']
         )
     FirstRun.WinOnlyModules(True)
@@ -18,7 +18,7 @@ elif sys.platform == 'darwin':
 
 setup(
     name='ShenCode',
-    version='0.7.1',
+    version='0.7.2',
     author='psycore8',
     description='A versatile tool for working with shellcodes',
     long_description=open('README.md').read(),

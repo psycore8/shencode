@@ -1,4 +1,5 @@
 from utils.helper import nstate as nstate
+from utils.helper import GetFileHash #, CheckFile
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
@@ -18,7 +19,10 @@ def register_arguments(parser):
 class aes_encoder:
     Author = 'psycore8'
     Description = 'AES encoder for payloads'
-    Version = '2.0.0'
+    Version = '2.1.0'
+    DisplayName = 'AES-ENCODER'
+    data_size = int
+    hash = ''
 
     def __init__(self, mode, input_file, output_file, key, data_bytes:bytes):
         self.mode = mode
@@ -26,6 +30,20 @@ class aes_encoder:
         self.output_file = output_file
         self.key = key
         self.data_bytes = data_bytes
+
+    def msg(self, message_type, ErrorExit=False):
+        messages = {
+            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.input'    : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',
+            'error.enc'      : f'{nstate.s_fail} En-/Decrption error, aborting script execution',
+            'error.mode'     : f'{nstate.s_fail} Please provide a valid mode: encode / decode',
+            'post.done'      : f'{nstate.s_ok} DONE!',
+            'proc.input_ok'  : f'{nstate.s_ok} File {self.input_file} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
+            'proc.out'       : f'{nstate.s_ok} File created in {self.output_file}\n{nstate.s_ok} Hash: {self.hash}'
+        }
+        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
+        if ErrorExit:
+            exit()
 
     def generate_key(self, password: bytes, salt: bytes) -> bytes:
         kdf = PBKDF2HMAC(
@@ -62,24 +80,33 @@ class aes_encoder:
 
         return data
     
+    def EncodeKey(self):
+        self.key = self.key.encode('utf-8')
+    
     def encode(self):
         try:
             with open(self.input_file, 'rb') as file:
                 self.data_bytes = file.read()
         except FileNotFoundError:
-            print(f'{nstate.FAIL} File {self.input_file} not found or cannot be opened.')
-            exit()
-        size = len(self.data_bytes)
-        print(f'{nstate.OKBLUE} File {self.input_file} loaded, size of shellcode {size} bytes')
+            self.msg('error.input', True)
+            #print(f'{nstate.FAIL} File {self.input_file} not found or cannot be opened.')
+            #exit()
+        self.data_size = len(self.data_bytes)
+        self.hash = GetFileHash(self.input_file)
+        self.msg('proc.input_ok')
+        #print(f'{nstate.OKBLUE} File {self.input_file} loaded, size of shellcode {size} bytes')
         enc_data, salt, iv = self.aes_encrypt(self.data_bytes, self.key)
         with open(self.output_file, "wb") as f:
             pickle.dump((enc_data, salt, iv), f)
         cf = os.path.isfile(self.output_file)
         if cf == True:
-            print(f"{nstate.OKGREEN} [AES-ENC] file created in {self.output_file}")
+            self.hash = GetFileHash(self.output_file)
+            self.msg('proc.out')
+            #print(f"{nstate.OKGREEN} [AES-ENC] file created in {self.output_file}")
         else:
-            print(f"{nstate.FAIL} [AES-ENC] encrption error, aborting script execution")
-            exit()
+            self.msg('error.input', True)
+            #print(f"{nstate.FAIL} [AES-ENC] encrption error, aborting script execution")
+            #exit()
 
     def decode(self):
         enc_data = b''
@@ -89,19 +116,34 @@ class aes_encoder:
             with open(self.input_file, "rb") as f:
                 enc_data, salt, iv = pickle.load(f)
         except FileNotFoundError:
-            print(f'{nstate.FAIL} File {self.input_file} not found or cannot be opened.')
-            exit()
-        size = len(enc_data)
-        print(f'{nstate.OKBLUE} File {self.input_file} loaded, filesize {size} bytes')
+            self.msg('error.input', True)
+        self.data_size = len(enc_data)
+        self.hash = GetFileHash(self.input_file)
+        self.msg('proc.input_ok')
+        #print(f'{nstate.OKBLUE} File {self.input_file} loaded, filesize {size} bytes')
         Shellcode = self.aes_decrypt(enc_data, self.key, salt, iv)
         with open(self.output_file, 'wb') as file:
              file.write(Shellcode)
         cf = os.path.isfile(self.output_file)
         if cf == True:
-            print(f"{nstate.OKGREEN} [AES-DEC] file created in {self.output_file}")
+            self.hash = GetFileHash(self.output_file)
+            self.msg('proc.out')
+            #print(f"{nstate.OKGREEN} [AES-DEC] file created in {self.output_file}")
         else:
-            print(f"{nstate.FAIL} [AES-DEC] encrption error, aborting script execution")
-            exit()
+            self.msg('error.input', True)
+            #print(f"{nstate.FAIL} [AES-DEC] encrption error, aborting script execution")
+            #exit()
+
+    def process(self):
+        self.msg('pre.head')
+        self.EncodeKey()
+        if self.mode == 'encode':
+            self.encode()
+        elif self.mode == 'decode':
+            self.decode()
+        else:
+            self.msg('error.mode', True)
+        self.msg('post.done')
 
     # def debug():
     #     aes_encoder.Input_File = 'dev\\aes-debug-plain.txt'

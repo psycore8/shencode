@@ -16,6 +16,7 @@ class format:
   Author = 'psycore8'
   Description = 'create formatted output by filename'
   Version = '2.0.1'
+  DisplayName = 'FORMATOUT'
   no_line_break = False
 
   def __init__(self, input_file, syntax, show_lines, no_break, write_out, bytes_per_row):
