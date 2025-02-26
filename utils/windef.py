@@ -23,6 +23,7 @@ LPDWORD     = ctypes.wintypes.LPDWORD
 LPVOID      = ctypes.wintypes.LPVOID
 LPCVOID     = ctypes.wintypes.LPCVOID
 PWORD       = ctypes.wintypes.PWORD
+PSIZE_T     = ctypes.wintypes.PSIZE
 SIZE_T      = ctypes.c_size_t
 ULONG       = ctypes.wintypes.ULONG
 VOID        = ctypes.c_void_p
@@ -48,36 +49,38 @@ HeapCreate.argtypes = [DWORD, ctypes.c_size_t, ctypes.c_size_t]
 HeapCreate.restype = HANDLE
 
 NtCreateThreadEx = ntdll.NtCreateThreadEx
-NtCreateThreadEx.argtypes = [
-    HANDLE,         # ThreadHandle
-    ACCESS_MASK,    # desired access
-    LPVOID,         # ObjectAttributes
-    HANDLE,         # ProcessHandle
-    LPVOID,         # lpStartAddress
-    LPVOID,         # lpParameter
-    ULONG,          # flags
-    SIZE_T,         # StackZeroBits
-    SIZE_T,         # SizeOfStackCommit
-    SIZE_T,         # SizeOfStackReserve
-    LPVOID          # lpBytesBuffer
-]
-NtCreateThreadEx.restype = LONG  # NTSTATUS
+NtCreateThreadEx.argtypes = [ HANDLE, ACCESS_MASK, LPVOID, HANDLE, LPVOID, LPVOID, ULONG, SIZE_T, SIZE_T, SIZE_T, LPVOID ]
+NtCreateThreadEx.restype = LONG
+
+def pNtCreateThreadEx(
+        ThreadHandle=HANDLE, DesiredAccess=ACCESS_MASK, ObjectAttributes: LPVOID=None,
+        ProcessHandle=HANDLE, lpStartAddress=LPVOID, lpParameter: LPVOID=None,
+        CreateFlags=ULONG, ZeroBits=SIZE_T, SizeOfStackCommit=SIZE_T,
+        SizeOfStackReserve=SIZE_T, lpBytesBuffer: LPVOID=None
+    ):
+    r = NtCreateThreadEx(ThreadHandle, DesiredAccess, ObjectAttributes,
+                         ProcessHandle, lpStartAddress, lpParameter,
+                         CreateFlags, ZeroBits, SizeOfStackCommit, 
+                         SizeOfStackReserve, lpBytesBuffer)
+    return r
 
 NtCreateThread = ntdll.NtCreateThread
-NtCreateThread.argtypes = [
-    HANDLE,  # ThreadHandle
-    ACCESS_MASK,  # DesiredAccess
-    LPVOID,  # ObjectAttributes (optional)
-    HANDLE,  # ProcessHandle
-    LPVOID,  # lpStartAddress
-    LPVOID,  # lpParameter
-    BOOL,  # CreateSuspended
-    ULONG,  # StackZeroBits (optional)
-    ULONG,  # SizeOfStackCommit (optional)
-    ULONG,  # SizeOfStackReserve (optional)
-    LPVOID  # lpThreadId (optional)
-]
-NtCreateThread.restype = LONG  # NTSTATUS
+NtCreateThread.argtypes = [ HANDLE, ACCESS_MASK, LPVOID, HANDLE, LPVOID, LPVOID, BOOL, ULONG, ULONG, ULONG, LPVOID ]
+NtCreateThread.restype = LONG
+
+NtWriteVirtualMemory = ntdll.NtWriteVirtualMemory
+NtWriteVirtualMemory.argtypes = [HANDLE, LPVOID, LPVOID, ULONG, PSIZE_T]
+NtWriteVirtualMemory.restype = LONG
+
+def pNtWriteVirtualMemory(
+        ProcessHandle=HANDLE, 
+        BaseAddress=LPVOID, 
+        Buffer=LPVOID, 
+        BufferSize=SIZE_T, 
+        NumberOfWrittenBytes: HANDLE=None
+    ):
+    r = NtWriteVirtualMemory(ProcessHandle, BaseAddress, Buffer, BufferSize, NumberOfWrittenBytes)
+    return r
 
 OpenProcess = kernel32.OpenProcess
 OpenProcess.argtypes = [DWORD, BOOL, DWORD]

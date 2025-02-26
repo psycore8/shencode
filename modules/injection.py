@@ -106,7 +106,7 @@ class inject:
             Injection = CreateRemoteThread(phandle, None, 0, memory, None, 0x00000004, None)
         elif self.ntcrt:
             th = HANDLE()
-            Injection = NtCreateThreadEx(ctypes.byref(th), ACCESS_MASK(GENERIC_ALL), None, phandle, memory, None, False, 0, 0, 0, None)
+            Injection = pNtCreateThreadEx(ctypes.byref(th), ACCESS_MASK(GENERIC_ALL), None, phandle, memory, None, False, 0, 0, 0, None)
         else:
             Injection = CreateRemoteThread(phandle, None, 0, memory, None, EXECUTE_IMMEDIATLY, None)
 
