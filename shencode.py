@@ -6,7 +6,6 @@ from utils.helper import FileCheck
 import utils.hashes as hashes
 import utils.header
 
-## Migrate Mods
 import modules.aes as aes
 import modules.bytebert as bytebert
 import modules.byteswap as byteswap
@@ -14,23 +13,26 @@ import modules.extract as extract
 import modules.feed as feed
 import modules.formatout as formatout
 import utils.helper
-if os.name == 'nt':
-  import modules.injection as injection
-  import modules.meterpreter as meterpreter
 import modules.info as info
 import modules.msfvenom as msf
 import modules.output as output
 import modules.qrcode as qrcode
-if os.name == 'nt':
-  import modules.rolhash as rolhash
-  import modules.sliver as sliver
 import modules.uuid as uuid
 import modules.xor as xor
 import modules.xorpoly as xorpoly
+if os.name == 'nt':
+  import modules.psoverwrite as psoverwrite
+  import modules.dll as dll
+  import modules.injection as injection
+  import modules.meterpreter as meterpreter
+  import modules.ntinjection as ntinjection
+  import modules.rolhash as rolhash
+  import modules.sliver as sliver
+
 
 #import modules.power as power
 
-Version = '0.7.2'
+Version = '0.8.0'
 # if you want a static banner, specify it here
 banner = -1
 
@@ -75,9 +77,17 @@ def main(command_line=None):
     poly = xorpoly.xor(arguments.input, arguments.output, b'', b'', f'{tpl_path}xor-stub.tpl', arguments.key)
     poly.process()
 
+  elif arguments.command == 'psoverwrite':
+    ow = psoverwrite.process_overwrite(arguments.target, arguments.payload, arguments.nocfg) #xorpoly.xor(arguments.input, arguments.output, b'', b'', f'{tpl_path}xor-stub.tpl', arguments.key)
+    ow.process()
+
   elif arguments.command == 'byteswap':
     swapper = byteswap.xor(arguments.input, arguments.output, f'{tpl_path}byteswap-short.tpl', arguments.key)
     swapper.process()
+
+  elif arguments.command == 'dll':
+    dll_inj = dll.inject(arguments.input, arguments.process, arguments.start_process)
+    dll_inj.process()
 
   elif arguments.command == 'aes':
     aes_enc = aes.aes_encoder(arguments.mode, arguments.input, arguments.output, arguments.key, b'')
@@ -131,6 +141,10 @@ def main(command_line=None):
     code_injection = injection.inject(arguments.input, arguments.start, arguments.process, '', arguments.resume_thread, arguments.virtual_protect)
     code_injection.process()
 
+  elif arguments.command == 'ntinjection':
+    code_injection = ntinjection.inject(arguments.input, arguments.start, arguments.process, '')
+    code_injection.process()
+
   elif arguments.command == 'extract':
     ext = extract.extract_shellcode(arguments.input, arguments.output, arguments.start_offset, arguments.end_offset)
     ext.process()
@@ -139,8 +153,8 @@ def main(command_line=None):
     inf = info.develop(Version, 'modules', arguments.modlist)
     inf.process()
 
-  elif arguments.version:
-    print(f'ShenCode {Version}')
+  # elif arguments.version:
+  #   print(f'ShenCode {Version}')
 
 if __name__ == "__main__":
     main()

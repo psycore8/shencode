@@ -1,5 +1,6 @@
 from utils.helper import nstate as nstate
 from utils.windef import *
+from utils.winconst import *
 #from utils.helper import CheckFile, GetFileHash
 from time import sleep
 import socket

