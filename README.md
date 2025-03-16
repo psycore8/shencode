@@ -4,7 +4,7 @@
 
 **A versatile tool for working with shellcodes.**
 
-![](shencode-072.png)
+![](shencode-080.png)
 
 ## Features
 
@@ -55,9 +55,13 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 - `general` - windows functions and constants sorted in `windef` and `winconst`
 - `general` - added a new category: `inject`
+- `general` - module categories sorted in alphabetical order
+- `general` - updated dependencies
 - `inject/psoverwrite` - Python adapted process overwriting technique 
-- `inject/ntinjection` - native api injection
+- `inject/ntinjection` - native api injection (experimental)
 - `inject/dll` - dll injection
+- `obfuscate/feed` - fixed typo
+- `obfuscate/qrcode` - fixed dependency error for PIL
 
 ## References
 

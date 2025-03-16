@@ -3,7 +3,7 @@ import os
 from utils.args import parse_arguments
 from utils.helper import nstate as nstate
 from utils.helper import FileCheck
-import utils.hashes as hashes
+#import utils.hashes as hashes
 import utils.header
 
 import modules.aes as aes

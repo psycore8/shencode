@@ -43,6 +43,7 @@ def create_parser():
 
     modules_by_category = load_modules()
 
+    modules_by_category = {k: v for k, v in sorted(modules_by_category.items())}
     for category, modules in modules_by_category.items():
         category_parser = subparsers.add_parser(category, help=f"{category} group", formatter_class=FixedWidthHelpFormatter)
         category_subparsers = category_parser.add_subparsers(dest='command', required=True)

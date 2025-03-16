@@ -3,9 +3,9 @@
 ### ToDo
 
 
-- [ ] code cleanup
-- [ ] `core/dll` - dll injection module
-- [ ] `utils/windef` - Windows API definitions
+- [x] code cleanup
+- [x] `core/dll` - dll injection module
+- [x] `utils/windef` - Windows API definitions
 
 ## Linux Changes
 

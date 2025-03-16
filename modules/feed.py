@@ -7,8 +7,8 @@ from utils.helper import GetFileInfo, CheckFile
 CATEGORY = 'obfuscate'
 
 def register_arguments(parser):
-    parser.add_argument('-i', '--input', help='Input file for UUID encoding')
-    parser.add_argument('-o', '--output', help='Outputfile for ROR13 to ROL conversion')
+    parser.add_argument('-i', '--input', help='Input file for feed encoding')
+    parser.add_argument('-o', '--output', help='Output file for feed encoding')
 
     grp = parser.add_argument_group('additional')
     grp.add_argument('-r', '--reassemble', action='store_true', help='Reassemble fake feed to Shellcode')
