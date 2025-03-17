@@ -141,7 +141,7 @@ class FirstRun:
 
     def WinOnlyModules(ActivationState:bool):
         Mod_Dir = 'modules'
-        FileList = [ 'injection', 'meterpreter', 'sliver', 'rolhash' ]
+        FileList = [ 'injection', 'dll', 'meterpreter', 'ntinjection', 'psoverwrite', 'sliver', 'rolhash' ]
         if ActivationState:
             for file in FileList:
                 src_file = f'{Mod_Dir}\\{file}.px'
