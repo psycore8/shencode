@@ -1,7 +1,5 @@
 # ShenCode
 
-> developer branch - not stable!
-
 **A versatile tool for working with shellcodes.**
 
 ![](shencode-080.png)
