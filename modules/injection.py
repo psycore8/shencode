@@ -1,11 +1,12 @@
 import os
 #import ctypes
 from utils.windef import *
+from utils.winconst import *
 
 from utils.helper import nstate
 from utils.helper import CheckFile, GetFileInfo
 
-CATEGORY = 'core'
+CATEGORY = 'inject'
 
 def register_arguments(parser):
             parser.add_argument('-i', '--input', help='Input file for process injection')

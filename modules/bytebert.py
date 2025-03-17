@@ -27,7 +27,7 @@ def register_arguments(parser):
 class bb_encoder:
     Author = 'psycore8'
     Description = 'ByteBert - Advanced polymorphic Encoder Stub'
-    Version = '0.2.0'
+    Version = '0.2.1'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -179,9 +179,11 @@ class bb_encoder:
 
         if int(self.Shellcode_Length) <= 256:
            sc_size = f'mov {reg3[3]}, {self.Shellcode_Length}'
-        elif int(self.Shellcode_Length) > 256:
+        elif int(self.Shellcode_Length) > 256 and int(self.Shellcode_Length) <= 65536:
            sc_size = f'mov {reg3[2]}, {self.Shellcode_Length}'
-
+        elif int(self.Shellcode_Length) > 65536:
+           sc_size = f'mov {reg3[1]}, {self.Shellcode_Length}'
+        
         stub64 = f"""
                     section .data
 

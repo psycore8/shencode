@@ -5,7 +5,7 @@ extras = []
 import sys
 if sys.platform == 'win32':
     extras.append(
-        ['pywin32==308',
+        ['pywin32==309',
         'WMI==1.5.1']
         )
     FirstRun.WinOnlyModules(True)
@@ -18,7 +18,7 @@ elif sys.platform == 'darwin':
 
 setup(
     name='ShenCode',
-    version='0.7.2',
+    version='0.8.0',
     author='psycore8',
     description='A versatile tool for working with shellcodes',
     long_description=open('README.md').read(),
@@ -30,21 +30,22 @@ setup(
         'utils'
     ],
     install_requires=[
-        'capstone==5.0.3',
-        'certifi==2024.12.14',
+        'capstone==5.0.5',
+        'certifi==2025.1.31',
         'cffi==1.17.1',
         'charset-normalizer==3.4.1',
         'colorama==0.4.6',
-        'cryptography==43.0.3',
+        'cryptography==44.0.2',
         'feedparser==6.0.11',
         'idna==3.10',
-        'lxml==5.3.0',
+        'lxml==5.3.1',
         'pefile==2024.8.26',
+        'psutil',
         'pycparser==2.22',
         'pypng==0.20220715.0',
-        'qrcode==7.4.2',
+        'qrcode==8.0',
         'requests==2.32.3',
-        'setuptools==75.8.0',
+        'setuptools==76.0.0',
         'sgmllib3k==1.0.0',
         'typing_extensions==4.12.2',
         'urllib3==2.3.0',

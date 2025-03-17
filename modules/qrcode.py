@@ -7,15 +7,16 @@ CATEGORY = 'obfuscate'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for QR-Code encoding')
-    parser.add_argument('-o', '--output', help='Outputfile for QR-Code encoding')
+    parser.add_argument('-o', '--output', help='Output file for QR-Code encoding')
 
 class qrcode_obfuscator:
     Author = 'psycore8'
     Description = 'obfuscate shellcodes as QR-Codes'
-    Version = '2.1.0'
+    Version = '2.1.1'
     DisplayName = 'QRCODE-OBF'
     hash = ''
     data_size = 0
+    from qrcode.image.pure import PyPNGImage
 
     def __init__(self, input_file, output_file, shellcode):
          self.input_file = input_file
@@ -53,7 +54,7 @@ class qrcode_obfuscator:
             self.data_size, self.hash = GetFileInfo(self.input_file)
             self.msg('proc.input_ok')
             self.msg('proc.try')
-            qr = qrcode.QRCode(version=3, box_size=20, border=10, error_correction=qrcode.constants.ERROR_CORRECT_H)
+            qr = qrcode.QRCode(version=3, box_size=20, border=10, error_correction=qrcode.constants.ERROR_CORRECT_H, image_factory=self.PyPNGImage)
             payload_bytes = self.shellcode.encode('utf-8')
             qr.add_data(payload_bytes)
             qr.make(fit=True)

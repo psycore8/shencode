@@ -2,11 +2,10 @@
 
 ### ToDo
 
-- [x] `general` - improved messaging system
-- [x] implement messaging in all modules
-- [x] clean main()
-- [ ] code cleanup
-- [ ] automate main in 3 lines?
+
+- [x] code cleanup
+- [x] `core/dll` - dll injection module
+- [x] `utils/windef` - Windows API definitions
 
 ## Linux Changes
 
@@ -21,7 +20,6 @@
 ### Changes
 
 
-
 #### Wiki
 
-
+- `shencode-core-dll`
