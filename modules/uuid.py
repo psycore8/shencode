@@ -6,10 +6,10 @@ CATEGORY = 'obfuscate'
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for UUID encoding')
 
-class uuid_obfuscator:
+class module:
     Author = 'psycore8'
     Description = 'obfuscate shellcodes as UUID strings'
-    Version = '2.1.0'
+    Version = '2.1.1'
     DisplayName = 'UUID-OBF'
     UUID_string = ''
     hash = ''

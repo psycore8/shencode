@@ -17,12 +17,12 @@ def register_arguments(parser):
             parser.add_argument('-p', '--process', required=True, help='Process to inject into')
             parser.add_argument('-s', '--start-process', action='store_true', required=False, default=False, help='If set, the process will be started')
 
-class inject:
+class module:
     import wmi, threading
     from time import sleep
     Author = 'psycore8'
     Description = 'DLL Injection Module'
-    Version = '0.1.0'
+    Version = '0.1.1'
     DisplayName = 'DLL-INJECTION'
     mem = any
     data_bytes = bytes

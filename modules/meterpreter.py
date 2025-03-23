@@ -17,11 +17,11 @@ def register_arguments(parser):
     grp.add_argument('-s', '--sleep', default=0, type=int, required=True, help='Sleep for x seconds before the stage is executed')
     grp.add_argument('-t', '--timeout', default=30, type=int, help='Connect timeout in seconds, 30 seconds is the default')
 
-class stage():
+class module:
     
     Author          = 'raptor@0xdeadbeef.info, psycore8'
     Description     = 'Connect back (reverse_tcp) to remote host and receive a stage'
-    Version         = '1.2.0'
+    Version         = '1.2.1'
     DisplayName      = 'METERPRETER-STAGER'
     payload         = any
     payload_size    = int

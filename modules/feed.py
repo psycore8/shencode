@@ -14,10 +14,10 @@ def register_arguments(parser):
     grp.add_argument('-r', '--reassemble', action='store_true', help='Reassemble fake feed to Shellcode')
     grp.add_argument('-u', '--uri', help='URI to fake feed')
 
-class feed_obfuscator:
+class module:
     Author = 'psycore8'
     Description = 'obfuscate shellcodes as XML Feed'
-    Version = '2.1.0'
+    Version = '2.1.1'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0

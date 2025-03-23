@@ -16,6 +16,7 @@ from utils.helper import CheckFile, GetFileInfo
 import utils.helper
 from os import path as osp
 from subprocess import run
+#import lief
 
 CATEGORY = 'encoder'
 
@@ -24,10 +25,10 @@ def register_arguments(parser):
             parser.add_argument('-o', '--output', help='outputfile for bytebert')
             parser.add_argument('-v', '--variable-padding', action='store_true', help='Inserts a random NOP to differ the padding')
 
-class bb_encoder:
+class module:
     Author = 'psycore8'
     Description = 'ByteBert - Advanced polymorphic Encoder Stub'
-    Version = '0.2.1'
+    Version = '0.2.2'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -35,8 +36,8 @@ class bb_encoder:
     Modified_Shellcode = ''
     OutputFile_Root = ''
     key = 0
-    start_offset = '100'
-    end_offset = ''
+    # start_offset = '100'
+    # end_offset = ''
     stub_size = 0
     data_size = 0
     hash = ''
@@ -134,6 +135,21 @@ class bb_encoder:
         self.OutputFile_Root, output_file_extension = osp.splitext(self.output_file)
         run(f'nasm.exe -f win64 {self.output_file} -o {self.OutputFile_Root}.o')
 
+    def extract_section_from_object(self, pe):
+        for section in pe.sections:
+            if section.Name.decode().strip() == ".text":
+                raw_offset = section.PointerToRawData
+                raw_size = section.SizeOfRawData
+                
+                # Section-Daten auslesen
+                with open("example.exe", "rb") as f:
+                    f.seek(raw_offset)
+                    section_data = f.read(raw_size)
+                
+                print(f"Erste 16 Bytes der .text-Section: {section_data[:16].hex()}")
+                break
+        return section_data
+
     def ExtractShellCode(self):
         extract_shellcode = modules.extract.extract_shellcode(f'{self.OutputFile_Root}.o', f'{self.OutputFile_Root}.bs', self.start_offset, self.end_offset)
         extract_shellcode.process()
@@ -161,6 +177,9 @@ class bb_encoder:
             if CheckFile(f'{self.OutputFile_Root}.o'):
                 self.data_size, self.hash = GetFileInfo(f'{self.OutputFile_Root}.o')
                 self.msg('proc.compile')
+                #pe = pefile.PE(f'{self.OutputFile_Root}.o')
+                final_shellcode = self.extract_section_from_object_file(f'{self.OutputFile_Root}.o') #self.extract_section_from_object(pe)
+                self.WriteToFile(final_shellcode, self.output_file)
         else:
             self.msg('error.nasm1')
             self.msg('error.nasm2')

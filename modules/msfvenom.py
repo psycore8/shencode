@@ -8,10 +8,10 @@ CATEGORY = 'core'
 def register_arguments(parser):
       parser.add_argument('-c', '--cmd', help='msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"')
 
-class msfvenom:
+class module:
   Author        = 'psycore8'
   Description   = 'Generate payloads with metasploit'
-  Version       = '2.1.0'
+  Version       = '2.1.1'
   DisplayName   = 'MSFGEN'
   Args          = []
   

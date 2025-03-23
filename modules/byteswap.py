@@ -5,23 +5,24 @@ from os import path as osp
 CATEGORY = 'encoder'
 
 def register_arguments(parser):
-    parser.add_argument('-i', '--input', help='Input file to use with byteswap stub')
+    parser.add_argument('-i', '--input', help='Input file or buffer to use with byteswap stub')
     parser.add_argument('-o', '--output', help= 'outputfile for byteswap stub')
     parser.add_argument('-k', '--key', type=int, help='the XOR key to use')
 
-class xor:
+class module:
     Author = 'psycore8'
     Description = 'create payload from a raw file, encode with byteswap-xor, add to byteswap stub'
-    Version = '2.1.0'
+    Version = '2.1.1'
     DisplayName = 'BYTESWAP-ENC'
     Shellcode = ''
     Shellcode_Length = 0
     Modified_Shellcode = bytes
     data_size = 0
     hash = ''
+    relay = False
 
-    def __init__(self, input_file, output_file, template_file, xor_key):
-        self.input_file = input_file
+    def __init__(self, input, output_file, template_file, xor_key):
+        self.input = input
         self.output_file = output_file
         self.template_file = template_file
         self.xor_key = xor_key
@@ -30,14 +31,14 @@ class xor:
         messages = {
             'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
             'error.size'     : f'{nstate.s_fail} Shellcode exceeds max size of 255 bytes',
-            'error.input'    : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',
+            'error.input'    : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
             'error.output'   : f'{nstate.s_fail} File {self.output_file} not found or cannot be opened.',
             'error.template' : f'{nstate.s_fail} File {self.template_file} not found or cannot be opened.',
             'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.input_ok'  : f'{nstate.s_ok} File {self.input_file} loaded!\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
+            'proc.input_ok'  : f'{nstate.s_ok} File {self.input} loaded!\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
             'proc.output_ok' : f'{nstate.s_ok} File {self.output_file} created!\n{nstate.s_note} Size {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
             'proc.stub_ok'   : f'{nstate.s_ok} Stub {self.template_file} loaded!\n{nstate.s_note} Size {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
-            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input_file}',
+            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input}',
             'proc.output_try': f'{nstate.s_note} Try to write XORPOLY shellcode to file',
             'proc.stub'      : f'{nstate.s_note} Try to load stub from {self.template_file}',
             'proc.try'       : f'{nstate.s_note} Try to append shellcode',
@@ -69,7 +70,7 @@ class xor:
                 self.Modified_Shellcode = file.read()
 
     def LoadShellcode(self):
-        with open(self.input_file, 'rb') as file:
+        with open(self.input, 'rb') as file:
             self.Shellcode = file.read()
         self.Shellcode_Length = len(self.Shellcode)
         if self.Shellcode_Length > 255:
@@ -103,8 +104,8 @@ class xor:
        else:
             self.msg('error.template', True)
        self.msg('proc.input_try')
-       if CheckFile(self.input_file):
-        self.data_size, self.hash = GetFileInfo(self.input_file)
+       if CheckFile(self.input):
+        self.data_size, self.hash = GetFileInfo(self.input)
         self.msg('proc.input_ok')   
         self.LoadShellcode()
        else:
@@ -115,10 +116,14 @@ class xor:
        self.msg('proc.key')
        self.Modified_Shellcode = self.replace_bytes_at_offset(self.Modified_Shellcode, Length_Offset, self.Shellcode_Length)
        self.Modified_Shellcode = self.replace_bytes_at_offset(self.Modified_Shellcode, XOR_Key_Offset, self.xor_key)
-       self.WriteToFile()
-       if CheckFile(self.output_file):
-        self.data_size, self.hash = GetFileInfo(self.output_file)
-        self.msg('proc.output_ok') 
-       else:
-           self.msg('error.output', True)
+       if not self.relay:
+        self.WriteToFile()
+        if CheckFile(self.output_file):
+            self.data_size, self.hash = GetFileInfo(self.output_file)
+            self.msg('proc.output_ok') 
+        else:
+            self.msg('error.output', True)
+       elif self.relay:
+        self.msg('post.done')
+        return self.Modified_Shellcode    
        self.msg('post.done')

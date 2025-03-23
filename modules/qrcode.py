@@ -1,7 +1,8 @@
-import qrcode
-import qrcode.constants
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo
+from qrcode.image.pure import PyPNGImage
+import qrcode
+import qrcode.constants
 
 CATEGORY = 'obfuscate'
 
@@ -9,14 +10,13 @@ def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for QR-Code encoding')
     parser.add_argument('-o', '--output', help='Output file for QR-Code encoding')
 
-class qrcode_obfuscator:
+class module:
     Author = 'psycore8'
     Description = 'obfuscate shellcodes as QR-Codes'
-    Version = '2.1.1'
+    Version = '2.1.2'
     DisplayName = 'QRCODE-OBF'
     hash = ''
     data_size = 0
-    from qrcode.image.pure import PyPNGImage
 
     def __init__(self, input_file, output_file, shellcode):
          self.input_file = input_file

@@ -16,10 +16,10 @@ def register_arguments(parser):
     parser.add_argument('-k', '--key', required=True, help='Key for AES encoding')
     parser.add_argument('-o', '--output', required=True, help= 'Outputfile for AES encoding')
 
-class aes_encoder:
+class module:
     Author = 'psycore8'
     Description = 'AES encoder for payloads'
-    Version = '2.1.0'
+    Version = '2.1.1'
     DisplayName = 'AES-ENCODER'
     data_size = int
     hash = ''
@@ -71,7 +71,7 @@ class aes_encoder:
     
     def aes_decrypt(self, encrypted_data: bytes, password: bytes, salt: bytes, iv: bytes) -> bytes:
         key = self.generate_key(password, salt)
-        cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+        cipher = Cipher(self.algorithms.AES(key), modes.CBC(iv), backend=default_backend())
         decryptor = cipher.decryptor()
         padded_data = decryptor.update(encrypted_data) + decryptor.finalize()
 

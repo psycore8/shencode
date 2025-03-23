@@ -51,15 +51,8 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
-- `general` - windows functions and constants sorted in `windef` and `winconst`
-- `general` - added a new category: `inject`
-- `general` - module categories sorted in alphabetical order
-- `general` - updated dependencies
-- `inject/psoverwrite` - Python adapted process overwriting technique 
-- `inject/ntinjection` - native api injection (experimental)
-- `inject/dll` - dll injection
-- `obfuscate/feed` - fixed typo
-- `obfuscate/qrcode` - fixed dependency error for PIL
+- `encoder/xor` - fixed typo
+- `stager/sliver` - changed AES argument to nargs: `--aes <aes-key> <aes-iv>`
 
 ## References
 

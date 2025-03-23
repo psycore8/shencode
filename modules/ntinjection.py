@@ -17,7 +17,7 @@ def register_arguments(parser):
             grp.add_argument('-s', '--start', action='store_true', help='If not active, start the process before injection')
             # grp.add_argument('-v', '--virtual-protect', action='store_true', help='Deny access on memory for a specified time')
 
-class inject:
+class module:
     #from ctypes import windll
     #from ctypes import wintypes
     from urllib import request

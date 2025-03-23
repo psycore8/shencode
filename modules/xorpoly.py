@@ -1,32 +1,40 @@
+import utils.relay as relay
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo
 from os import path as osp
-from modules.xor import xor_encoder
+from modules.xor import module
 
 CATEGORY = 'encoder'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for XOR stub')
-    parser.add_argument('-o', '--output', help= 'Outputfile for XOR stub')
+    #parser.add_argument('-o', '--output', help= 'Outputfile for XOR stub')
     parser.add_argument('-k', '--key', type=int, help='Key for XOR stub')
 
-class xor:
+    grpout = parser.add_argument_group('output')
+    grpout.add_argument('-o', '--output', help= 'Output file or buffer for XORPOLY encoding')
+    grpout.add_argument('-r', '--relay', choices=relay.relay_options, help='Relay to module')
+
+class module:
     Author = 'psycore8'
     Description = 'create payload from a raw file, encode with xor, add to xor stub'
-    Version = '2.1.0'
+    Version = '2.1.1'
     DisplayName = 'X0RP0LY-ENC'
     data_size = 0
     hash = ''
 
-    def __init__(self, input_file, output_file, shellcode, xored_shellcode, template_file, xor_key):
+    def __init__(self, input_file, output, shellcode, xored_shellcode, template_file, xor_key, relay_command=None):
        self.input_file = input_file
-       self.output_file = output_file
+       self.output_file = output
        self.shellcode = shellcode
        self.xored_shellcode = xored_shellcode
        self.template_file = template_file
        self.xor_key = xor_key
+       self.relay_command = relay_command
        with open(self.input_file, 'rb') as file:
           self.shellcode = file.read()
+       if relay_command != None:
+          self.relay = True
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
@@ -50,6 +58,10 @@ class xor:
         if ErrorExit:
             exit()
 
+    # def LoadInputFile(self):
+    #    with open(self.input_file, 'rb') as file:
+    #       self.shellcode = file.read()
+
     def LoadHeader(self):
         with open(self.template_file, "rb") as file:
             self.shellcode = file.read()
@@ -71,12 +83,12 @@ class xor:
     def process(self):
         #Offset = 5
         self.msg('pre.head')
-        xor_enc = xor_encoder('', '', 0, False)
+        xor_enc = module('', '', 0, False, 'encode', None)
         self.xored_shellcode = xor_enc.xor_crypt_bytes(self.shellcode, self.xor_key)
         self.msg('proc.stub')
         if CheckFile(self.template_file):
           self.data_size, self.hash = GetFileInfo(self.template_file)
-          xor.LoadHeader(self)
+          self.LoadHeader(self)
           self.msg('proc.stub_ok')
           self.msg('proc.stats')
         else:
@@ -85,19 +97,24 @@ class xor:
         if CheckFile(self.input_file):
            self.data_size, self.hash = GetFileInfo(self.input_file)
            self.msg('proc.input_ok')
-           xor.AppendShellcode(self)
+           self.AppendShellcode(self)
            self.msg('proc.stats')
            self.msg('proc.key')
-           self.shellcode = xor.replace_bytes_at_offset(self.shellcode, 5, self.xor_key)
+           self.shellcode = self.replace_bytes_at_offset(self.shellcode, 5, self.xor_key)
         else:
            self.msg('error.input', True)
-        self.msg('proc.output_try')
-        xor.WriteToFile(self)
-        if CheckFile(self.output_file):
-           self.data_size, self.hash = GetFileInfo(self.output_file)
-           self.msg('proc.output_ok')
+        if not self.relay:
+            self.msg('proc.output_try')
+            self.WriteToFile(self)
+            if CheckFile(self.output_file):
+                self.data_size, self.hash = GetFileInfo(self.output_file)
+                self.msg('proc.output_ok')
+            else:
+                self.msg('error.output', True)
         else:
-           self.msg('error.output', True)
+           self.msg('post.done')
+           print('\n')
+           relay.start_relay(self.relay_command, self.shellcode)
         self.msg('post.done')
 
     

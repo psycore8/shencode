@@ -6,12 +6,12 @@ def register_arguments(parser):
     parser.add_argument('-g', '--get', action='store_true', help='Get developer info')
     parser.add_argument('-m', '--modlist', action='store_true', help='List modules')
 
-class develop:
+class module:
     import utils.header as header
     from os import listdir, path
     Author = 'psycore8'
     Description = 'AES encoder for payloads'
-    Version = '0.0.1'
+    Version = '0.0.2'
     DisplayName = 'SHENCODE-DEViNFO'
     mod_count = 0
     mod_name = ''
