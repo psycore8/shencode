@@ -1,3 +1,8 @@
+########################################################
+### AES Module
+### Status: untested
+########################################################
+
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo
 from os import path as osp
@@ -21,9 +26,9 @@ class module:
     hash = ''
     relay = False
 
-    def __init__(self, input, output_file, template_file, xor_key):
+    def __init__(self, input, output, template_file, xor_key):
         self.input = input
-        self.output_file = output_file
+        self.output = output
         self.template_file = template_file
         self.xor_key = xor_key
 
@@ -32,11 +37,11 @@ class module:
             'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
             'error.size'     : f'{nstate.s_fail} Shellcode exceeds max size of 255 bytes',
             'error.input'    : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'   : f'{nstate.s_fail} File {self.output_file} not found or cannot be opened.',
+            'error.output'   : f'{nstate.s_fail} File {self.output} not found or cannot be opened.',
             'error.template' : f'{nstate.s_fail} File {self.template_file} not found or cannot be opened.',
             'post.done'      : f'{nstate.s_ok} DONE!',
             'proc.input_ok'  : f'{nstate.s_ok} File {self.input} loaded!\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
-            'proc.output_ok' : f'{nstate.s_ok} File {self.output_file} created!\n{nstate.s_note} Size {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
+            'proc.output_ok' : f'{nstate.s_ok} File {self.output} created!\n{nstate.s_note} Size {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
             'proc.stub_ok'   : f'{nstate.s_ok} Stub {self.template_file} loaded!\n{nstate.s_note} Size {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
             'proc.input_try' : f'{nstate.s_note} Try to open file {self.input}',
             'proc.output_try': f'{nstate.s_note} Try to write XORPOLY shellcode to file',
@@ -88,7 +93,7 @@ class module:
         return bytes(data)
 
     def WriteToFile(self):
-      with open(self.output_file, 'wb') as file:
+      with open(self.output, 'wb') as file:
         file.write(self.Modified_Shellcode)
 
     def process(self):
@@ -118,8 +123,8 @@ class module:
        self.Modified_Shellcode = self.replace_bytes_at_offset(self.Modified_Shellcode, XOR_Key_Offset, self.xor_key)
        if not self.relay:
         self.WriteToFile()
-        if CheckFile(self.output_file):
-            self.data_size, self.hash = GetFileInfo(self.output_file)
+        if CheckFile(self.output):
+            self.data_size, self.hash = GetFileInfo(self.output)
             self.msg('proc.output_ok') 
         else:
             self.msg('error.output', True)

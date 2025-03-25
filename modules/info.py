@@ -1,3 +1,8 @@
+########################################################
+### Info Module
+### Status: untested
+########################################################
+
 from utils.helper import nstate as nstate
 
 CATEGORY = 'core'
@@ -26,9 +31,6 @@ class module:
     def msg(self, message_type, ErrorExit=False):
         messages = {
             'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            #'error.input'    : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',
-            #'error.enc'      : f'{nstate.s_fail} En-/Decrption error, aborting script execution',
-            #'error.mode'     : f'{nstate.s_fail} Please provide a valid mode: encode / decode',
             'banner'         : f'{nstate.s_ok} Banner count: {len(self.header.headers)}',
             'version'        : f'{nstate.s_ok} ShenCode Version: {self.version}',
             'mods'           : f'{nstate.s_ok} Module count: {self.mod_count}',
@@ -36,7 +38,6 @@ class module:
             'modlist.s'      : f'{nstate.s_ok} List modules',
             'modlist'        : f'{nstate.s_note} Module {self.mod_count}: {self.mod_name}',
             'post.done'      : f'{nstate.s_ok} DONE!'
-            #'proc.out'       : f'{nstate.s_ok} File created in {self.output_file}\n{nstate.s_ok} Hash: {self.hash}'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:

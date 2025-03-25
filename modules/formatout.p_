@@ -1,3 +1,8 @@
+########################################################
+### Formatout Module
+### Status: deprecated, remove in 081
+########################################################
+
 import shutil, fileinput, base64
 from utils.helper import nstate as nstate
 

@@ -1,3 +1,8 @@
+########################################################
+### DLL Inject Module
+### Status: untested
+########################################################
+
 
 #import ctypes
 #import ctypes.wintypes as wt

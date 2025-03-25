@@ -1,0 +1,59 @@
+{
+    "task": {
+        "name": "Test Modules",
+        "count": 4
+    },
+    "aes": {
+        "args": {
+            "mode": "encode",
+            "input": "tests\\calc.raw",
+            "output": "tests\\0-sc.aes",
+            "key": "shenpa$$"
+        },
+        "input_buffer": false,
+        "return_buffer": false
+    },
+    "bytebert": {
+        "args": {
+            "input": "tests\\calc.raw",
+            "output": "tests\\0-sc.bb",
+            "variable_padding": true
+        },
+        "input_buffer": false,
+        "return_buffer": false
+    },
+    "byteswap": {
+        "args": {
+            "input": "tests\\calc.raw",
+            "output_file": "tests\\0-sc.bs",
+            "template_file": "tpl\\byteswap-short.tpl",
+            "xor_key": 113
+            },
+        "input_buffer": false,
+        "return_buffer": false
+    },
+    "extract": {
+        "args": {
+            "input": "tests\\calc.raw",
+            "output": "tests\\0-ext.txt",
+            "extract_range": [10,40],
+            "start_offset": 0,
+            "end_offset": 0,
+            "extract_section": null
+        },
+        "input_buffer": false,
+        "return_buffer": false
+    },
+    "injection": {
+        "args": {
+            "input": "$BUFFER$",
+            "process_start": true,
+            "target_process": "notepad.exe",
+            "shellcode": null,
+            "resume_thread": null,
+            "virtual_protect": null
+        },
+        "input_buffer": false,
+        "return_buffer": false
+    }
+}

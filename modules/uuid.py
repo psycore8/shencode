@@ -1,3 +1,8 @@
+########################################################
+### UUID Module
+### Status: untested
+########################################################
+
 from utils.helper import nstate as nstate
 from utils.helper import GetFileInfo
 

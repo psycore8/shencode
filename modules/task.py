@@ -1,3 +1,8 @@
+########################################################
+### AES Module
+### Status: untested
+########################################################
+
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileHash
 
@@ -12,7 +17,7 @@ class module:
     Author = 'psycore8'
     Description = 'Create tasks to pipe ShenCode modules'
     DisplayName = 'TASKS'
-    Version = '0.0.2'
+    Version = '0.0.4'
     result = any
 
     def __init__(self, input):
@@ -21,11 +26,12 @@ class module:
     def msg(self, message_type, MsgVar=None, ErrorExit=False):
         messages = {
                 'pre.head'         : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
+                'task.name'        : f'{nstate.s_note} Starting Task: {MsgVar}',
                 'proc.input'       : f'{nstate.s_note} Task file ok',
-                'create.cfg'       : f'{nstate.f_out} CFGuard mitigation will be applied!',
-                'create.try'       : f'{nstate.s_note} Create suspended Process...',
-                'create.error'     : f'{nstate.s_fail} CreateProcess failed',
-                'step.post'        : f'\n'
+                'error.input'      : f'{nstate.s_fail} Task file failed!',
+                'post.done'        : f'{nstate.s_ok} Task DONE!',
+                'step.pre'         : f'{nstate.s_note} Executing step',
+                'nl'               : f'\n'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
@@ -42,16 +48,19 @@ class module:
             m('proc.input')
             self.result = None
             task = self.load_config(self.input)
-            #steps = len(task)
+            m('task.name', task['task']['name'])
+            m('nl')
             for step in task:
-                #print(f'{step}')
                 if step != 'task':
                     mod = self.importlib.import_module(f'modules.{step}')
-                    if task[step]['input'] == '$BUFFER$':
-                        task[step]['input'] = self.result
-                    modclass = mod.module(**task[step])
-                    modclass.relay = True
+                    if task[step]['input_buffer']:
+                        task[step]['args']['input'] = self.result
+                        mod.module.relay = True
+                    if task[step]['return_buffer']:
+                        mod.module.relay = True
+                    modclass = mod.module(**task[step]['args'])
                     self.result = modclass.process()
-                    m('step.post')
+                    m('nl')
+            m('post.done')
         else:
-            pass
+            m('error.input', None, True)

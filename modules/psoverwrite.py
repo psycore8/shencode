@@ -1,3 +1,8 @@
+########################################################
+### PSOverwrite Module
+### Status: untested
+########################################################
+
 import ctypes
 import ctypes.wintypes
 from utils.helper import nstate as nstate

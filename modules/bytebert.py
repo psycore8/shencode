@@ -1,22 +1,20 @@
+########################################################
+### ByteBert Module
+### Status: migrated to 081
+########################################################
+
 ### DEFINITIONS
 # reg1 = save / read encryptedbyte(odd)
 # reg2 = shellcode indexer
 # reg3 = counter
 # reg1, reg2 = random.sample(registers, 2)
-#
-# Compiled Code cut from offset 100 tp 156+len(shellcode)
-# insert shellcode into vs template
-# or inject via shencode
-# autocompile?
 
-import modules.extract
 import random
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo
-import utils.helper
 from os import path as osp
 from subprocess import run
-#import lief
+import struct
 
 CATEGORY = 'encoder'
 
@@ -28,7 +26,7 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     Description = 'ByteBert - Advanced polymorphic Encoder Stub'
-    Version = '0.2.2'
+    Version = '0.2.3'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -36,37 +34,62 @@ class module:
     Modified_Shellcode = ''
     OutputFile_Root = ''
     key = 0
-    # start_offset = '100'
-    # end_offset = ''
     stub_size = 0
     data_size = 0
     hash = ''
+    relay = False
 
-    def __init__(self, input_file, output_file, random_padding=bool):
-        self.input_file = input_file
-        self.output_file = output_file
-        self.random_padding = random_padding
+    def __init__(self, input, output, variable_padding=bool):
+        self.input = input
+        self.output = output
+        self.variable_padding = variable_padding
 
-    def msg(self, message_type, ErrorExit=False):
+    def msg(self, message_type, ErrorExit=False, MsgVar=any):
         messages = {
             'pre.head'      : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'post.done'     : f'{nstate.s_ok} DONE!',
             'proc.ssize'    : f'{nstate.s_note} Stub generated with a size of {self.stub_size} bytes',
             'proc.rkey'     : f'{nstate.s_note} Random key: {self.key} ({hex(self.key)})',
-            'error.input'   : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',
-            'error.output'  : f'{nstate.s_fail} File {self.output_file} not found or cannot be opened.',
+            'error.input'   : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
+            'error.output'  : f'{nstate.s_fail} File {self.output} not found or cannot be opened.',
             'proc.psize'    : f'{nstate.s_note} Payload size: {self.Shellcode_Length}',
             'proc.xor_ok'   : f'{nstate.s_note} XORed payload added!',
-            'proc.out'      : f'{nstate.s_ok} File created in {self.output_file}\n{nstate.s_note} Hash: {self.hash}',
+            'proc.out'      : f'{nstate.s_ok} File created in {self.output}\n{nstate.s_note} Hash: {self.hash}',
             'proc.comp_try' : f'{nstate.s_note} Try to compile object file',
-            'proc.input_ok' : f'{nstate.s_ok} File {self.input_file} loaded\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
+            'proc.input_ok' : f'{nstate.s_ok} File {self.input} loaded\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
             'proc.compile'  : f'{nstate.s_ok} File {self.OutputFile_Root}.o created\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
+            'proc.ext'      : f'{nstate.s_info} Extract .text section from object file',
+            'proc.fsize'    : f'{nstate.s_info} Final shellcode size: {MsgVar} bytes',
             'error.xor_ok'  : f"{nstate.s_fail} XOR encoded Shellcode error, aborting script execution",
             'error.nasm1'   : f'{nstate.s_fail} nasm.exe not found! Please download and place it in the shencode directory',
-            'error.nasm2'   : f'{nstate.s_info} You can compile it by hand: nasm.exe -f win64 {self.output_file} -o {self.OutputFile_Root}.o'
+            'error.nasm2'   : f'{nstate.s_info} You can compile it by hand: nasm.exe -f win64 {self.output} -o {self.OutputFile_Root}.o'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
             exit()
+
+    def read_coff_text_section(self, filename):
+        with open(filename, "rb") as f:
+            data = f.read()
+
+        # number of sections after DOS Header
+        num_sections = struct.unpack_from("<H", data, 2)[0]
+
+        # section table at offset 14h without optional header, section table has a length of 40 bytes
+        section_offset = 0x14 
+        section_size = 40 
+
+        for i in range(num_sections):
+            section_data = data[section_offset + i * section_size : section_offset + (i + 1) * section_size]
+            name = section_data[:8].strip(b"\x00").decode()
+            if name == ".text":
+                raw_data_offset = struct.unpack_from("<I", section_data, 20)[0]
+                raw_data_size = struct.unpack_from("<I", section_data, 16)[0]
+                text_data = data[raw_data_offset : raw_data_offset + raw_data_size]
+                return text_data
+
+        print(".text section not found!")
+        return None
 
     def CheckNasm(self)->bool:
         if osp.exists('nasm.exe'):
@@ -97,7 +120,7 @@ class module:
         self.key = random.randint(1, 255)
         self.msg('proc.rkey')
         try:
-          with open(self.input_file, 'rb') as file:
+          with open(self.input, 'rb') as file:
              shellcode_bytes = file.read()
         except FileNotFoundError:
           self.msg('error.input', True)
@@ -132,42 +155,23 @@ class module:
                 file.write(data)
 
     def CompileObjectFile(self):
-        self.OutputFile_Root, output_file_extension = osp.splitext(self.output_file)
-        run(f'nasm.exe -f win64 {self.output_file} -o {self.OutputFile_Root}.o')
-
-    def extract_section_from_object(self, pe):
-        for section in pe.sections:
-            if section.Name.decode().strip() == ".text":
-                raw_offset = section.PointerToRawData
-                raw_size = section.SizeOfRawData
-                
-                # Section-Daten auslesen
-                with open("example.exe", "rb") as f:
-                    f.seek(raw_offset)
-                    section_data = f.read(raw_size)
-                
-                print(f"Erste 16 Bytes der .text-Section: {section_data[:16].hex()}")
-                break
-        return section_data
-
-    def ExtractShellCode(self):
-        extract_shellcode = modules.extract.extract_shellcode(f'{self.OutputFile_Root}.o', f'{self.OutputFile_Root}.bs', self.start_offset, self.end_offset)
-        extract_shellcode.process()
+        self.OutputFile_Root, output_file_extension = osp.splitext(self.output)
+        run(f'nasm.exe -f win64 {self.output} -o {self.OutputFile_Root}.o')
         
     def process(self):
         self.msg('pre.head')
-        if CheckFile(self.input_file):
+        if CheckFile(self.input):
             self.LoadShellcode()
-            self.data_size, self.hash = GetFileInfo(self.input_file)
+            self.data_size, self.hash = GetFileInfo(self.input)
             self.msg('proc.input_ok')
         else:
             self.msg('error.input', True)
         self.LoadHeader()
         self.ConvertShellCodeToStr()
         self.AppendShellcode()
-        self.WriteToFile(self.Modified_Shellcode, self.output_file)
-        if CheckFile(self.output_file):
-            self.data_size, self.hash = GetFileInfo(self.output_file)
+        self.WriteToFile(self.Modified_Shellcode, self.output)
+        if CheckFile(self.output):
+            self.data_size, self.hash = GetFileInfo(self.output)
             self.msg('proc.out')
         else:
             self.msg('error.output', True)
@@ -177,9 +181,15 @@ class module:
             if CheckFile(f'{self.OutputFile_Root}.o'):
                 self.data_size, self.hash = GetFileInfo(f'{self.OutputFile_Root}.o')
                 self.msg('proc.compile')
-                #pe = pefile.PE(f'{self.OutputFile_Root}.o')
-                final_shellcode = self.extract_section_from_object_file(f'{self.OutputFile_Root}.o') #self.extract_section_from_object(pe)
-                self.WriteToFile(final_shellcode, self.output_file)
+                self.msg('proc.ext')
+                final_shellcode = self.read_coff_text_section(f'{self.OutputFile_Root}.o')
+                self.msg('proc.fsize', False, len(final_shellcode))
+                if self.relay:
+                    self.msg('post.done')
+                    return final_shellcode
+                else:
+                    self.WriteToFile(final_shellcode, self.output)
+                    self.msg('post.done')
         else:
             self.msg('error.nasm1')
             self.msg('error.nasm2')
@@ -247,7 +257,7 @@ class module:
                     call_decoder:
                         call decoder             ; JMP-CALL-POP: 2. CALL
                   """
-        if self.random_padding:
+        if self.variable_padding:
             paddy = stub64.split('\n')
             noppy = '                        nop'
             random_noppy_index = random.randint(6, len(paddy)-2)

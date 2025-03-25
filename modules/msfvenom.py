@@ -1,3 +1,8 @@
+########################################################
+### MSFVenom Module
+### Status: untested
+########################################################
+
 #import utils.arg
 from utils.helper import nstate
 #from utils.helper import GetFileHash, CheckFile

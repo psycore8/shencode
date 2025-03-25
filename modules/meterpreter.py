@@ -1,3 +1,8 @@
+########################################################
+### Meterpreter Module
+### Status: untested
+########################################################
+
 from utils.helper import nstate as nstate
 from utils.windef import *
 from utils.winconst import *

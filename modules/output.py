@@ -1,3 +1,8 @@
+########################################################
+### Output Module
+### Status: migrated to 081
+########################################################
+
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileHash
 

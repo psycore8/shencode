@@ -9,12 +9,14 @@ def register_arguments(parser):
     parser.add_argument('-e', '--exponent', type=int, help='the exponent')
     parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
 
-class example:
+class module:
   # general information
   Author =      'Name'
   Description = 'some useful information about this module'
   Version =     '1.0.0'
   DisplayName = 'CALC-POWER'
+  # relay is used in tasked mode
+  relay = False
 
   # class init
   def __init__(self, base=0, exponent=0, power=0, verbose=False):
@@ -46,10 +48,16 @@ class example:
     # executes function
     self.CalculatePower()
 
-    # prints the result
-    if self.verbose:
-      # [+] The base of 8 raised to the exponent of 4 results in the power value 4096
-      self.msg('proc.calcv')
+    # check for tasked mode
+    if not self.relay:
+      # prints the result
+      if self.verbose:
+        # [+] The base of 8 raised to the exponent of 4 results in the power value 4096
+        self.msg('proc.calcv')
+      else:
+        # [+] The result equals 4096
+        self.msg('proc.calcs')
     else:
-      # [+] The result equals 4096
-      self.msg('proc.calcs')
+       # returns the values to task module for further processing
+       value_list = [self.base, self.exponent, self.power]
+       return value_list

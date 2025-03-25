@@ -1,3 +1,8 @@
+########################################################
+### NtInjection Module
+### Status: untested
+########################################################
+
 import os
 #import ctypes
 from utils.windef import *

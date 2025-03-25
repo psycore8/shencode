@@ -1,3 +1,8 @@
+########################################################
+### AES Module
+### Status: untested
+########################################################
+
 import utils.relay as relay
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo

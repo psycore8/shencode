@@ -1,3 +1,8 @@
+########################################################
+### XOR Module
+### Status: migrated to 081
+########################################################
+
 import base64
 from itertools import cycle
 import utils.relay as relay
@@ -8,12 +13,12 @@ CATEGORY = 'encoder'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for XOR encoding')
-    #parser.add_argument('-o', '--output', help= 'Outputfile for XOR encoding')
+    parser.add_argument('-o', '--output', help= 'Outputfile for XOR encoding')
     parser.add_argument('-k', '--key', type=int, help='Key for XOR encoding')
 
-    grpout = parser.add_argument_group('output')
-    grpout.add_argument('-o', '--output', help= 'Output file or buffer for XOR encoding')
-    grpout.add_argument('-r', '--relay', choices=relay.relay_options, help='Relay to module')
+    #grpout = parser.add_argument_group('output')
+    #grpout.add_argument('-o', '--output', help= 'Output file or buffer for XOR encoding')
+    #grpout.add_argument('-r', '--relay', choices=relay.relay_options, help='Relay to module')
 
     grp = parser.add_argument_group('additional')
     #grp.add_argument('-ch', '--chain', choices=['inject', 'ntinject'], required=False, help='If set, the output will be redirected to the choosen module')
@@ -23,7 +28,7 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     Description = 'XOR encoder for payloads'
-    Version = '2.1.1'
+    Version = '2.1.2'
     DisplayName = 'XOR-ENCODER'
     hash = ''
     data_size = 0
@@ -32,15 +37,15 @@ class module:
     out = list
     relay = False
 
-    def __init__(self, input, output, xor_key, verbose, mode, relay_command=None):
+    def __init__(self, input, output, xor_key, verbose, mode):
         self.input = input
         self.output = output
         self.xor_key = xor_key
         self.verbose = verbose
         self.mode = mode
-        self.relay_command = relay_command
-        if relay_command != None:
-            self.relay = True
+        # self.relay_command = relay_command
+        # if relay_command != None:
+        #     self.relay = True
 
     def msg(self, message_type, ErrorExit=False):
         messages = {

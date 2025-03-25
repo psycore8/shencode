@@ -1,3 +1,8 @@
+########################################################
+### QRCode Module
+### Status: untested
+########################################################
+
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo
 from qrcode.image.pure import PyPNGImage
