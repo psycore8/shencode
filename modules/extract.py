@@ -1,5 +1,5 @@
 ########################################################
-### AES Module
+### Extract Module
 ### Status: migrated to 081
 ########################################################
 
@@ -84,7 +84,8 @@ class module:
     def process(self):
         self.msg('pre.head')
         self.msg('proc.input_try')
-        #short_fn = os_path.basename(self.input)
+        #
+        # short_fn = os_path.basename(self.input)
         try:
             with open(self.input, "rb") as file:
                 shellcode = file.read()

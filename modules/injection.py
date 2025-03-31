@@ -4,6 +4,7 @@
 ########################################################
 
 import os
+#import subprocess
 from utils.windef import *
 from utils.winconst import *
 
@@ -18,7 +19,7 @@ def register_arguments(parser):
 
             grp = parser.add_argument_group('additional')
             grp.add_argument('-r', '--resume-thread', action='store_true', help='Start thread suspended and resume after speciefied time')
-            grp.add_argument('-s', '--start', action='store_true', help='If not active, start the process before injection')
+            grp.add_argument('-s', '--start-process', action='store_true', help='If not active, start the process before injection')
             grp.add_argument('-v', '--virtual-protect', action='store_true', help='Deny access on memory for a specified time')
 
 class module:
@@ -37,10 +38,10 @@ class module:
     pid = int
     relay = False
 
-    def __init__(self, input, process_start, target_process, shellcode, resume_thread=None, virtual_protect=None):
+    def __init__(self, input, process, start_process, shellcode=None, resume_thread=None, virtual_protect=None):
         self.input = input
-        self.process_start = process_start
-        self.target_process = target_process
+        self.process_start = start_process
+        self.target_process = process
         self.shellcode = shellcode
         self.resume_thread = resume_thread
         self.virtual_protect = virtual_protect
@@ -72,18 +73,23 @@ class module:
 
     def Start_Process(self):
         self.msg('inj.run')
+        #subprocess.Popen([self.target_process], creationflags=subprocess.DETACHED_PROCESS)
         os.system(self.target_process)
 
     def get_proc_id(self):
+        #print(self.target_process)
         processes = self.wmi.WMI().Win32_Process(name=self.target_process)
         self.pid = processes[0].ProcessId
         self.msg('inj.pid')
         return int(self.pid)
 
     def start_injection(self):
-        if self.Start_Process:
+        if self.process_start:
             s = self.threading.Thread(target=self.Start_Process)
             s.start()
+            #self.Start_Process()
+            #print('x')
+            #subprocess.Popen([self.target_process], creationflags=subprocess.DETACHED_PROCESS)
             self.sleep(3)
 
         process_id = self.get_proc_id()

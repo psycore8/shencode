@@ -17,6 +17,7 @@ def register_arguments(parser):
       grp = parser.add_argument_group('additional')
       grp.add_argument('-b', '--bytes-per-row', required=False, default=16, type=int, help='Define how many bytes per row will be displayed', metavar='INT')
       grp.add_argument('-d', '--decimal', action='store_true', required=False, default=False, help='Output decimal offsets instead of hex')
+      grp.add_argument('-hl', '--highlight', default=None, help='highlights bytes')
       grp.add_argument('-l', '--lines', action='store_true', default=False, help='adds a line numbering after each 8 bytes')
       grp.add_argument('-n', '--no-line-break', action='store_true', default=False, help='no line break during output')
       grp.add_argument('-o', '--output', required=False, type=str, default=None, help='save output to file')
@@ -25,19 +26,20 @@ class module:
     Author = 'psycore8'
     Description = 'create formatted output by filename'
     DisplayName = 'MODOUT'
-    Version = '0.1.5'
+    Version = '0.1.7'
     file_bytes = bytes
     offset_color = nstate.clLIGHTMAGENTA
     cFile = False
 
 
-    def __init__(self, input=any, syntax=str, bytes_per_row=int, decimal=bool, lines=bool, no_line_break=bool, output=None):
+    def __init__(self, input=any, syntax=str, bytes_per_row=int, decimal=bool, highlight=None, lines=bool, no_line_break=bool, output=None):
         self.input = input
         #self.input_type = input_type
         self.syntax = syntax
         self.lines = lines
         self.bytes_per_row = bytes_per_row
         self.decimal = decimal
+        self.highlight = highlight
         self.no_line_break = no_line_break
         #self.output_type = output_type
         #self.output_buffer = output_buffer
@@ -52,6 +54,7 @@ class module:
             'pre.hash'      : f'{nstate.f_out} File Hash: {MsgVar}',
             'process'       : f'{nstate.s_note} processing shellcode format... NoLineBreak: {self.no_line_break}\n',
             'post.output'   : f'{nstate.s_ok} Output file: {self.output}',
+            'post.summary'  : f'{nstate.s_info} Total length: {MsgVar} bytes',
             'post.done'     : f'{nstate.s_ok} DONE!',
             'error.input'   : f'{nstate.s_fail} Input file not found' ,
             'error.output'  : f'{nstate.s_fail} Output file not found'
@@ -70,22 +73,43 @@ class module:
             file.write(
                 nstate.remove_ansi_escape_sequences( data )
                 )
+            
+    # def highlight_null_in_hex_string(hex_string):
+    #     hex_bytes = hex_string.split()  # Zerlegt den String in einzelne Bytes (durch Leerzeichen getrennt)
+    #     result = any
+
+    #     for byte in hex_bytes:
+    #         if byte == "00":
+    #             check_byte = 
+    #             print("\033[91m00\033[0m", end=" ")  # Rote Markierung für 00
+    #         else:
+    #             print(byte, end=" ")  # Normale Ausgabe für andere Bytes
+    #     print()
+
+    def highlight_word(self, text, word, colorclass):
+        highlighted_text = text.replace(word, f"{colorclass}{word}{nstate.ENDC}")  # Rote Markierung
+        #print(highlighted_text)
+        return highlighted_text
 
     def GenerateOutput(self):
         formatted_bytes = self.GenerateHeader()
         offset = ''
         s = self.lang[self.syntax]
+        size = len(self.file_bytes)
         for i in range(0, len(self.file_bytes), self.bytes_per_row):
             if self.lines:
                 offset = self.GenerateOffset(i)
             chunk = self.file_bytes[i:i+self.bytes_per_row]
             #chunk = self.GenerateHighlight(chunk)
             formatted_row = ''.join(f'{s['byte_sep']}{byte:02x}' for byte in chunk)
+            formatted_row = self.highlight_word(formatted_row, '00', nstate.clRED)
+            if self.highlight != None:
+                formatted_row = self.highlight_word(formatted_row, self.highlight, nstate.clLIGHTBLUE)
             #formatted_row = self.GenerateHighlight(formatted_row)
             formatted_bytes += f'{offset}{s['row_prefix']}{formatted_row[s['row_cut']:]}{s['row_suffix']}'
         if self.no_line_break:
             formatted_bytes = formatted_bytes.replace('\n', '')
-        return f'{formatted_bytes[:s['code_cut']]}{s["code_add"]}'
+        return f'{formatted_bytes[:s['code_cut']]}{s["code_add"]}', size
 
     def GenerateHeader(self):
         if not self.syntax == 'inspect':
@@ -138,7 +162,7 @@ class module:
         else:
             self.msg('error.input', True)
         self.msg('process')
-        output = self.GenerateOutput()
+        output, size = self.GenerateOutput()
         if not self.output == None:
             self.SaveOutputFile(output)
             if CheckFile(self.output):
@@ -146,6 +170,7 @@ class module:
             else:
                 self.msg('error.output', True)
         print(output)
+        self.msg('post.summary', False, size)
         self.msg('post.done')
         #return output
         

@@ -10,6 +10,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import hashes
+from tqdm import tqdm
 import pickle
 import os
 
@@ -98,7 +99,8 @@ class module:
                 self.msg('error.input', True)
             self.data_size, self.hash = GetFileInfo(self.input)
             self.msg('proc.input_ok')
-        enc_data, salt, iv = self.aes_encrypt(self.data_bytes, self.key)
+        for i in tqdm (range (100), colour='magenta', leave=False):
+            enc_data, salt, iv = self.aes_encrypt(self.data_bytes, self.key)
         self.process_encoded_output(enc_data, salt, iv)
         # with open(self.output_file, "wb") as f:
         #     pickle.dump((enc_data, salt, iv), f)
@@ -124,7 +126,8 @@ class module:
                 self.msg('error.input', True)
             self.data_size, self.hash = GetFileInfo(self.input)
             self.msg('proc.input_ok')
-        Shellcode = self.aes_decrypt(enc_data, self.key, salt, iv)
+        for i in tqdm (range (100), colour='magenta', leave=False):
+            Shellcode = self.aes_decrypt(enc_data, self.key, salt, iv)
         self.process_decoded_output(Shellcode)
         # with open(self.output_file, 'wb') as file:
         #      file.write(Shellcode)

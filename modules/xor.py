@@ -8,6 +8,7 @@ from itertools import cycle
 import utils.relay as relay
 from utils.helper import nstate
 from utils.helper import CheckFile, GetFileInfo
+from tqdm import tqdm
 
 CATEGORY = 'encoder'
 
@@ -37,10 +38,10 @@ class module:
     out = list
     relay = False
 
-    def __init__(self, input, output, xor_key, verbose, mode):
+    def __init__(self, input, output, key, verbose, mode):
         self.input = input
         self.output = output
-        self.xor_key = xor_key
+        self.xor_key = key
         self.verbose = verbose
         self.mode = mode
         # self.relay_command = relay_command
@@ -103,9 +104,11 @@ class module:
             self.msg('proc.input_ok')
             self.msg('proc.try')
             if self.mode == 'encode':
-                self.mod_shellcode = self.xor_crypt_bytes(self.shellcode, self.xor_key)
+                for i in tqdm (range (100), colour='magenta', leave=False):
+                    self.mod_shellcode = self.xor_crypt_bytes(self.shellcode, self.xor_key)
             elif self.mode == 'decode':
-                self.mod_shellcode = self.xor_decrypt_bytes(self.shellcode, self.xor_key)
+                for i in tqdm (range (100), colour='magenta', leave=False):
+                    self.mod_shellcode = self.xor_decrypt_bytes(self.shellcode, self.xor_key)
             if self.verbose:
                 self.msg('proc.verbose')
             if not self.relay:

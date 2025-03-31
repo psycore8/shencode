@@ -1,10 +1,12 @@
 import argparse
 import importlib
 import os
+from utils.const import *
+#from shencode import module_dir
 #import __main__ as main
 from textwrap import wrap
 
-Modules_Dir = 'modules'
+Modules_Dir = module_dir
 
 class FixedWidthHelpFormatter(argparse.HelpFormatter):
     def _split_lines(self, text, width):
@@ -38,6 +40,7 @@ def load_modules():
 
 def create_parser():
     parser = argparse.ArgumentParser(description='dynamic module parser', formatter_class=FixedWidthHelpFormatter)
+    parser.add_argument('--config', help='load a json config file')
     #parser.add_argument('-v', '--version', action='store_true' ,help='Shows the shencode version')
     #parser.add_argument('--header', type=int, help='Shows a specific banner')
     subparsers = parser.add_subparsers(dest='module', required=True, help='Available modules')

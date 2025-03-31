@@ -28,6 +28,7 @@ class module:
                 'C:\\Windows\\System32\\dnsapi.dll',
                 'C:\\Windows\\System32\\mswsock.dll'
              ]
+  relay = False
   
   def __init__(self, input, output, key):
      self.input = input
@@ -183,16 +184,20 @@ class module:
    
     m('proc.sizemod', len(modified_shellcode))
     #print(f"{nstate.OKBLUE} Shellcode size: " + str(len(modified_shellcode)))
-    m('proc.out')
-    #print(f"{nstate.OKBLUE} Writing bytes to file: {self.output}")
-    with open(self.output, 'wb') as file:
-      file.write(modified_shellcode)
-    cf = ospath.isfile(self.output)
-    if cf == True:
-      m('proc.done')
-      #print(f"{nstate.OKGREEN} encoded shellcode created in {self.output}")
+    if self.relay:
+       m('proc.done')
+       return modified_shellcode
     else:
-      m('proc.error')
-      #print(f"{nstate.FAIL} encoded Shellcode error, aborting script execution")
-      exit()
-    m('post.done')
+      m('proc.out')
+      #print(f"{nstate.OKBLUE} Writing bytes to file: {self.output}")
+      with open(self.output, 'wb') as file:
+        file.write(modified_shellcode)
+      cf = ospath.isfile(self.output)
+      if cf == True:
+        m('proc.done')
+        #print(f"{nstate.OKGREEN} encoded shellcode created in {self.output}")
+      else:
+        m('proc.error')
+        #print(f"{nstate.FAIL} encoded Shellcode error, aborting script execution")
+        exit()
+      m('post.done')

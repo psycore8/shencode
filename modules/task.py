@@ -1,5 +1,5 @@
 ########################################################
-### AES Module
+### Task Module
 ### Status: untested
 ########################################################
 
@@ -51,13 +51,15 @@ class module:
             m('task.name', task['task']['name'])
             m('nl')
             for step in task:
-                if step != 'task':
+                if step != 'task' and step != 'bypass':
                     mod = self.importlib.import_module(f'modules.{step}')
                     if task[step]['input_buffer']:
                         task[step]['args']['input'] = self.result
                         mod.module.relay = True
+                        mod.module.relay_input = True
                     if task[step]['return_buffer']:
                         mod.module.relay = True
+                        mod.module.relay_output = True
                     modclass = mod.module(**task[step]['args'])
                     self.result = modclass.process()
                     m('nl')
