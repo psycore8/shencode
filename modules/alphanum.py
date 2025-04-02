@@ -5,11 +5,11 @@
 
 import os
 import random
-import struct
 import tqdm
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo
 from utils.const import *
+from utils.binary import get_coff_section
 from subprocess import run
 
 CATEGORY = 'encoder'
@@ -25,7 +25,7 @@ def register_arguments(parser):
 class module:
     Author          = 'psycore8'
     Description     = 'Encode bytes to alphanumeric output'
-    Version         = '0.0.2'
+    Version         = '0.1.0'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
@@ -58,29 +58,6 @@ class module:
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
             exit()
-
-    def read_coff_text_section(self, filename):
-        with open(filename, "rb") as f:
-            data = f.read()
-
-        # number of sections after DOS Header
-        num_sections = struct.unpack_from("<H", data, 2)[0]
-
-        # section table at offset 14h without optional header, section table has a length of 40 bytes
-        section_offset = 0x14 
-        section_size = 40 
-
-        for i in range(num_sections):
-            section_data = data[section_offset + i * section_size : section_offset + (i + 1) * section_size]
-            name = section_data[:8].strip(b"\x00").decode()
-            if name == ".text":
-                raw_data_offset = struct.unpack_from("<I", section_data, 20)[0]
-                raw_data_size = struct.unpack_from("<I", section_data, 16)[0]
-                text_data = data[raw_data_offset : raw_data_offset + raw_data_size]
-                return text_data
-
-        print(".text section not found!")
-        return None
 
     def to_alphanum(self, encoded_shellcode):
         self.msg('note', False, 'Encoder running...')
@@ -125,26 +102,28 @@ class module:
         inst_asm_inc_reg = [
             f'inc {reg4[0]}',
             f'add {reg4[0]}, 1',
-            f'lea {reg4[0]}, [{reg4[0]}+1]'
+            f'lea {reg4[0]}, [{reg5[0]}+1]'
             ]
         inst_asm_dec_reg = [
             f'dec {reg3[0]}',
             f'sub {reg3[0]}, 1',
-            f'lea {reg3[0]}, [{reg3[0]}-1]'
+            f'lea {reg3[0]}, [{reg2[0]}-1]'
             ]
         
+        rc = random.choice
         asm_reg_zero    = random.choice(inst_asm_reg_zero)
         asm_jmp_cond    = random.choice(inst_asm_jmp_cond)
         #asm_jmp_ncond   = random.choice(inst_asm_jmp_ncond)
         asm_inc_reg     = random.choice(inst_asm_inc_reg)
         asm_dec_reg     = random.choice(inst_asm_dec_reg)
 
+        ### Check logic, bytes/2 -> seems ok -> 2 chars = 1 byte
         size = len(self.encoded_data)//2
         if size <= 255:
            sc_size = f'mov {reg2[3]}, {size}'
-        elif size > 255 and size <= 65535:
+        elif size <= 65535:
            sc_size = f'mov {reg2[2]}, {size}'
-        elif size > 65535:
+        else:
            sc_size = f'mov {reg2[1]}, {size}'
 
         stub = f"""
@@ -152,38 +131,38 @@ class module:
                         global _start
 
                     _start:
-                        {asm_reg_zero} {reg1[0]}, {reg1[0]}
-                        {asm_reg_zero} {reg2[0]}, {reg2[0]}
-                        {asm_reg_zero} {reg3[0]}, {reg3[0]}
-                        {asm_reg_zero} {reg4[0]}, {reg4[0]}
-                        {asm_reg_zero} {reg5[0]}, {reg5[0]}
+                        {rc(inst_asm_reg_zero)} {reg1[0]}, {reg1[0]}
+                        {rc(inst_asm_reg_zero)} {reg2[0]}, {reg2[0]}
+                        {rc(inst_asm_reg_zero)} {reg3[0]}, {reg3[0]}
+                        {rc(inst_asm_reg_zero)} {reg4[0]}, {reg4[0]}
+                        {rc(inst_asm_reg_zero)} {reg5[0]}, {reg5[0]}
                         jmp short call_decoder
 
                     decoder:
-                        pop {reg1[0]}                     ; shellcode address
-                        mov {reg5[0]}, {reg1[0]}          ; Target address
-                        {sc_size}                         ; amount of bytes to encode
+                        pop {reg1[0]}                     ; shellcode address = reg1
+                        mov {reg5[0]}, {reg1[0]}          ; Target address = reg5
+                        {sc_size}                         ; amount of bytes to encode = reg2
 
                     decode_loop:
-                        test {reg2[0]}, {reg2[0]}
-                        {asm_jmp_cond} encoded_shellcode
+                        test {reg2[0]}, {reg2[0]}         ; test reg2
+                        {rc(inst_asm_jmp_cond)} encoded_shellcode
 
-                        mov {reg3[3]}, byte [{reg1[0]}]   ; get alphanumeric bytes
+                        mov {reg3[3]}, byte [{reg1[0]}]   ; get alphanumeric bytes = reg3
                         sub {reg3[3]}, 0x41               ; "A-Z" → High-Nibble (A=0)
                         shl {reg3[3]}, 4                  ; shift High-Nibble left
 
-                        mov {reg4[3]}, byte [{reg1[0]}+1] ; Low-Nibble
+                        mov {reg4[3]}, byte [{reg1[0]}+1] ; Low-Nibble = reg4
                         sub {reg4[3]}, 0x61               ; "a-p" → Low-Nibble (a=0)
                         or {reg3[3]}, {reg4[3]}           ; combine high and low nibble
 
                         mov byte [{reg5[0]}], {reg3[3]}   ; write decoded byte at the same position
-                        inc {reg5[0]}
+                        {rc(inst_asm_inc_reg)}
                         add {reg1[0]}, 2                  ; jump 2 chars
-                        sub {reg2[0]}, 1
-                        jmp decode_loop
-                        ;loop decode_loop                  ; repeat until it is done
+                        {rc(inst_asm_dec_reg)}
+                        jmp decode_loop                   ; using jmp, loop auto decrements rcx
+                        ;loop decode_loop                 ; repeat until it is done
 
-                        ;jmp {reg1[0]}                     ; jump to shellcode
+                        ;jmp {reg1[0]}                    ; jump to shellcode
 
                     call_decoder:
                         call decoder
@@ -226,7 +205,7 @@ class module:
                     f.write(sc)
             fn_root, fn_extension = os.path.splitext(self.output)
             run(f'{self.compiler_cmd} -f win64 {self.output} -o {fn_root}.o')
-            sc = self.read_coff_text_section(f'{fn_root}.o')
+            sc = get_coff_section(f'{fn_root}.o', '.text')
         if self.relay_output:
             return sc
         else:

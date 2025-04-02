@@ -14,25 +14,28 @@ def register_arguments(parser):
       #parser.add_argument('-it', '--input-type', choices=['file', 'buffer'], default='file', help='Specify input type')
       parser.add_argument('-s', '--syntax', choices=['c','casm','cs','ps1','py','hex','inspect'], help='formatting the shellcode in C, Casm, C#, Powershell, python or hex')
 
+      src = parser.add_argument_group('formatting')
+      src.add_argument('-b', '--bytes-per-row', required=False, default=16, type=int, help='Define how many bytes per row will be displayed', metavar='INT')
+      src.add_argument('-hl', '--highlight', default=None, help='highlights bytes')
+      src.add_argument('-n', '--no-line-break', action='store_true', default=False, help='no line break during output')
+      src.add_argument('-r', '--range', nargs=2, default=[0, 0], type=int, help='Set a range of bytes to output: <start> <end>')
+
       grp = parser.add_argument_group('additional')
-      grp.add_argument('-b', '--bytes-per-row', required=False, default=16, type=int, help='Define how many bytes per row will be displayed', metavar='INT')
       grp.add_argument('-d', '--decimal', action='store_true', required=False, default=False, help='Output decimal offsets instead of hex')
-      grp.add_argument('-hl', '--highlight', default=None, help='highlights bytes')
       grp.add_argument('-l', '--lines', action='store_true', default=False, help='adds a line numbering after each 8 bytes')
-      grp.add_argument('-n', '--no-line-break', action='store_true', default=False, help='no line break during output')
       grp.add_argument('-o', '--output', required=False, type=str, default=None, help='save output to file')
 
 class module:
     Author = 'psycore8'
     Description = 'create formatted output by filename'
     DisplayName = 'MODOUT'
-    Version = '0.1.7'
+    Version = '0.1.9'
     file_bytes = bytes
     offset_color = nstate.clLIGHTMAGENTA
     cFile = False
 
 
-    def __init__(self, input=any, syntax=str, bytes_per_row=int, decimal=bool, highlight=None, lines=bool, no_line_break=bool, output=None):
+    def __init__(self, input=any, syntax=str, bytes_per_row=int, decimal=bool, highlight=None, lines=bool, range=[None, None], no_line_break=bool, output=None):
         self.input = input
         #self.input_type = input_type
         self.syntax = syntax
@@ -43,6 +46,10 @@ class module:
         self.no_line_break = no_line_break
         #self.output_type = output_type
         #self.output_buffer = output_buffer
+        if range != [0, 0]:
+            self.range = [range[0], range[1]]
+        # else:
+        #     self.range = None
         self.output = output
         if not output == '':
             self.cFile = True
@@ -65,7 +72,13 @@ class module:
  
     def LoadInputFile(self):
         with open(self.input, 'rb') as file:
-            self.file_bytes = file.read()
+            if self.range == [0, 0]:
+                self.file_bytes = file.read()
+            else:
+                x = self.range[0]
+                y = self.range[1]
+                file.seek(x)
+                self.file_bytes = file.read(y - x)
 
     def SaveOutputFile(self, data):
         nstate.remove_ansi_escape_sequences(data)

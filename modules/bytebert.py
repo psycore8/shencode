@@ -12,11 +12,12 @@
 import random
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo
+from utils.binary import get_coff_section
 from os import path as osp
 from os import name as os_name
 from os import urandom as urandom
 from subprocess import run
-import struct
+#import struct
 from tqdm import tqdm
 from utils.const import *
 
@@ -32,7 +33,7 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     Description = 'ByteBert - Advanced polymorphic Encoder Stub'
-    Version = '0.3.3'
+    Version = '0.3.5'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -88,28 +89,28 @@ class module:
         if ErrorExit:
             exit()
 
-    def read_coff_text_section(self, filename):
-        with open(filename, "rb") as f:
-            data = f.read()
+    # def read_coff_text_section(self, filename):
+    #     with open(filename, "rb") as f:
+    #         data = f.read()
 
-        # number of sections after DOS Header
-        num_sections = struct.unpack_from("<H", data, 2)[0]
+    #     # number of sections after DOS Header
+    #     num_sections = struct.unpack_from("<H", data, 2)[0]
 
-        # section table at offset 14h without optional header, section table has a length of 40 bytes
-        section_offset = 0x14 
-        section_size = 40 
+    #     # section table at offset 14h without optional header, section table has a length of 40 bytes
+    #     section_offset = 0x14 
+    #     section_size = 40 
 
-        for i in range(num_sections):
-            section_data = data[section_offset + i * section_size : section_offset + (i + 1) * section_size]
-            name = section_data[:8].strip(b"\x00").decode()
-            if name == ".text":
-                raw_data_offset = struct.unpack_from("<I", section_data, 20)[0]
-                raw_data_size = struct.unpack_from("<I", section_data, 16)[0]
-                text_data = data[raw_data_offset : raw_data_offset + raw_data_size]
-                return text_data
+    #     for i in range(num_sections):
+    #         section_data = data[section_offset + i * section_size : section_offset + (i + 1) * section_size]
+    #         name = section_data[:8].strip(b"\x00").decode()
+    #         if name == ".text":
+    #             raw_data_offset = struct.unpack_from("<I", section_data, 20)[0]
+    #             raw_data_size = struct.unpack_from("<I", section_data, 16)[0]
+    #             text_data = data[raw_data_offset : raw_data_offset + raw_data_size]
+    #             return text_data
 
-        print(".text section not found!")
-        return None
+    #     print(".text section not found!")
+    #     return None
 
     def CheckNasm(self)->bool:
         if osp.exists('nasm.exe'):
@@ -168,12 +169,6 @@ class module:
                     shellcode_bytes = file.read()
             except FileNotFoundError:
                 self.msg('error.input', True)
-        # self.msg('key.try')
-        # for i in tqdm (range (100), colour='magenta', leave=False):
-        #     self.key = self.find_valid_xor_key(shellcode_bytes)
-        # if self.key == 0:
-        #     self.msg('error.key')
-        #     self.key = random.randint(1, 255)
         self.msg('proc.rkey')
 
         for i in tqdm (range (100), colour='magenta', leave=False):
@@ -190,12 +185,6 @@ class module:
     def AppendShellcode(self):
         self.Modified_Shellcode += self.Shellcode
         self.msg('proc.xor_ok')
-
-    def replace_bytes_at_offset(self, data, offset, new_bytes):
-        data = bytearray(data)
-        data[offset] = int(new_bytes.encode('utf-8'))
-        data.append(int(new_bytes))
-        return bytes(data)
 
     def WriteToFile(self, data, filename):
       if isinstance(data, bytes):
@@ -236,7 +225,7 @@ class module:
                 self.data_size, self.hash = GetFileInfo(f'{self.OutputFile_Root}.o')
                 self.msg('proc.compile')
                 self.msg('proc.ext')
-                final_shellcode = self.read_coff_text_section(f'{self.OutputFile_Root}.o')
+                final_shellcode = get_coff_section(f'{self.OutputFile_Root}.o', '.text')
                 self.msg('proc.fsize', False, len(final_shellcode))
                 if self.relay_output:
                     self.msg('post.done')
@@ -266,6 +255,7 @@ class module:
             f'lea {reg3[0]}, [{reg3[0]}-1]'
             ]
         
+        rc = random.choice
         asm_reg_zero    = random.choice(inst_asm_reg_zero)
         asm_jmp_cond    = random.choice(inst_asm_jmp_cond)
         asm_jmp_ncond   = random.choice(inst_asm_jmp_ncond)
@@ -277,12 +267,14 @@ class module:
             self.msg('v.inst', False, f'Instruction set: {asm_jmp_cond} / {asm_jmp_ncond} / {asm_reg_zero}')
             self.msg('v.inst', False, f'Increase, decrease: {asm_inc_reg} {asm_dec_reg}')
 
-        if int(self.Shellcode_Length) <= 255:
-           sc_size = f'mov {reg3[3]}, {self.Shellcode_Length}'
-        elif int(self.Shellcode_Length) > 255 and int(self.Shellcode_Length) <= 65535:
-           sc_size = f'mov {reg3[2]}, {self.Shellcode_Length}'
-        elif int(self.Shellcode_Length) > 65535:
-           sc_size = f'mov {reg3[1]}, {self.Shellcode_Length}'
+        size = int(self.Shellcode_Length)
+        
+        if size <= 255:
+           sc_size = f'mov {reg3[3]}, {size}'
+        elif size <= 65535:
+           sc_size = f'mov {reg3[2]}, {size}'
+        else:
+           sc_size = f'mov {reg3[1]}, {size}'
 
         if self.verbose:
             self.msg('v.size', False, f'{sc_size}')
@@ -294,10 +286,10 @@ class module:
                         global _start
 
                     _start:
-                        {asm_reg_zero} {reg1[0]}, {reg1[0]}
-                        {asm_reg_zero} {reg2[0]}, {reg2[0]}
-                        {asm_reg_zero} {reg3[0]}, {reg3[0]}
-                        {asm_reg_zero} {reg4[0]}, {reg4[0]}
+                        {rc(inst_asm_reg_zero)} {reg1[0]}, {reg1[0]}
+                        {rc(inst_asm_reg_zero)} {reg2[0]}, {reg2[0]}
+                        {rc(inst_asm_reg_zero)} {reg3[0]}, {reg3[0]}
+                        {rc(inst_asm_reg_zero)} {reg4[0]}, {reg4[0]}
                         {sc_size}              ; length of embedded shellcode
                         jmp short call_decoder   ; JMP-CALL-POP: 1. JMP
 
