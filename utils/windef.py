@@ -5,26 +5,6 @@ kernel32     = ctypes.windll.kernel32
 ntdll        = ctypes.windll.ntdll
 user32       = ctypes.windll.user32
 
-# EXECUTE_IMMEDIATLY = 0
-# MEM_COMMIT_RESERVE = 0x00003000
-# NT_SUCCESS = 0
-# PAGE_READWRITE_EXECUTE = 0x00000040
-# PROCESS_ALL_ACCESS = 0x1fffff
-# PROCESS_CREATE_FLAGS_SUSPENDED = 0x00000200
-# THREAD_CREATE_FLAGS_CREATE_SUSPENDED = 0x00000001
-
-# GENERIC_READ    = 0x80000000
-# GENERIC_WRITE   = 0x40000000
-# GENERIC_EXECUTE = 0x20000000
-# GENERIC_ALL     = 0x10000000
-
-# # Define MemoryProtections
-# PAGE_EXECUTE_READWRITE = 0x00000040
-# PAGE_EXECUTE_READ =      0x00000020
-# PAGE_READWRITE =         0x00000004
-# PAGE_READONLY =          0x00000002
-# PAGE_SIZE =              0x00001000
-
 ACCESS_MASK = ctypes.wintypes.ULONG
 BOOL        = ctypes.wintypes.BOOL
 BYTE        = ctypes.wintypes.BYTE
@@ -214,10 +194,6 @@ def pNtCreateThreadEx(
                          CreateFlags, ZeroBits, SizeOfStackCommit, 
                          SizeOfStackReserve, lpBytesBuffer)
     return r
-
-# NtCreateThread = ntdll.NtCreateThread
-# NtCreateThread.argtypes = [ HANDLE, ACCESS_MASK, LPVOID, HANDLE, LPVOID, LPVOID, BOOL, ULONG, ULONG, ULONG, LPVOID ]
-# NtCreateThread.restype = LONG
 
 NtResumeThread = ntdll.NtResumeThread
 NtResumeThread.argtypes = [ HANDLE, PULONG ]

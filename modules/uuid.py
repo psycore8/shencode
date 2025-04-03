@@ -1,6 +1,7 @@
 ########################################################
 ### UUID Module
 ### Status: untested
+### Passed: (x) manual tests () task
 ########################################################
 
 from utils.helper import nstate as nstate
@@ -14,17 +15,18 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     Description = 'obfuscate shellcodes as UUID strings'
-    Version = '2.1.1'
+    Version = '2.2.1'
     DisplayName = 'UUID-OBF'
     UUID_string = ''
     hash = ''
     data_size = 0
+    shellcode = b''
+    obf_String = ''
+    var_counter = 0
 
-    def __init__(self, input_file, shellcode, obf_string, var_counter):
-        self.input_file = input_file
-        self.shellcode = shellcode
-        self.obf_string = obf_string
-        self.var_counter = var_counter
+
+    def __init__(self, input):
+        self.input_file = input
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
@@ -46,8 +48,10 @@ class module:
     
     def open_file(self, filename):
         try:
-            for b in open(filename, 'rb').read():
-                self.shellcode += b.to_bytes(1, 'big').hex()
+            # for b in open(filename, 'rb').read():
+            #     self.shellcode += b.to_bytes(1, 'big').hex()
+            with open(filename, 'rb') as f:
+                self.shellcode = f.read()
             return True
         except FileNotFoundError:
             return False
@@ -58,12 +62,12 @@ class module:
         return [s[i:i + block_size] for i in range(0, len(s), block_size)]
     
     def CreateVar(self):
-        self.Obf_String = ''
+        self.obf_String = ''
         blocks = self.split_string_into_blocks(self.shellcode, 32)
         self.obf_string = f'std::vector<std::string> sID = '
         self.obf_string += '{\n'
         for block in blocks:
-            s = self.string_to_uuid(block.decode())
+            s = self.string_to_uuid(block.hex())
             self.obf_string += f'\"{s}\",\n'
         self.obf_string = self.obf_string[:-2] + ' };'
         return self.obf_string

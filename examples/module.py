@@ -16,7 +16,8 @@ class module:
   Version =     '1.0.0'
   DisplayName = 'CALC-POWER'
   # relay is used in tasked mode
-  relay = False
+  relay_input = False
+  relay_output = False
 
   # class init
   def __init__(self, base=0, exponent=0, power=0, verbose=False):

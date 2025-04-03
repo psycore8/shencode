@@ -1,10 +1,13 @@
 ########################################################
 ### AES Module
 ### Status: untested
+### Passed: (x) manual tests () task
 ########################################################
 
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo
+from utils.const import tpl_path
+from utils.binary import replace_bytes_at_offset
 from os import path as osp
 
 CATEGORY = 'encoder'
@@ -17,7 +20,7 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     Description = 'create payload from a raw file, encode with byteswap-xor, add to byteswap stub'
-    Version = '2.1.1'
+    Version = '2.1.2'
     DisplayName = 'BYTESWAP-ENC'
     Shellcode = ''
     Shellcode_Length = 0
@@ -26,11 +29,11 @@ class module:
     hash = ''
     relay = False
 
-    def __init__(self, input, output, template_file, xor_key):
+    def __init__(self, input, output, key):
         self.input = input
         self.output = output
-        self.template_file = template_file
-        self.xor_key = xor_key
+        self.template_file = f'{tpl_path}byteswap-short.tpl'
+        self.xor_key = key
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
@@ -86,11 +89,11 @@ class module:
         size = len(self.Modified_Shellcode)
         print(f'{nstate.OKBLUE} XORed payload added, size of shellcode {size} bytes')
 
-    def replace_bytes_at_offset(self, data, offset, new_bytes):
-        data = bytearray(data)
-        data[offset] = new_bytes
-        data.append(int(new_bytes))
-        return bytes(data)
+    # def replace_bytes_at_offset(self, data, offset, new_bytes):
+    #     data = bytearray(data)
+    #     data[offset] = new_bytes
+    #     data.append(int(new_bytes))
+    #     return bytes(data)
 
     def WriteToFile(self):
       with open(self.output, 'wb') as file:
@@ -119,8 +122,8 @@ class module:
        self.AppendShellcode()
        self.msg('proc.stats')
        self.msg('proc.key')
-       self.Modified_Shellcode = self.replace_bytes_at_offset(self.Modified_Shellcode, Length_Offset, self.Shellcode_Length)
-       self.Modified_Shellcode = self.replace_bytes_at_offset(self.Modified_Shellcode, XOR_Key_Offset, self.xor_key)
+       self.Modified_Shellcode = replace_bytes_at_offset(self.Modified_Shellcode, Length_Offset, self.Shellcode_Length)
+       self.Modified_Shellcode = replace_bytes_at_offset(self.Modified_Shellcode, XOR_Key_Offset, self.xor_key)
        if not self.relay:
         self.WriteToFile()
         if CheckFile(self.output):

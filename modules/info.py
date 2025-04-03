@@ -26,8 +26,6 @@ class module:
     hash = ''
 
     def __init__(self, get, modlist=False):
-        #self.version = version
-        #self.mod_dir = mod_dir
         self.get = get
         self.modlist = modlist
         
@@ -39,6 +37,9 @@ class module:
             'version'        : f'{nstate.s_ok} ShenCode Version: {Version}',
             'mods'           : f'{nstate.s_ok} Module count: {self.mod_count}',
             'repo'           : f'{nstate.s_ok} Repository: {nstate.f_link}https://github.com/psycore8/shencode{nstate.f_end}',
+            'msf'            : f'{nstate.s_ok} msfvenom: {msfvenom_path}',
+            'template'       : f'{nstate.s_ok} template dir: {tpl_path}',
+            'modules'        : f'{nstate.s_ok} module dir: {module_dir}',
             'modlist.s'      : f'{nstate.s_ok} List modules',
             'modlist'        : f'{nstate.s_note} Module {self.mod_count}: {self.mod_name}',
             'post.done'      : f'{nstate.s_ok} DONE!'
@@ -62,6 +63,9 @@ class module:
         self.msg('banner')
         self.get_mod_count()
         self.msg('mods')
+        self.msg('modules')
+        self.msg('template')
+        self.msg('msf')
         self.msg('repo')
         if self.modlist:
             self.mod_count = 1

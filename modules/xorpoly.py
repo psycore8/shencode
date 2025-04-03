@@ -1,13 +1,15 @@
 ########################################################
 ### AES Module
 ### Status: untested
+### Passed: (x) manual tests () task
 ########################################################
 
-import utils.relay as relay
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo
+from utils.const import tpl_path
+from utils.binary import replace_bytes_at_offset
 from os import path as osp
-from modules.xor import module
+from modules.xor import module as xormod
 
 CATEGORY = 'encoder'
 
@@ -18,28 +20,30 @@ def register_arguments(parser):
 
     grpout = parser.add_argument_group('output')
     grpout.add_argument('-o', '--output', help= 'Output file or buffer for XORPOLY encoding')
-    grpout.add_argument('-r', '--relay', choices=relay.relay_options, help='Relay to module')
+    #grpout.add_argument('-r', '--relay', choices=relay.relay_options, help='Relay to module')
 
 class module:
     Author = 'psycore8'
     Description = 'create payload from a raw file, encode with xor, add to xor stub'
-    Version = '2.1.1'
+    Version = '2.1.2'
     DisplayName = 'X0RP0LY-ENC'
+    shellcode = b''
+    xored_shellcode = b''
     data_size = 0
     hash = ''
+    relay_input     = False
+    relay_output    = False
 
-    def __init__(self, input_file, output, shellcode, xored_shellcode, template_file, xor_key, relay_command=None):
-       self.input_file = input_file
+    def __init__(self, input, output, key):
+       self.input_file = input
        self.output_file = output
-       self.shellcode = shellcode
-       self.xored_shellcode = xored_shellcode
-       self.template_file = template_file
-       self.xor_key = xor_key
-       self.relay_command = relay_command
-       with open(self.input_file, 'rb') as file:
-          self.shellcode = file.read()
-       if relay_command != None:
-          self.relay = True
+       self.template_file = f'{tpl_path}xor-stub.tpl'
+       self.xor_key = key
+       #self.relay_command = relay_command
+    #    with open(self.input_file, 'rb') as file:
+    #       self.shellcode = file.read()
+    #    if relay_command != None:
+    #       self.relay = True
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
@@ -71,14 +75,18 @@ class module:
         with open(self.template_file, "rb") as file:
             self.shellcode = file.read()
 
+    def LoadPayload(self):
+       with open(self.input_file, 'rb') as file:
+          self.shellcode = file.read()
+
     def AppendShellcode(self):
         self.shellcode += self.xored_shellcode
 
-    def replace_bytes_at_offset(data, offset, new_bytes):
-        data = bytearray(data)
-        data[offset] = new_bytes
-        data.append(int(new_bytes))
-        return bytes(data)
+    # def replace_bytes_at_offset(data, offset, new_bytes):
+    #     data = bytearray(data)
+    #     data[offset] = new_bytes
+    #     data.append(int(new_bytes))
+    #     return bytes(data)
 
     def WriteToFile(self):
       outputfile = self.output_file #xor.Output_File
@@ -88,29 +96,33 @@ class module:
     def process(self):
         #Offset = 5
         self.msg('pre.head')
-        xor_enc = module('', '', 0, False, 'encode', None)
+        xor_enc = xormod('', '', 0, False, 'encode')
         self.xored_shellcode = xor_enc.xor_crypt_bytes(self.shellcode, self.xor_key)
         self.msg('proc.stub')
         if CheckFile(self.template_file):
           self.data_size, self.hash = GetFileInfo(self.template_file)
-          self.LoadHeader(self)
+          self.LoadHeader()
           self.msg('proc.stub_ok')
           self.msg('proc.stats')
         else:
             self.msg('error.template', True)
-        self.msg('proc.try')
-        if CheckFile(self.input_file):
-           self.data_size, self.hash = GetFileInfo(self.input_file)
-           self.msg('proc.input_ok')
-           self.AppendShellcode(self)
-           self.msg('proc.stats')
-           self.msg('proc.key')
-           self.shellcode = self.replace_bytes_at_offset(self.shellcode, 5, self.xor_key)
+        if self.relay_input:
+            self.shellcode = self.input_file
         else:
-           self.msg('error.input', True)
-        if not self.relay:
+            self.msg('proc.try')
+            if CheckFile(self.input_file):
+                self.LoadPayload()
+                self.data_size, self.hash = GetFileInfo(self.input_file)
+                self.msg('proc.input_ok')
+            else:
+                self.msg('error.input', True)
+        self.AppendShellcode()
+        self.msg('proc.stats')
+        self.msg('proc.key')
+        self.shellcode = replace_bytes_at_offset(self.shellcode, 5, self.xor_key)
+        if not self.relay_output:
             self.msg('proc.output_try')
-            self.WriteToFile(self)
+            self.WriteToFile()
             if CheckFile(self.output_file):
                 self.data_size, self.hash = GetFileInfo(self.output_file)
                 self.msg('proc.output_ok')
@@ -119,7 +131,8 @@ class module:
         else:
            self.msg('post.done')
            print('\n')
-           relay.start_relay(self.relay_command, self.shellcode)
+           #relay.start_relay(self.relay_command, self.shellcode)
+           return self.shellcode
         self.msg('post.done')
 
     

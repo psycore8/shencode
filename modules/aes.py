@@ -1,6 +1,7 @@
 ########################################################
 ### AES Module
 ### Status: migrated to 081
+### Passed: (x) manual tests () task
 ########################################################
 
 from utils.helper import nstate as nstate

@@ -5,13 +5,14 @@
 
 #import utils.arg
 from utils.helper import nstate
+from utils.const import msfvenom_path
 #from utils.helper import GetFileHash, CheckFile
 import subprocess
 
 CATEGORY = 'core'
 
 def register_arguments(parser):
-      parser.add_argument('-c', '--cmd', help='msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"')
+      parser.add_argument('-c', '--command-line', help='msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"')
 
 class module:
   Author        = 'psycore8'
@@ -20,7 +21,7 @@ class module:
   DisplayName   = 'MSFGEN'
   Args          = []
   
-  def __init__(self, command_line, msfvenom_path):
+  def __init__(self, command_line):
     self.command_line = command_line
     self.msfvenom_path = msfvenom_path
 

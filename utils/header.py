@@ -9,23 +9,6 @@ headers =["""
  |::.. . |                         |::.. . |                        
  `-------\'                         `-------\'                      
  """,
-#  """
-#    .dMMMb     dMP dMP     dMMMMMP     dMMMMb    .aMMMb    .aMMMb     dMMMMb     dMMMMMP 
-#   dMP" VP    dMP dMP     dMP         dMP dMP   dMP"VMP   dMP"dMP    dMP VMP    dMP      
-#   VMMMb     dMMMMMP     dMMMP       dMP dMP   dMP       dMP dMP    dMP dMP    dMMMP     
-# dP .dMP    dMP dMP     dMP         dMP dMP   dMP.aMP   dMP.aMP    dMP.aMP    dMP        
-# VMMMP"    dMP dMP     dMMMMMP     dMP dMP    VMMMP"    VMMMP"    dMMMMP"    dMMMMMP     
-# """,
-# """
-#  .d8888b.  888                         .d8888b.                888          
-# d88P  Y88b 888                        d88P  Y88b               888          
-# Y88b.      888                        888    888               888          
-#  "Y888b.   88888b.   .d88b.  88888b.  888         .d88b.   .d88888  .d88b.  
-#     "Y88b. 888 "88b d8P  Y8b 888 "88b 888        d88""88b d88" 888 d8P  Y8b 
-#       "888 888  888 88888888 888  888 888    888 888  888 888  888 88888888 
-# Y88b  d88P 888  888 Y8b.     888  888 Y88b  d88P Y88..88P Y88b 888 Y8b.     
-#  "Y8888P"  888  888  "Y8888  888  888  "Y8888P"   "Y88P"   "Y88888  "Y8888  
-# """,
 """
  :::===  :::  === :::===== :::= === :::===== :::====  :::====  :::=====
  :::     :::  === :::      :::===== :::      :::  === :::  === :::     
@@ -67,15 +50,6 @@ ____/ / _  / / //  __/_  / / // /___   / /_/ // /_/ /  /  __/
 /____/  /_/ /_/ \\___/ /_/ /_/ \\____/   \\____/ \\__,_/   \\___/ 
                                                              
 """,
-# """
-# ..######..##.....##.########.##....##..######...#######..########..########
-# .##....##.##.....##.##.......###...##.##....##.##.....##.##.....##.##......
-# .##.......##.....##.##.......####..##.##.......##.....##.##.....##.##......
-# ..######..#########.######...##.##.##.##.......##.....##.##.....##.######..
-# .......##.##.....##.##.......##..####.##.......##.....##.##.....##.##......
-# .##....##.##.....##.##.......##...###.##....##.##.....##.##.....##.##......
-# ..######..##.....##.########.##....##..######...#######..########..########
-# """,
 """
   ^    ^    ^    ^    ^    ^    ^    ^  
  /S\\  /h\\  /e\\  /n\\  /C\\  /o\\  /d\\  /e\\ 
@@ -137,29 +111,4 @@ def get_header(num_banner=int):
     else:
       header = random.choice(headers)
     return header
-    # if num_banner == 0:
-    #     rnd = random.randint(1, 9)
-    # else:
-    #     rnd = num_banner
-    #rnd = random.randint(1, 9)
-    #print(f'{rnd}')
-
-    # if rnd == 1:
-    #     return header1
-    # elif rnd == 2:
-    #     return header2
-    # elif rnd == 3:
-    #     return header3
-    # elif rnd == 4:
-    #     return header4
-    # elif rnd == 5:
-    #     return header5
-    # elif rnd == 6:
-    #     return header6
-    # elif rnd == 7:
-    #     return header7
-    # elif rnd == 8:
-    #     return header8
-    # elif rnd == 9:
-    #     return header9
 

@@ -21,6 +21,7 @@ def get_coff_section(file_name=str, section_name=str):
 
 def replace_bytes_at_offset(data, offset, new_bytes):
     data = bytearray(data)
-    data[offset] = int(new_bytes.encode('utf-8'))
+    #data[offset] = int(new_bytes.encode('utf-8'))
+    data[offset] = new_bytes
     data.append(int(new_bytes))
     return bytes(data)

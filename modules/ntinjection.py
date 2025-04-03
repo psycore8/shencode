@@ -1,6 +1,7 @@
 ########################################################
 ### NtInjection Module
 ### Status: untested
+### Passed: (x) manual tests () task
 ########################################################
 
 import os
@@ -19,7 +20,7 @@ def register_arguments(parser):
 
             grp = parser.add_argument_group('additional')
             # grp.add_argument('-r', '--resume-thread', action='store_true', help='Start thread suspended and resume after speciefied time')
-            grp.add_argument('-s', '--start', action='store_true', help='If not active, start the process before injection')
+            grp.add_argument('-s', '--start-process', action='store_true', help='If not active, start the process before injection')
             # grp.add_argument('-v', '--virtual-protect', action='store_true', help='Deny access on memory for a specified time')
 
 class module:
@@ -32,7 +33,7 @@ class module:
 
     Author = 'psycore8'
     Description = 'native inject shellcode to process'
-    Version = '0.0.1'
+    Version = '0.0.2'
     DisplayName = 'NATIVE-INJECTION'
     delay = 5
     data_size = 0
@@ -40,12 +41,13 @@ class module:
     pid = int
     nt_error = 0
     callback_func = False
+    shellcode = b''
 
-    def __init__(self, input_file, process_start, target_process, shellcode, resume_thread=None, virtual_protect=None):
-        self.input_file = input_file
-        self.process_start = process_start
-        self.target_process = target_process
-        self.shellcode = shellcode
+    def __init__(self, input, start_process, process):
+        self.input_file = input
+        self.process_start = start_process
+        self.target_process = process
+        #self.shellcode = shellcode
         # self.resume_thread = resume_thread
         # self.virtual_protect = virtual_protect
 

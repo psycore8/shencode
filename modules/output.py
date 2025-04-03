@@ -1,6 +1,7 @@
 ########################################################
 ### Output Module
 ### Status: migrated to 081
+### Passed: (x) manual tests (x) task
 ########################################################
 
 from utils.helper import nstate as nstate
@@ -48,6 +49,8 @@ class module:
         #self.output_buffer = output_buffer
         if range != [0, 0]:
             self.range = [range[0], range[1]]
+        else:
+            self.range = [0, 0]
         # else:
         #     self.range = None
         self.output = output

@@ -1,5 +1,15 @@
+import os
+
 module_dir = 'modules'
 Version = '0.8.1'
+banner = -1
+
+if os.name == 'nt':
+  msfvenom_path = "msfvenom.bat"
+  tpl_path = 'tpl\\'
+elif os.name == 'posix':
+  msfvenom_path = 'msfvenom'
+  tpl_path = 'tpl/'
 
 multi_bit_registers = [
     ['rax', 'eax', 'ax', 'al'],

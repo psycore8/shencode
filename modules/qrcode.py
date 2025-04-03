@@ -1,6 +1,7 @@
 ########################################################
 ### QRCode Module
 ### Status: untested
+### Passed: (x) manual tests () task
 ########################################################
 
 from utils.helper import nstate as nstate
@@ -18,15 +19,16 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     Description = 'obfuscate shellcodes as QR-Codes'
-    Version = '2.1.2'
+    Version = '2.1.3'
     DisplayName = 'QRCODE-OBF'
     hash = ''
     data_size = 0
+    shellcode = b''
+    relay_input = False
 
-    def __init__(self, input_file, output_file, shellcode):
-         self.input_file = input_file
-         self.output_file = output_file
-         self.shellcode = shellcode
+    def __init__(self, input, output):
+         self.input_file = input
+         self.output_file = output
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
@@ -44,23 +46,29 @@ class module:
             exit()
 
     def open_file(self):
-        try:
-            for b in open(self.input_file, 'rb').read():
-                self.shellcode += b.to_bytes(1, 'big').hex()
-            return True
-        except FileNotFoundError:
-            return False
+        if self.relay_input:
+            self.shellcode = self.input_file
+        else:
+            try:
+                # for b in open(self.input_file, 'rb').read():
+                #     self.shellcode += b.to_bytes(1, 'big').hex()
+                with open(self.input_file, 'rb') as f:
+                    self.shellcode = f.read()
+                return True
+            except FileNotFoundError:
+                return False
                         
     def process(self):
         self.msg('pre.head')
         self.msg('proc.input_try')
         self.open_file()
-        if CheckFile(self.input_file):
-            self.data_size, self.hash = GetFileInfo(self.input_file)
-            self.msg('proc.input_ok')
+        if not self.relay_input:
+            if CheckFile(self.input_file):
+                self.data_size, self.hash = GetFileInfo(self.input_file)
+                self.msg('proc.input_ok')
             self.msg('proc.try')
-            qr = qrcode.QRCode(version=3, box_size=20, border=10, error_correction=qrcode.constants.ERROR_CORRECT_H, image_factory=self.PyPNGImage)
-            payload_bytes = self.shellcode.encode('utf-8')
+            qr = qrcode.QRCode(version=3, box_size=20, border=10, error_correction=qrcode.constants.ERROR_CORRECT_H, image_factory=PyPNGImage)
+            payload_bytes = self.shellcode #.encode('utf-8')
             qr.add_data(payload_bytes)
             qr.make(fit=True)
             img = qr.make_image(fill_color='white', back_color='black')

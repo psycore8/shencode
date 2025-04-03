@@ -1,13 +1,9 @@
 ########################################################
 ### DLL Inject Module
 ### Status: untested
+### Passed: (x) manual tests () task
 ########################################################
 
-
-#import ctypes
-#import ctypes.wintypes as wt
-#import sys
-#import time
 import os
 
 from utils.helper import nstate as nstate
@@ -27,7 +23,7 @@ class module:
     from time import sleep
     Author = 'psycore8'
     Description = 'DLL Injection Module'
-    Version = '0.1.1'
+    Version = '0.1.2'
     DisplayName = 'DLL-INJECTION'
     mem = any
     data_bytes = bytes
@@ -35,9 +31,9 @@ class module:
     hash = ''
     pid = 0
 
-    def __init__(self, input_file, target_process, start_process):
-            self.input_file: str = input_file
-            self.target_process = target_process
+    def __init__(self, input, process, start_process):
+            self.input_file: str = input
+            self.target_process = process
             self.start_process = start_process
 
     def msg(self, message_type, ErrorExit=False):
@@ -48,18 +44,12 @@ class module:
             'post.done'      : f'{nstate.s_ok} DONE!',
             'proc.input_ok'  : f'{nstate.s_ok} File {self.input_file} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
             'proc.input_try' : f'{nstate.s_note} Try to open dll file {self.input_file}',
-           # 'proc.try'       : f'{nstate.s_note} Try to execute s',
             'inj.run'        : f'{nstate.s_note} starting {self.target_process}',
             'inj.pid'        : f'{nstate.s_note} {self.target_process} process id: {self.pid}',
             'inj.handle'     : f'{nstate.s_note} Opened a Handle to the process',
             'inj.alloc'      : f'{nstate.s_note} Allocated Memory at 0x{self.mem}',
             'inj.write'      : f'{nstate.s_note} Write to memory',
-            #'inj.nacc'       : f'{nstate.s_note} VirtualProtectEx: PAGE_NO_ACCESS',
-            #'inj.susp'       : f'{nstate.s_note} CreateRemoteThread: START_SUSPENDED',
             'inj.inj_ok'     : f'{nstate.s_ok} Injected {self.input_file} into {self.target_process}',
-            #'inj.rwe'        : f'{nstate.s_note} VirtualProtectEx: PAGE_READWRITE_EXECUTE',
-            #'inj.rest'       : f'{nstate.s_note} ResumeThread',
-            #'inj.resume'     : f'{nstate.s_ok} Process resumed'
 
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))

@@ -1,6 +1,7 @@
 ########################################################
 ### ROLHash Module
 ### Status: migrated to 081
+### Passed: (x) manual tests () task
 ########################################################
 
 import pefile
@@ -17,7 +18,7 @@ def register_arguments(parser):
 class module:
   Author = 'bordergate, psycore8'
   Description = 'change ROR13 to ROL encoding in metasploit payloads'
-  Version = '2.1.0'
+  Version = '2.1.1'
   DisplayName = 'ROLLIN-HASH'
   data_size = 0
   hash = ''

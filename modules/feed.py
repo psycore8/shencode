@@ -1,6 +1,7 @@
 ########################################################
 ### AES Module
 ### Status: untested
+### Passed: (x) manual tests () task
 ########################################################
 
 import datetime
@@ -22,7 +23,7 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     Description = 'obfuscate shellcodes as XML Feed'
-    Version = '2.1.1'
+    Version = '2.1.2'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0
@@ -33,10 +34,12 @@ class module:
     feed_fake_author = 'Bill Ports'
     feed_fake_ids = []
     shellcode = ''
+    relay_input = False
+    relay_output = False
 
-    def __init__(self, input_file, output_file, uri, reassemble):
-        self.input_file = input_file
-        self.output_file = output_file
+    def __init__(self, input, output, uri, reassemble):
+        self.input_file = input
+        self.output_file = output
         self.uri = uri
         self.reassemble = reassemble
 
@@ -57,12 +60,15 @@ class module:
             exit()
 
     def open_file(self):
-        try:
-            for b in open(self.input_file, 'rb').read():
-                self.shellcode += b.to_bytes(1, 'big').hex()
-            return True
-        except FileNotFoundError:
-            return False
+        if self.relay_input:
+            self.shellcode = self.input_file
+        else:
+            try:
+                for b in open(self.input_file, 'rb').read():
+                    self.shellcode += b.to_bytes(1, 'big').hex()
+                return True
+            except FileNotFoundError:
+                return False
 
     def convert_bytes_to_fake_id(self, block_size=16):
         s = self.shellcode.encode('utf-8')
@@ -107,28 +113,32 @@ class module:
             i += 1
 
         xml_str = etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="utf-8")
-        with open(self.output_file, "wb") as file:
-            file.write(xml_str)
+        return xml_str
+        # with open(self.output_file, "wb") as file:
+        #     file.write(xml_str)
 
     def reassemble_shellcode(self):
         feed = feedparser.parse(self.uri)
         for entry in feed.entries:
             pos = entry.id.rfind('/')
             self.shellcode += entry.id[pos + 1:]
-        out_shellcode = bytes.fromhex(self.shellcode)
-        with open(self.output_file, 'wb') as file:
-            file.write(out_shellcode)
+        return bytes.fromhex(self.shellcode)
+        # with open(self.output_file, 'wb') as file:
+        #     file.write(out_shellcode)
+
+    def output_result(self):
+        if self.relay_output:
+            return self.shellcode
+        else:
+            with open(self.output_file, 'wb') as f:
+                f.write(self.shellcode)
 
     def process(self):
         self.msg('pre.head')
         if self.reassemble:
             self.msg('proc.retry')
-            self.reassemble_shellcode()
-            if CheckFile(self.output_file):
-                self.data_size, self.hash = GetFileInfo(self.output_file)
-                self.msg('proc.output_ok')
-            else:
-                self.msg('error.output', True)
+            self.shellcode = self.reassemble_shellcode()
+            self.output_result()
         else:
             self.msg('proc.input_try')
             if CheckFile(self.input_file):
@@ -137,14 +147,16 @@ class module:
                 self.msg('proc.input_ok')
                 self.convert_bytes_to_fake_id()
                 self.msg('proc.try')
-                self.generate_feed()
-                if CheckFile(self.output_file):
-                    self.data_size, self.hash = GetFileInfo(self.output_file)
-                    self.msg('proc.output_ok')
-                else:
-                    self.msg('error.output', True)
+                self.shellcode = self.generate_feed()
+                self.output_result()
             else:
                 self.msg('error.input', True)
+        if not self.relay_output:
+            if CheckFile(self.output_file):
+                self.data_size, self.hash = GetFileInfo(self.output_file)
+                self.msg('proc.output_ok')
+            else:
+                self.msg('error.output', True)
         self.msg('post.done')
 
 

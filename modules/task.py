@@ -1,6 +1,7 @@
 ########################################################
 ### Task Module
 ### Status: untested
+### Passed: (x) manual tests () task
 ########################################################
 
 from utils.helper import nstate as nstate
