@@ -5,7 +5,7 @@ extras = []
 import sys
 if sys.platform == 'win32':
     extras.append(
-        ['pywin32==309',
+        ['pywin32==310',
         'WMI==1.5.1']
         )
     FirstRun.WinOnlyModules(True)
@@ -30,7 +30,7 @@ setup(
         'utils'
     ],
     install_requires=[
-        'capstone==5.0.5',
+        'capstone==5.0.6',
         'certifi==2025.1.31',
         'cffi==1.17.1',
         'charset-normalizer==3.4.1',
@@ -43,12 +43,12 @@ setup(
         'psutil',
         'pycparser==2.22',
         'pypng==0.20220715.0',
-        'qrcode==8.0',
+        'qrcode==8.1',
         'requests==2.32.3',
-        'setuptools==76.0.0',
+        'setuptools==78.1.0',
         'sgmllib3k==1.0.0',
         'tqdm',
-        'typing_extensions==4.12.2',
+        'typing_extensions==4.13.1',
         'urllib3==2.3.0',
         
         ] + extras,
