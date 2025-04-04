@@ -1,7 +1,7 @@
 ########################################################
 ### ROLHash Module
 ### Status: migrated to 081
-### Passed: (x) manual tests () task
+### Passed: (x) manual tests (x) task
 ########################################################
 
 import pefile

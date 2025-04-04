@@ -55,7 +55,7 @@ class module:
             'inj.ok'        : f'{nstate.s_ok} Looks good!',
             'inj.fail'      : f'{nstate.s_fail} Payload not executed',
             'post.done'     : f'{nstate.s_ok} DONE!',
-            'error.con'     : f'{nstate.s_fail} Connevtion failed',
+            'error.con'     : f'{nstate.s_fail} Connection failed',
             'error.stage_ok': f'{nstate.s_fail} Error during download'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
@@ -70,7 +70,7 @@ class module:
         if con == 0:
             self.msg('proc.con')
         else:
-            self.msg('error.con')
+            self.msg('error.con', True)
 
     def ReceivePayload(self):
         # get 4-byte payload length

@@ -50,7 +50,7 @@ class module:
     self.CalculatePower()
 
     # check for tasked mode
-    if not self.relay:
+    if not self.relay_output:
       # prints the result
       if self.verbose:
         # [+] The base of 8 raised to the exponent of 4 results in the power value 4096

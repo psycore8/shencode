@@ -1,7 +1,7 @@
 ########################################################
 ### DLL Inject Module
-### Status: untested
-### Passed: (x) manual tests () task
+### Status: migrated to 081
+### Passed: (x) manual tests (x) task
 ########################################################
 
 import os
@@ -23,13 +23,14 @@ class module:
     from time import sleep
     Author = 'psycore8'
     Description = 'DLL Injection Module'
-    Version = '0.1.2'
+    Version = '0.1.3'
     DisplayName = 'DLL-INJECTION'
     mem = any
     data_bytes = bytes
     data_size = 0
     hash = ''
     pid = 0
+    relay_input = False
 
     def __init__(self, input, process, start_process):
             self.input_file: str = input
@@ -87,14 +88,17 @@ class module:
         CloseHandle(th)
 
     def process(self):
-          self.msg('pre.head')
-          self.msg('proc.input_try')
+        self.msg('pre.head')
+        self.msg('proc.input_try')
+        if self.relay_input:
+                self.data_bytes = self.input_file
+        else:
           if CheckFile(self.input_file):
             self.data_size, self.hash = GetFileInfo(self.input_file)
             self.msg('proc.input_ok')
             dll_file = os.path.abspath(self.input_file)
             self.data_bytes = dll_file.encode('utf-8')
-            self.start_injection()
-            self.msg('post.done')
           else:
             self.msg('error.input', True)
+        self.start_injection()
+        self.msg('post.done')

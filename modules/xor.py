@@ -6,7 +6,7 @@
 
 import base64
 from itertools import cycle
-import utils.relay as relay
+#import utils.relay as relay
 from utils.helper import nstate
 from utils.helper import CheckFile, GetFileInfo
 from tqdm import tqdm

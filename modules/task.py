@@ -18,7 +18,7 @@ class module:
     Author = 'psycore8'
     Description = 'Create tasks to pipe ShenCode modules'
     DisplayName = 'TASKS'
-    Version = '0.0.4'
+    Version = '0.0.6'
     result = any
 
     def __init__(self, input):
@@ -31,7 +31,7 @@ class module:
                 'proc.input'       : f'{nstate.s_note} Task file ok',
                 'error.input'      : f'{nstate.s_fail} Task file failed!',
                 'post.done'        : f'{nstate.s_ok} Task DONE!',
-                'step.pre'         : f'{nstate.s_note} Executing step',
+                'step.pre'         : f'{nstate.s_note} Executing step {MsgVar}',
                 'nl'               : f'\n'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
@@ -48,11 +48,18 @@ class module:
         if CheckFile(self.input):
             m('proc.input')
             self.result = None
-            task = self.load_config(self.input)
-            m('task.name', task['task']['name'])
+            tasks = self.load_config(self.input)
+            m('task.name', tasks['task']['name'])
             m('nl')
-            for step in task:
-                if step != 'task' and step != 'bypass':
+            single_step = tasks['task']['single_step']
+            task = tasks['task']['modules']
+            mod_count = len(task)
+            if single_step == None:
+                for index, step in enumerate(task, start=1):
+                    if step == 'task' or step == 'bypass':
+                        continue
+                    m('step.pre', f'{step} // {index} of {mod_count}')
+                    m('nl')
                     mod = self.importlib.import_module(f'modules.{step}')
                     if task[step]['input_buffer']:
                         task[step]['args']['input'] = self.result
@@ -64,6 +71,10 @@ class module:
                     modclass = mod.module(**task[step]['args'])
                     self.result = modclass.process()
                     m('nl')
+            else:
+                mod = self.importlib.import_module(f'modules.{single_step}')
+                modclass = mod.module(**task[single_step]['args'])
+                modclass.process()
             m('post.done')
         else:
             m('error.input', None, True)
