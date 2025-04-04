@@ -19,14 +19,14 @@ def register_arguments(parser):
     exd.add_argument('-s', '--extract-section', help='Extract a section from exe, dll, obj')
 
     dpc = parser.add_argument_group('Deprecated, will be removed in a future release')
-    dpc.add_argument('-so', '--start-offset', help='begin extraction from this offset', deprecated=True)
-    dpc.add_argument('-eo', '--end-offset', help='extract until here', deprecated=True)
+    dpc.add_argument('-so', '--start-offset', help='begin extraction from this offset')
+    dpc.add_argument('-eo', '--end-offset', help='extract until here')
 
 
 class module:
     Author =      'psycore8'
     Description = 'extract shellcode from/to offset'
-    Version =     '2.1.3'
+    Version =     '2.1.4'
     DisplayName = 'BYTE-XTRACT0R'
     hash = ''
     data_size = 0
