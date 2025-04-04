@@ -26,7 +26,7 @@ def register_arguments(parser):
 class module:
     Author          = 'psycore8'
     Description     = 'Encode bytes to alphanumeric output'
-    Version         = '0.1.0'
+    Version         = '0.1.2'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
@@ -38,10 +38,11 @@ class module:
             self.output = output
             self.decode = decode
             self.compile = compile
-            if os.name == 'nt':
-                self.compiler_cmd = 'nasm.exe'
-            elif os.name == 'posix':
-                self.compiler_cmd = 'nasm'
+            self.compiler_cmd = nasm
+            # if os.name == 'nt':
+            #     self.compiler_cmd = 'nasm.exe'
+            # elif os.name == 'posix':
+            #     self.compiler_cmd = 'nasm'
 
     def msg(self, message_type, ErrorExit=False, MsgVar=str):
         messages = {
@@ -205,7 +206,8 @@ class module:
                 else:
                     f.write(sc)
             fn_root, fn_extension = os.path.splitext(self.output)
-            run(f'{self.compiler_cmd} -f win64 {self.output} -o {fn_root}.o')
+            #run(f'{self.compiler_cmd} -f win64 {self.output} -o {fn_root}.o')
+            run([self.compiler_cmd, '-f', 'win64', self.output, '-o', f'{fn_root}.o'])
             sc = get_coff_section(f'{fn_root}.o', '.text')
         if self.relay_output:
             return sc

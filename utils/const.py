@@ -6,9 +6,11 @@ banner = -1
 
 if os.name == 'nt':
   msfvenom_path = "msfvenom.bat"
+  nasm = 'nasm.exe'
   tpl_path = 'tpl\\'
 elif os.name == 'posix':
   msfvenom_path = 'msfvenom'
+  nasm = 'nasm'
   tpl_path = 'tpl/'
 
 multi_bit_registers = [

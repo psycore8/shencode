@@ -34,7 +34,7 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     Description = 'ByteBert - Advanced polymorphic Encoder Stub'
-    Version = '0.3.5'
+    Version = '0.3.6'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -54,10 +54,11 @@ class module:
         self.output = output
         self.variable_padding = variable_padding
         self.verbose = verbose
-        if os_name == 'nt':
-            self.compiler_cmd = 'nasm.exe'
-        elif os_name == 'posix':
-            self.compiler_cmd = 'nasm'
+        self.compiler_cmd = nasm
+        # if os_name == 'nt':
+        #     self.compiler_cmd = 'nasm.exe'
+        # elif os_name == 'posix':
+        #     self.compiler_cmd = 'nasm'
 
     def msg(self, message_type, ErrorExit=False, MsgVar=any):
         messages = {
@@ -114,7 +115,7 @@ class module:
     #     return None
 
     def CheckNasm(self)->bool:
-        if osp.exists('nasm.exe'):
+        if osp.exists(self.compiler_cmd):
             return True
         else:
             return False
@@ -197,7 +198,8 @@ class module:
 
     def CompileObjectFile(self):
         self.OutputFile_Root, output_file_extension = osp.splitext(self.output)
-        run(f'{self.compiler_cmd} -f win64 {self.output} -o {self.OutputFile_Root}.o')
+        #run(f'{self.compiler_cmd} -f win64 {self.output} -o {self.OutputFile_Root}.o')
+        run([self.compiler_cmd, '-f', 'win64', self.output, '-o', f'{self.OutputFile_Root}.o'])
         
     def process(self):
         self.msg('pre.head')
