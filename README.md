@@ -56,7 +56,7 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 - `core/output` - Added size info
 - `core/output` - Highlight search `--highlight "00 AF"`
 - `core/task` - automate and pipe ShenCode commands
-- `encoder/aes` - changed 
+- `encoder/alphanum` - alphanumeric encoder to avoid zero bytes
 - `encoder/bytebert` - module is working now, as expected: create ASM-Script, compile, extract shellcode
 - `encoder/bytebert` - fixed some logic errors
 - `encoder/bytebert` - more random registers and instructions
