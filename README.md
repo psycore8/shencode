@@ -2,37 +2,34 @@
 
 **A versatile tool for working with shellcodes.**
 
-![](shencode-080.png)
+![](shencode-081.png)
 
 ## Features
 
-### Version 0.8.0
+### Version 0.8.1
 
-- **core**
-	- `extract` - [extract](https://www.heckhausen.it/shencode/wiki/core/extract) from/to offset
-	- `msfvenom` - [create payloads](https://www.heckhausen.it/shencode/wiki/core/msfvenom)  with msfvenom
-	- `output` - [Inspect and display](https://www.heckhausen.it/shencode/wiki/core/output) files in different formats
-- **encoder**
-	- `aes` - [Encrypt](https://www.heckhausen.it/shencode/wiki/encoder/aes) payload with AES
-	- `bytebert` - advanced polymorphic encoder
-	- `byteswap` - New XOR Encryption, [Swapping Bytes](https://www.heckhausen.it/shencode/wiki/encoder/byteswap) ([Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping))
-	- `xor` - [Encode payload](https://www.heckhausen.it/shencode/wiki/encoder/xor) with custom XOR key
-	- `xorpoly` - [polymorphic x64](https://www.heckhausen.it/shencode/wiki/encoder/xorpoly) in-memory decoder (for details, visit this [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder))
-- **inject**
-	- `dll` - [inject a dll](https://www.heckhausen.it/shencode/wiki/inject/dll) into a process
-	- `injection` - [inject shellcode](https://www.heckhausen.it/shencode/wiki/inject/injection) into process (Windows only)
-	- `ntinjection` - [native injection](https://www.heckhausen.it/shencode/wiki/inject/ntinjection) with undocumented windows functions
-	- `psoverwrite` - [process overwriting](https://www.heckhausen.it/shencode/wiki/inject/psoverwrite) injection technique by [hasherezade](https://github.com/hasherezade/process_overwriting)
-- **obfuscate**
-	- `Feed` - Splits Bytes in a [feed.xml file](https://www.heckhausen.it/shencode/wiki/obfuscate/feed) as article IDs
-	- `QR-Code` hide OpCodes as [QR-Code image](https://www.heckhausen.it/shencode/wiki/obfuscate/qrcode)
-	- `ROR13` to `ROL` [conversion with custom key](https://www.heckhausen.it/shencode/wiki/obfuscate/rolhash) (Windows only)
-	- `UUID` [obfuscation](https://www.heckhausen.it/shencode/wiki/obfuscate/uuid) - Please, check out my [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_shellcode_als_uuids_tarnen_-_teil_1) about this encoder
--  **stager**
-	- `meterpreter` - Initiate a `meterpreter/reverse_tcp` [stage](https://www.heckhausen.it/shencode/wiki/stager/meterpreter)
-	- `sliver` - Initiate a `https` [sliver stage](https://www.heckhausen.it/shencode/wiki/stager/sliver)
-- **archive**
-	- `formatout` - [display raw shellcodes](https://www.heckhausen.it/shencode/wiki/core/formatout) in `C++, C#` and more
+| Category    | Module        | Description                                    | Docs                                                                      | Refs                                                                                                      |
+| ----------- | ------------- | ---------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `core`      | `extract`     | Extract a range of bytes from a file           | [extract](https://www.heckhausen.it/shencode/wiki/core/extract)           |                                                                                                           |
+| `core`      | `msfvenom`    | Create payloads with msfvenom                  | [msfvenom](https://www.heckhausen.it/shencode/wiki/core/msfvenom)         |                                                                                                           |
+| `core`      | `output`      | Inspect and display files in different formats | [output](https://www.heckhausen.it/shencode/wiki/core/output)             |                                                                                                           |
+| `core`      | `task`        | Execute tasks to automate ShenCode             | [task](https://www.heckhausen.it/shencode/wiki/core/task)                 |                                                                                                           |
+| `encoder`   | `aes`         | Encrypt with AES                               | [aes](https://www.heckhausen.it/shencode/wiki/encoder/aes)                |                                                                                                           |
+| `encoder`   | `alphanum`    | Alphanumeric encoder to avoid null bytes       | [alphanum](https://www.heckhausen.it/shencode/wiki/encoder/alphanum)      |                                                                                                           |
+| `encoder`   | `bytebert`    | Advanced polymorphic encoder                   | [bytebert](https://www.heckhausen.it/shencode/wiki/encoder/bytebert)      |                                                                                                           |
+| `encoder`   | `byteswap`    | New XOR Encryption, Swapping Bytes             | [byteswap](https://www.heckhausen.it/shencode/wiki/encoder/byteswap)      | [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping)                        |
+| `encoder`   | `xor`         | Encode payload with custom XOR key             | [xor](https://www.heckhausen.it/shencode/wiki/encoder/xor)                |                                                                                                           |
+| `encoder`   | `xorpoly`     | Polymorphic x64 in-memory decoder              | [xorpoly](https://www.heckhausen.it/shencode/wiki/encoder/xorpoly)        | [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder)       |
+| `inject`    | `dll`         | Inject dll into a process                      | [dll](https://www.heckhausen.it/shencode/wiki/inject/dll)                 |                                                                                                           |
+| `inject`    | `injection`   | Inject shellcode into a process                | [injection](https://www.heckhausen.it/shencode/wiki/inject/injection)     |                                                                                                           |
+| `inject`    | `ntinjection` | Inject with native windows API                 | [ntinjection](https://www.heckhausen.it/shencode/wiki/inject/ntinjection) |                                                                                                           |
+| `inject`    | `psoverwrite` | Process overwriting injection                  | [psoverwrite](https://www.heckhausen.it/shencode/wiki/inject/psoverwrite) | [hasherezade](https://github.com/hasherezade/process_overwriting)                                         |
+| `obfuscate` | `feed`        | Hide shellcode bytes in a feed.xml file        | [feed](https://www.heckhausen.it/shencode/wiki/obfuscate/feed)            |                                                                                                           |
+| `obfuscate` | `qrcode`      | Generate QR-Code from a file                   | [qrcode](https://www.heckhausen.it/shencode/wiki/obfuscate/qrcode)        |                                                                                                           |
+| `obfuscate` | `rolhash`     | ROR13 to custom ROL hashing                    | [rolhash](https://www.heckhausen.it/shencode/wiki/obfuscate/rolhash)      |                                                                                                           |
+| `obfuscate` | `uuid`        | Generate UUIDs from shellcode                  | [uuid](https://www.heckhausen.it/shencode/wiki/obfuscate/uuid)            | [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_shellcode_als_uuids_tarnen_-_teil_1) |
+| `stager`    | `meterpreter` | Download a meterpreter reverse tcp stage       | [meterpreter](https://www.heckhausen.it/shencode/wiki/stager/meterpreter) |                                                                                                           |
+| `stager`    | `sliver`      | Download  a sliver stage                       | [sliver](https://www.heckhausen.it/shencode/wiki/stager/sliver)           |                                                                                                           |
 
 ## How to use
 
@@ -51,15 +48,20 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
-- `general` - windows functions and constants sorted in `windef` and `winconst`
-- `general` - added a new category: `inject`
-- `general` - module categories sorted in alphabetical order
-- `general` - updated dependencies
-- `inject/psoverwrite` - Python adapted process overwriting technique 
-- `inject/ntinjection` - native api injection (experimental)
-- `inject/dll` - dll injection
-- `obfuscate/feed` - fixed typo
-- `obfuscate/qrcode` - fixed dependency error for PIL
+- `general` - many bugfixes
+- `general` - implemented `tqdm` bar into some modules
+- `core/extract` - added nargs argument `--extract-range <start-byte> <end-byte>`
+- `core/extract` - added section extraction `--extract-section <section-name>`
+- `core/output` - Null-Byte highlighting
+- `core/output` - Added size info
+- `core/output` - Highlight search `--highlight "00 AF"`
+- `core/task` - automate and pipe ShenCode commands
+- `encoder/alphanum` - alphanumeric encoder to avoid zero bytes
+- `encoder/bytebert` - module is working now, as expected: create ASM-Script, compile, extract shellcode
+- `encoder/bytebert` - fixed some logic errors
+- `encoder/bytebert` - more random registers and instructions
+- `encoder/xor` - fixed typo
+- `stager/sliver` - changed AES argument to nargs: `--aes <aes-key> <aes-iv>`
 
 ## References
 

@@ -1,3 +1,9 @@
+########################################################
+### PSOverwrite Module
+### Status: untested
+### Passed: (x) manual tests () task
+########################################################
+
 import ctypes
 import ctypes.wintypes
 from utils.helper import nstate as nstate
@@ -17,10 +23,10 @@ class STARTUPINFOEX(ctypes.Structure):
         ("lpAttributeList", LPVOID)
     ]
 
-class process_overwrite:
+class module:
         Author = 'psycore8'
         Description = 'Process_Overwrite Module, depends on https://github.com/hasherezade/process_overwriting'
-        Version = '0.1.2'
+        Version = '0.1.3'
         DisplayName = 'PROCESS-OVERWRITE'
         pid = 0
         attr_list = any

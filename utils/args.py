@@ -1,9 +1,10 @@
 import argparse
 import importlib
 import os
+from utils.const import *
 from textwrap import wrap
 
-Modules_Dir = 'modules'
+Modules_Dir = module_dir
 
 class FixedWidthHelpFormatter(argparse.HelpFormatter):
     def _split_lines(self, text, width):
@@ -23,9 +24,6 @@ def load_modules():
     modules = {}
     for file in os.listdir(Modules_Dir):
         if file.endswith(".py") and not file.startswith("__"):
-            ### to sort categories ASC rename file category-modulename.py
-            # mod_name = file.split('-')[1][:-3]
-            ###
             mod_name = file[:-3] 
             mod = importlib.import_module(f"{Modules_Dir}.{mod_name}")
             if hasattr(mod, "register_arguments") and hasattr(mod, "CATEGORY"):
@@ -37,8 +35,7 @@ def load_modules():
 
 def create_parser():
     parser = argparse.ArgumentParser(description='dynamic module parser', formatter_class=FixedWidthHelpFormatter)
-    #parser.add_argument('-v', '--version', action='store_true' ,help='Shows the shencode version')
-    #parser.add_argument('--header', type=int, help='Shows a specific banner')
+    parser.add_argument('--config', help='load a json config file')
     subparsers = parser.add_subparsers(dest='module', required=True, help='Available modules')
 
     modules_by_category = load_modules()

@@ -1,8 +1,9 @@
+########################################################
+### DLL Inject Module
+### Status: migrated to 081
+### Passed: (x) manual tests (x) task
+########################################################
 
-#import ctypes
-#import ctypes.wintypes as wt
-#import sys
-#import time
 import os
 
 from utils.helper import nstate as nstate
@@ -17,22 +18,23 @@ def register_arguments(parser):
             parser.add_argument('-p', '--process', required=True, help='Process to inject into')
             parser.add_argument('-s', '--start-process', action='store_true', required=False, default=False, help='If set, the process will be started')
 
-class inject:
+class module:
     import wmi, threading
     from time import sleep
     Author = 'psycore8'
     Description = 'DLL Injection Module'
-    Version = '0.1.0'
+    Version = '0.1.3'
     DisplayName = 'DLL-INJECTION'
     mem = any
     data_bytes = bytes
     data_size = 0
     hash = ''
     pid = 0
+    relay_input = False
 
-    def __init__(self, input_file, target_process, start_process):
-            self.input_file: str = input_file
-            self.target_process = target_process
+    def __init__(self, input, process, start_process):
+            self.input_file: str = input
+            self.target_process = process
             self.start_process = start_process
 
     def msg(self, message_type, ErrorExit=False):
@@ -43,18 +45,12 @@ class inject:
             'post.done'      : f'{nstate.s_ok} DONE!',
             'proc.input_ok'  : f'{nstate.s_ok} File {self.input_file} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
             'proc.input_try' : f'{nstate.s_note} Try to open dll file {self.input_file}',
-           # 'proc.try'       : f'{nstate.s_note} Try to execute s',
             'inj.run'        : f'{nstate.s_note} starting {self.target_process}',
             'inj.pid'        : f'{nstate.s_note} {self.target_process} process id: {self.pid}',
             'inj.handle'     : f'{nstate.s_note} Opened a Handle to the process',
             'inj.alloc'      : f'{nstate.s_note} Allocated Memory at 0x{self.mem}',
             'inj.write'      : f'{nstate.s_note} Write to memory',
-            #'inj.nacc'       : f'{nstate.s_note} VirtualProtectEx: PAGE_NO_ACCESS',
-            #'inj.susp'       : f'{nstate.s_note} CreateRemoteThread: START_SUSPENDED',
             'inj.inj_ok'     : f'{nstate.s_ok} Injected {self.input_file} into {self.target_process}',
-            #'inj.rwe'        : f'{nstate.s_note} VirtualProtectEx: PAGE_READWRITE_EXECUTE',
-            #'inj.rest'       : f'{nstate.s_note} ResumeThread',
-            #'inj.resume'     : f'{nstate.s_ok} Process resumed'
 
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
@@ -92,14 +88,17 @@ class inject:
         CloseHandle(th)
 
     def process(self):
-          self.msg('pre.head')
-          self.msg('proc.input_try')
+        self.msg('pre.head')
+        self.msg('proc.input_try')
+        if self.relay_input:
+                self.data_bytes = self.input_file
+        else:
           if CheckFile(self.input_file):
             self.data_size, self.hash = GetFileInfo(self.input_file)
             self.msg('proc.input_ok')
             dll_file = os.path.abspath(self.input_file)
             self.data_bytes = dll_file.encode('utf-8')
-            self.start_injection()
-            self.msg('post.done')
           else:
             self.msg('error.input', True)
+        self.start_injection()
+        self.msg('post.done')

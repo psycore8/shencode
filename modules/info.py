@@ -1,4 +1,10 @@
+########################################################
+### Info Module
+### Status: untested
+########################################################
+
 from utils.helper import nstate as nstate
+from utils.const import *
 
 CATEGORY = 'core'
 
@@ -6,37 +12,37 @@ def register_arguments(parser):
     parser.add_argument('-g', '--get', action='store_true', help='Get developer info')
     parser.add_argument('-m', '--modlist', action='store_true', help='List modules')
 
-class develop:
+class module:
     import utils.header as header
     from os import listdir, path
     Author = 'psycore8'
-    Description = 'AES encoder for payloads'
-    Version = '0.0.1'
+    Description = 'Info'
+    Version = '0.0.3'
     DisplayName = 'SHENCODE-DEViNFO'
+    mod_dir = module_dir
     mod_count = 0
     mod_name = ''
     data_size = int
     hash = ''
 
-    def __init__(self, version=str, mod_dir=str, modlist=False):
-        self.version = version
-        self.mod_dir = mod_dir
+    def __init__(self, get, modlist=False):
+        self.get = get
         self.modlist = modlist
+        
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
             'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            #'error.input'    : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',
-            #'error.enc'      : f'{nstate.s_fail} En-/Decrption error, aborting script execution',
-            #'error.mode'     : f'{nstate.s_fail} Please provide a valid mode: encode / decode',
             'banner'         : f'{nstate.s_ok} Banner count: {len(self.header.headers)}',
-            'version'        : f'{nstate.s_ok} ShenCode Version: {self.version}',
+            'version'        : f'{nstate.s_ok} ShenCode Version: {Version}',
             'mods'           : f'{nstate.s_ok} Module count: {self.mod_count}',
             'repo'           : f'{nstate.s_ok} Repository: {nstate.f_link}https://github.com/psycore8/shencode{nstate.f_end}',
+            'msf'            : f'{nstate.s_ok} msfvenom: {msfvenom_path}',
+            'template'       : f'{nstate.s_ok} template dir: {tpl_path}',
+            'modules'        : f'{nstate.s_ok} module dir: {module_dir}',
             'modlist.s'      : f'{nstate.s_ok} List modules',
             'modlist'        : f'{nstate.s_note} Module {self.mod_count}: {self.mod_name}',
             'post.done'      : f'{nstate.s_ok} DONE!'
-            #'proc.out'       : f'{nstate.s_ok} File created in {self.output_file}\n{nstate.s_ok} Hash: {self.hash}'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
@@ -57,6 +63,9 @@ class develop:
         self.msg('banner')
         self.get_mod_count()
         self.msg('mods')
+        self.msg('modules')
+        self.msg('template')
+        self.msg('msf')
         self.msg('repo')
         if self.modlist:
             self.mod_count = 1

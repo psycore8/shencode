@@ -1,0 +1,20 @@
+{
+    "task": {
+        "name": "Task1",
+        "count": 2
+    },
+    "byteswap": {
+        "input": "dev\\calc.raw",
+        "output_file": null,
+        "template_file": "tpl\\byteswap-short.tpl",
+        "xor_key": 113
+    },
+    "injection": {
+        "input": "$BUFFER$",
+        "process_start": true,
+        "target_process": "notepad.exe",
+        "shellcode": null,
+        "resume_thread": null,
+        "virtual_protect": null
+    }
+}

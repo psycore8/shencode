@@ -1,3 +1,9 @@
+########################################################
+### ROLHash Module
+### Status: migrated to 081
+### Passed: (x) manual tests (x) task
+########################################################
+
 import pefile
 from os import path as ospath
 from utils.helper import nstate as nstate
@@ -7,13 +13,13 @@ CATEGORY = 'obfuscate'
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for UUID encoding')
     parser.add_argument('-o', '--output', help='Outputfile for ROR13 to ROL conversion')
-    parser.add_argument('-k', '--key', help='Key to process ROR13 to ROL')
+    parser.add_argument('-k', '--key', type=int, help='Key to process ROR13 to ROL')
 
-class ror2rol_obfuscator:
+class module:
   Author = 'bordergate, psycore8'
   Description = 'change ROR13 to ROL encoding in metasploit payloads'
-  Version = '2.0.0'
-  #DisplayName = 'ROLLIN''HASH'
+  Version = '2.1.1'
+  DisplayName = 'ROLLIN-HASH'
   data_size = 0
   hash = ''
   hash_dict = dict()
@@ -23,11 +29,31 @@ class ror2rol_obfuscator:
                 'C:\\Windows\\System32\\dnsapi.dll',
                 'C:\\Windows\\System32\\mswsock.dll'
              ]
+  relay = False
   
-  def __init__(self, input_file, output_file, key):
-     self.input_file = input_file
-     self.output_file = output_file
+  def __init__(self, input, output, key):
+     self.input = input
+     self.output = output
      self.key = key
+
+  def msg(self, message_type, MsgVar=any, ErrorExit=False):
+    messages = {
+        'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
+        'error.input'    : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
+        'error.enc'      : f'{nstate.s_fail} En-/Decrption error, aborting script execution',
+        'error.mode'     : f'{nstate.s_fail} Please provide a valid mode: encode / decode',
+        'post.done'      : f'{nstate.s_ok} DONE!',
+        'proc.input_ok'  : f'{nstate.s_ok} File {self.input} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
+        'proc.out'       : f'{nstate.s_ok} File created in {self.output}\n{nstate.s_ok} Hash: {self.hash}',
+        'proc.error'     : f'{nstate.s_fail} encoded Shellcode error, aborting script execution',
+        'proc.done'      : f'{nstate.s_ok} encoded shellcode created in {self.output}',
+        'proc.sizemod'   : f'{nstate.s_note} Shellcode size: {MsgVar}',
+        'proc.out'       : f'{nstate.s_note} Writing bytes to file: {self.output}',
+        'proc.input'     : f'{nstate.s_ok} Reading shellcode'
+    }
+    print(messages.get(message_type, f'{message_type} - this message type is unknown'))
+    if ErrorExit:
+        exit()
 
   def lookup_functions(self, dll_path):
     pe = pefile.PE(dll_path)
@@ -110,17 +136,19 @@ class ror2rol_obfuscator:
     for key,value in self.hash_dict.items():
         index = self.check_shellcode(shellcode, key)
         if index != -1:
-            print(f'{nstate.OKBLUE} 0x%08X = %s offset: %s' % (key, value, index))
+            #self.msg('proc.func')
+            print(f'{nstate.s_note} 0x%08X = %s offset: %s' % (key, value, index))
             dll_name = value.split('!')[0]
             function_name = value.split('!')[1]
             hash = self.calculate_hash(dll_name, function_name, ror_key, "rol")
-            print(f'{nstate.OKGREEN}New value: 0x%08X' % (hash))
+            #self.msg('proc.newfunc')
+            print(f'{nstate.s_ok} New value: 0x%08X' % (hash))
             byte_data = hash.to_bytes(4, 'big')
             reversed_bytes = byte_data[::-1]
             new_shellcode = self.replace_bytes_at_offset(new_shellcode, index, reversed_bytes)
             hex_string = ''.join('\\x{:02X}'.format(byte) for byte in new_shellcode)
  
-    print(f"{nstate.OKBLUE} Changing ROR key")
+    print(f"{nstate.s_note} Changing ROR key")
     
     # \xC1\xCF\x0D ror edi,D
 
@@ -134,16 +162,19 @@ class ror2rol_obfuscator:
   
   # def process(dll_paths, filename, out_file, showmod, decompile, ror_key):
   def process(self):
+    m = self.msg
+    m('pre.head')
     for dll in self.dll_paths:
       self.lookup_functions(dll)
     # Read existing shellcode
-    print(f"{nstate.OKBLUE} Reading shellcode")
+    m('proc.input')
+    #print(f"{nstate.OKBLUE} Reading shellcode")
     try: 
-      with open(self.input_file, "rb") as file:
+      with open(self.input, "rb") as file:
         shellcode = file.read()
     except FileNotFoundError:
-        print(f"{nstate.FAIL} File not found or cannot be opened.")
-        exit()
+        m('error.input', None, True)
+        #print(f"{nstate.FAIL} File not found or cannot be opened.")
  
     new_shellcode = self.process_shellcode(shellcode,int(self.key))
  
@@ -152,13 +183,22 @@ class ror2rol_obfuscator:
     bytes_to_insert = b"\xFF\xC0\xFF\xC8" * 5  # INC EAX, DEC EAX
     modified_shellcode = new_shellcode[:position] + bytes_to_insert + new_shellcode[position:]
    
-    print(f"{nstate.OKBLUE} Shellcode size: " + str(len(modified_shellcode)))
-    print(f"{nstate.OKBLUE} Writing bytes to file: {self.output_file}")
-    with open(self.output_file, 'wb') as file:
-      file.write(modified_shellcode)
-    cf = ospath.isfile(self.output_file)
-    if cf == True:
-      print(f"{nstate.OKGREEN} encoded shellcode created in {self.output_file}")
+    m('proc.sizemod', len(modified_shellcode))
+    #print(f"{nstate.OKBLUE} Shellcode size: " + str(len(modified_shellcode)))
+    if self.relay:
+       m('proc.done')
+       return modified_shellcode
     else:
-      print(f"{nstate.FAIL} encoded Shellcode error, aborting script execution")
-      exit()
+      m('proc.out')
+      #print(f"{nstate.OKBLUE} Writing bytes to file: {self.output}")
+      with open(self.output, 'wb') as file:
+        file.write(modified_shellcode)
+      cf = ospath.isfile(self.output)
+      if cf == True:
+        m('proc.done')
+        #print(f"{nstate.OKGREEN} encoded shellcode created in {self.output}")
+      else:
+        m('proc.error')
+        #print(f"{nstate.FAIL} encoded Shellcode error, aborting script execution")
+        exit()
+      m('post.done')

