@@ -11,7 +11,7 @@ import struct
 CATEGORY = 'core'
 
 def register_arguments(parser):
-    parser.add_argument('-i', '--input', help='Input file for example module')
+    parser.add_argument('-i', '--input', help='Input file for extract module')
     parser.add_argument('-o', '--output', help='Output file with extracted bytes')
 
     exd = parser.add_argument_group('Extract data')

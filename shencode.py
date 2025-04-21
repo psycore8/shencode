@@ -1,8 +1,14 @@
-#import os
+########################################################################
+#
+# ShenCode
+# Autor:      psycore8
+# Repo:       https://github.com/psycore8/shencode
+# Web:        https://www.nocoiety.de
+#
+########################################################################
 
 from utils.args import parse_arguments
 from utils.helper import nstate as nstate
-#from utils.helper import FileCheck
 from utils.const import *
 import utils.header
 import utils.helper
