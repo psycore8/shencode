@@ -18,7 +18,7 @@ elif sys.platform == 'darwin':
 
 setup(
     name='ShenCode',
-    version='0.8.1',
+    version='0.8.2',
     author='psycore8',
     description='A versatile tool for working with shellcodes',
     long_description=open('README.md').read(),

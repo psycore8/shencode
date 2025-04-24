@@ -4,6 +4,7 @@
 ########################################################
 
 from utils.helper import nstate as nstate
+from utils.asm import variable_instruction_set
 from utils.hashes import FunctionHash
 from utils.const import *
 
@@ -13,6 +14,9 @@ def register_arguments(parser):
     parser.add_argument('-g', '--get', action='store_true', help='Get developer info')
     parser.add_argument('-m', '--modlist', action='store_true', help='List modules')
     parser.add_argument('-fh', '--function-hash', help='Returns Hash')
+
+    opt = parser.add_argument_group('additional')
+    opt.add_argument('--prep-str', help='Prepare a string for the stack')
 
 class module:
     import utils.header as header
@@ -27,10 +31,11 @@ class module:
     data_size = int
     hash = ''
 
-    def __init__(self, get, modlist=False, function_hash=''):
+    def __init__(self, get, modlist=False, function_hash='', prep_str=any):
         self.get = get
         self.modlist = modlist
         self.function_hash = function_hash
+        self.prep_str = prep_str
         
 
     def msg(self, message_type, ErrorExit=False):
@@ -62,6 +67,7 @@ class module:
                 return mod_name
 
     def process(self):
+        vi = variable_instruction_set()
         self.msg('pre.head')
         self.msg('version')
         self.msg('banner')
@@ -73,8 +79,14 @@ class module:
             fh = FunctionHash()
             hash_r = fh.ror_hash(self.function_hash, 13)
             #hash_l = FunctionHash.rol_hash(self.function_hash, 13)
-            #print(f'[ROR13] {self.function_hash} : {hex(hash_r)}')
+            print(f'[ROR13] {self.function_hash} : {hex(hash_r)}')
             #print(f'[ROL13] {self.function_hash} : 0x{hash_l:08X}')
+            exit()
+        if self.prep_str != None:
+            stack_list = vi.prepare_str_to_stack(self.prep_str)
+            #print(f"push 0x{stack_str:08x}")
+            for stack_string in stack_list:
+                print(stack_string)
             exit()
         self.get_mod_count()
         self.msg('mods')

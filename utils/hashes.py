@@ -36,8 +36,8 @@ class FunctionHash:
         hash = hash & 0xFFFFFFFF
         return hash
 
-    def rol32(val, l_bits):
-        return ((val << l_bits) | (val >> (32 - l_bits))) & 0xFFFFFFFF
+    def rol32(self, val, l_bits):
+        return ((val << (l_bits%32)) | (val >> (32 - (l_bits%32)))) & 0xFFFFFFFF
 
     def rol_hash(self, api_name: str, shift_left_bits: int) -> int:
         hash = 0
