@@ -45,7 +45,7 @@ setup(
         'pypng==0.20220715.0',
         'qrcode==8.1',
         'requests==2.32.3',
-        'setuptools==78.1.0',
+        'setuptools==79.0.1',
         'sgmllib3k==1.0.0',
         'tqdm',
         'typing_extensions==4.13.1',
