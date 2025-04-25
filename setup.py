@@ -38,7 +38,7 @@ setup(
         'cryptography==44.0.2',
         'feedparser==6.0.11',
         'idna==3.10',
-        'lxml==5.3.1',
+        'lxml==5.4.0',
         'pefile==2024.8.26',
         'psutil',
         'pycparser==2.22',
