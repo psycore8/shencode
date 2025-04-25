@@ -49,7 +49,7 @@ setup(
         'sgmllib3k==1.0.0',
         'tqdm',
         'typing_extensions==4.13.1',
-        'urllib3==2.3.0',
+        'urllib3==2.4.0',
         
         ] + extras,
         py_modules=['shencode'],
