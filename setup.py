@@ -50,7 +50,6 @@ setup(
         'tqdm',
         'typing_extensions==4.13.2',
         'urllib3==2.4.0',
-        
         ] + extras,
         py_modules=['shencode'],
         # py_modules=[
