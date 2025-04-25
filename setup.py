@@ -48,7 +48,7 @@ setup(
         'setuptools==78.1.0',
         'sgmllib3k==1.0.0',
         'tqdm',
-        'typing_extensions==4.13.1',
+        'typing_extensions==4.13.2',
         'urllib3==2.3.0',
         
         ] + extras,
