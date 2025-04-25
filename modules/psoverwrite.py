@@ -1,7 +1,7 @@
 ########################################################
 ### PSOverwrite Module
-### Status: untested
-### Passed: (x) manual tests () task
+### Status: migrated to 082
+###
 ########################################################
 
 import ctypes
@@ -10,7 +10,8 @@ from utils.helper import nstate as nstate
 from utils.windef import *
 from utils.winconst import *
 
-CATEGORY = 'inject'
+CATEGORY    = 'inject'
+DESCRIPTION = 'Process_Overwrite Module, depends on https://github.com/hasherezade/process_overwriting'
 
 def register_arguments(parser):
             parser.add_argument('-p', '--payload', type=str, required=True, help='Payload, which overwrites the target')
@@ -25,8 +26,8 @@ class STARTUPINFOEX(ctypes.Structure):
 
 class module:
         Author = 'psycore8'
-        Description = 'Process_Overwrite Module, depends on https://github.com/hasherezade/process_overwriting'
-        Version = '0.1.3'
+        #Description = 'Process_Overwrite Module, depends on https://github.com/hasherezade/process_overwriting'
+        Version = '0.1.4'
         DisplayName = 'PROCESS-OVERWRITE'
         pid = 0
         attr_list = any

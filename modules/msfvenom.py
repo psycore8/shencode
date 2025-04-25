@@ -1,6 +1,7 @@
 ########################################################
 ### MSFVenom Module
-### Status: untested
+### Status: migrated to 082
+###
 ########################################################
 
 #import utils.arg
@@ -9,16 +10,17 @@ from utils.const import msfvenom_path
 #from utils.helper import GetFileHash, CheckFile
 import subprocess
 
-CATEGORY = 'core'
+CATEGORY    = 'payload'
+DESCRIPTION = 'Generate payloads with msfvenom'
 
 def register_arguments(parser):
       parser.add_argument('-c', '--command-line', help='msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"')
 
 class module:
   Author        = 'psycore8'
-  Description   = 'Generate payloads with metasploit'
-  Version       = '2.1.1'
-  DisplayName   = 'MSFGEN'
+  #Description   = 'Generate payloads with metasploit'
+  Version       = '2.1.2'
+  DisplayName   = 'MSF-VENOM'
   Args          = []
   
   def __init__(self, command_line):

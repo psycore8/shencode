@@ -1,14 +1,15 @@
 ########################################################
 ### ROLHash Module
-### Status: migrated to 081
-### Passed: (x) manual tests (x) task
+### Status: migrated to 082
+### 
 ########################################################
 
 import pefile
 from os import path as ospath
 from utils.helper import nstate as nstate
 
-CATEGORY = 'obfuscate'
+CATEGORY    = 'obfuscate'
+DESCRIPTION = 'Change ROR13 to ROL encoding in metasploit payloads'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for UUID encoding')
@@ -17,8 +18,8 @@ def register_arguments(parser):
 
 class module:
   Author = 'bordergate, psycore8'
-  Description = 'change ROR13 to ROL encoding in metasploit payloads'
-  Version = '2.1.1'
+  #Description = 'change ROR13 to ROL encoding in metasploit payloads'
+  Version = '2.1.2'
   DisplayName = 'ROLLIN-HASH'
   data_size = 0
   hash = ''

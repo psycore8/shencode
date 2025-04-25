@@ -28,9 +28,13 @@ def load_modules():
             mod = importlib.import_module(f"{Modules_Dir}.{mod_name}")
             if hasattr(mod, "register_arguments") and hasattr(mod, "CATEGORY"):
                 category = mod.CATEGORY
+                description = getattr(mod, 'DESCRIPTION', 'No description available')
                 if category not in modules:
                     modules[category] = {}
-                modules[category][mod_name] = mod
+                modules[category][mod_name] = {
+                    'module': mod,
+                    'description': description
+                }
     return modules
 
 def create_parser():
@@ -45,8 +49,12 @@ def create_parser():
         category_parser = subparsers.add_parser(category, help=f"{category} group", formatter_class=FixedWidthHelpFormatter)
         category_subparsers = category_parser.add_subparsers(dest='command', required=True)
 
-        for mod_name, mod in modules.items():
-            mod_parser = category_subparsers.add_parser(mod_name, help=f"Arguments for {mod_name}", formatter_class=FixedWidthHelpFormatter)
+        #for mod_name, mod_desc, mod in modules.items():
+        for mod_name, mod_info in modules.items():
+            #mod_parser = category_subparsers.add_parser(mod_name, help=f"Arguments for {mod_name} {mod_desc}", formatter_class=FixedWidthHelpFormatter)
+            mod = mod_info['module']
+            description = mod_info['description']
+            mod_parser = category_subparsers.add_parser(mod_name, help=f'{description}', description=description, formatter_class=FixedWidthHelpFormatter)
             mod.register_arguments(mod_parser)
 
     return parser

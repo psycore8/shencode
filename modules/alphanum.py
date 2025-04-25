@@ -1,19 +1,21 @@
 ########################################################
 ### Alphanum Module
-### Status: untested
-### Passed: (x) manual tests () task
+### Status: migrated to 082
+### 
 ########################################################
 
 import os
 import random
 import tqdm
+from utils.asm import variable_instruction_set
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo
 from utils.const import *
 from utils.binary import get_coff_section
 from subprocess import run
 
-CATEGORY = 'encoder'
+CATEGORY    = 'encoder'
+DESCRIPTION = 'Encode bytes to alphanumeric output'
 
 def register_arguments(parser):
             parser.add_argument('-i', '--input', help='Input file to use')
@@ -25,8 +27,8 @@ def register_arguments(parser):
 
 class module:
     Author          = 'psycore8'
-    Description     = 'Encode bytes to alphanumeric output'
-    Version         = '0.1.2'
+    #Description     = 'Encode bytes to alphanumeric output'
+    Version         = '0.1.4'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
@@ -95,12 +97,12 @@ class module:
         return bytes(decoded_bytes)
     
     def gen_x64_stub(self):
+        vi = variable_instruction_set()
+        reg1, reg2, reg3, reg4, reg5 = vi.random.sample(vi.multi_bit_registers, 5)
 
-        reg1, reg2, reg3, reg4, reg5 = random.sample(multi_bit_registers, 5)
-
-        inst_asm_reg_zero = ['xor', 'sub']
-        inst_asm_jmp_cond = ['jz', 'je']
-        #inst_asm_jmp_ncond = ['jnz', 'jne']
+        #inst_asm_reg_zero = ['xor', 'sub']
+        #inst_asm_jmp_cond = ['jz', 'je']
+        inst_asm_jmp_ncond = ['jnz', 'jne']
         inst_asm_inc_reg = [
             f'inc {reg4[0]}',
             f'add {reg4[0]}, 1',
@@ -113,8 +115,8 @@ class module:
             ]
         
         rc = random.choice
-        asm_reg_zero    = random.choice(inst_asm_reg_zero)
-        asm_jmp_cond    = random.choice(inst_asm_jmp_cond)
+        #asm_reg_zero    = random.choice(inst_asm_reg_zero)
+        #asm_jmp_cond    = random.choice(inst_asm_jmp_cond)
         #asm_jmp_ncond   = random.choice(inst_asm_jmp_ncond)
         asm_inc_reg     = random.choice(inst_asm_inc_reg)
         asm_dec_reg     = random.choice(inst_asm_dec_reg)
@@ -133,11 +135,11 @@ class module:
                         global _start
 
                     _start:
-                        {rc(inst_asm_reg_zero)} {reg1[0]}, {reg1[0]}
-                        {rc(inst_asm_reg_zero)} {reg2[0]}, {reg2[0]}
-                        {rc(inst_asm_reg_zero)} {reg3[0]}, {reg3[0]}
-                        {rc(inst_asm_reg_zero)} {reg4[0]}, {reg4[0]}
-                        {rc(inst_asm_reg_zero)} {reg5[0]}, {reg5[0]}
+                        {rc(vi.register_set_zero)} {reg1[0]}, {reg1[0]}
+                        {rc(vi.register_set_zero)} {reg2[0]}, {reg2[0]}
+                        {rc(vi.register_set_zero)} {reg3[0]}, {reg3[0]}
+                        {rc(vi.register_set_zero)} {reg4[0]}, {reg4[0]}
+                        {rc(vi.register_set_zero)} {reg5[0]}, {reg5[0]}
                         jmp short call_decoder
 
                     decoder:
@@ -147,7 +149,7 @@ class module:
 
                     decode_loop:
                         test {reg2[0]}, {reg2[0]}         ; test reg2
-                        {rc(inst_asm_jmp_cond)} encoded_shellcode
+                        {rc(vi.jump_conditional_positive)} encoded_shellcode
 
                         mov {reg3[3]}, byte [{reg1[0]}]   ; get alphanumeric bytes = reg3
                         sub {reg3[3]}, 0x41               ; "A-Z" → High-Nibble (A=0)

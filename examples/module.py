@@ -1,7 +1,8 @@
 from utils.helper import nstate as nstate
 
 # defines a category
-CATEGORY = 'example'
+CATEGORY    = 'example'
+DESCRIPTION = 'An example module for ShenCode'
 
 # defines the parser arguments
 def register_arguments(parser):
@@ -12,7 +13,6 @@ def register_arguments(parser):
 class module:
   # general information
   Author =      'Name'
-  Description = 'some useful information about this module'
   Version =     '1.0.0'
   DisplayName = 'CALC-POWER'
   # relay is used in tasked mode

@@ -1,6 +1,7 @@
 ########################################################
 ### Meterpreter Module
-### Status: untested
+### Status: migrated to 082
+###
 ########################################################
 
 from utils.helper import nstate as nstate
@@ -11,7 +12,8 @@ from time import sleep
 import socket
 import struct
 
-CATEGORY = 'stager'
+CATEGORY    = 'stager'
+DESCRIPTION = 'Connect back (reverse_tcp) to remote host and receive a stage'
 
 def register_arguments(parser):
     parser.add_argument('-p', '--port', default=4444, type=int, required=True, help='Remote port to connect to')
@@ -25,8 +27,8 @@ def register_arguments(parser):
 class module:
     
     Author          = 'raptor@0xdeadbeef.info, psycore8'
-    Description     = 'Connect back (reverse_tcp) to remote host and receive a stage'
-    Version         = '1.2.2'
+    #Description     = 'Connect back (reverse_tcp) to remote host and receive a stage'
+    Version         = '1.2.3'
     DisplayName      = 'METERPRETER-STAGER'
     payload         = any
     payload_size    = int

@@ -2,17 +2,17 @@
 
 **A versatile tool for working with shellcodes.**
 
-![](shencode-081.png)
+![](shencode-082.png)
 
 ## Features
 
-### Version 0.8.1
+### Version 0.8.2
 
 | Category    | Module        | Description                                    | Docs                                                                      | Refs                                                                                                      |
 | ----------- | ------------- | ---------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `core`      | `extract`     | Extract a range of bytes from a file           | [extract](https://www.heckhausen.it/shencode/wiki/core/extract)           |                                                                                                           |
-| `core`      | `msfvenom`    | Create payloads with msfvenom                  | [msfvenom](https://www.heckhausen.it/shencode/wiki/core/msfvenom)         |                                                                                                           |
 | `core`      | `output`      | Inspect and display files in different formats | [output](https://www.heckhausen.it/shencode/wiki/core/output)             |                                                                                                           |
+| `core`      | `subproc`     | Execute an external subprocess                 | [subproc](https://www.heckhausen.it/shencode/wiki/core/subproc)           |                                                                                                           |
 | `core`      | `task`        | Execute tasks to automate ShenCode             | [task](https://www.heckhausen.it/shencode/wiki/core/task)                 |                                                                                                           |
 | `encoder`   | `aes`         | Encrypt with AES                               | [aes](https://www.heckhausen.it/shencode/wiki/encoder/aes)                |                                                                                                           |
 | `encoder`   | `alphanum`    | Alphanumeric encoder to avoid null bytes       | [alphanum](https://www.heckhausen.it/shencode/wiki/encoder/alphanum)      |                                                                                                           |
@@ -28,6 +28,8 @@
 | `obfuscate` | `qrcode`      | Generate QR-Code from a file                   | [qrcode](https://www.heckhausen.it/shencode/wiki/obfuscate/qrcode)        |                                                                                                           |
 | `obfuscate` | `rolhash`     | ROR13 to custom ROL hashing                    | [rolhash](https://www.heckhausen.it/shencode/wiki/obfuscate/rolhash)      |                                                                                                           |
 | `obfuscate` | `uuid`        | Generate UUIDs from shellcode                  | [uuid](https://www.heckhausen.it/shencode/wiki/obfuscate/uuid)            | [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_shellcode_als_uuids_tarnen_-_teil_1) |
+| `payload`   | `msfvenom`    | Create payloads with msfvenom                  | [msfvenom](https://www.heckhausen.it/shencode/wiki/payload/msfvenom)      |                                                                                                           |
+| `payload`   | `winexec`     | Create a shellcode with custom WinExec command | [winexec](https://www.heckhausen.it/shencode/wiki/core/winexec)           |                                                                                                           |
 | `stager`    | `meterpreter` | Download a meterpreter reverse tcp stage       | [meterpreter](https://www.heckhausen.it/shencode/wiki/stager/meterpreter) |                                                                                                           |
 | `stager`    | `sliver`      | Download  a sliver stage                       | [sliver](https://www.heckhausen.it/shencode/wiki/stager/sliver)           |                                                                                                           |
 
@@ -48,20 +50,19 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
-- `general` - many bugfixes
-- `general` - implemented `tqdm` bar into some modules
-- `core/extract` - added nargs argument `--extract-range <start-byte> <end-byte>`
-- `core/extract` - added section extraction `--extract-section <section-name>`
-- `core/output` - Null-Byte highlighting
-- `core/output` - Added size info
-- `core/output` - Highlight search `--highlight "00 AF"`
-- `core/task` - automate and pipe ShenCode commands
-- `encoder/alphanum` - alphanumeric encoder to avoid zero bytes
-- `encoder/bytebert` - module is working now, as expected: create ASM-Script, compile, extract shellcode
-- `encoder/bytebert` - fixed some logic errors
-- `encoder/bytebert` - more random registers and instructions
-- `encoder/xor` - fixed typo
-- `stager/sliver` - changed AES argument to nargs: `--aes <aes-key> <aes-iv>`
+- `general` - Function hashing support
+- `general` - New header
+- `general` - Added a diceware wordlist for jump label obfuscation
+- `general` - Added module description in `--help` output
+- `general` - Dependencies updated
+- `general` - Optimizations, typos, fixes
+- `core/subproc` - Execute a subprocess
+- `core/info` - Dev changes
+- `payload/msfvenom` - Moved to category payload
+- `payload/winexec` - Create a custom WinExec Shellcode with polymorphic features
+- `encoder/alphanum` - Instruction set changes
+- `utils` - Moved assembler instructions to asm.py
+- `utils` - Added ROL hashing
 
 ## References
 
