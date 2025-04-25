@@ -1,7 +1,7 @@
 ########################################################
-### AES Module
-### Status: untested
-### Passed: (x) manual tests () task
+### feed Module
+### Status: migrated to 082
+### 
 ########################################################
 
 import datetime
@@ -10,7 +10,8 @@ from lxml import etree
 from utils.helper import nstate as nstate
 from utils.helper import GetFileInfo, CheckFile
 
-CATEGORY = 'obfuscate'
+CATEGORY    = 'obfuscate'
+DESCRIPTION = 'Obfuscate shellcodes as XML Feed'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for feed encoding')
@@ -22,8 +23,8 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Description = 'obfuscate shellcodes as XML Feed'
-    Version = '2.1.2'
+    #Description = 'obfuscate shellcodes as XML Feed'
+    Version = '2.1.3'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0

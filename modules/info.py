@@ -1,6 +1,7 @@
 ########################################################
 ### Info Module
-### Status: untested
+### Status: migrated to 082
+###
 ########################################################
 
 from utils.helper import nstate as nstate
@@ -8,7 +9,8 @@ from utils.asm import variable_instruction_set
 from utils.hashes import FunctionHash
 from utils.const import *
 
-CATEGORY = 'core'
+CATEGORY    = 'core'
+DESCRIPTION = 'Developer Info Module'
 
 def register_arguments(parser):
     parser.add_argument('-g', '--get', action='store_true', help='Get developer info')
@@ -22,14 +24,15 @@ class module:
     import utils.header as header
     from os import listdir, path
     Author = 'psycore8'
-    Description = 'Info'
-    Version = '0.0.5'
+    #Description = 'Info'
+    Version = '0.0.7'
     DisplayName = 'SHENCODE-DEViNFO'
     mod_dir = module_dir
     mod_count = 0
     mod_name = ''
     data_size = int
     hash = ''
+    s = 40
 
     def __init__(self, get, modlist=False, function_hash='', prep_str=any):
         self.get = get
@@ -38,17 +41,19 @@ class module:
         self.prep_str = prep_str
         
 
-    def msg(self, message_type, ErrorExit=False):
+    def msg(self, message_type, MsgVar=None, left_msg=None, right_msg=None, ErrorExit=False):
         messages = {
             'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'banner'         : f'{nstate.s_ok} Banner count: {len(self.header.headers)}',
-            'version'        : f'{nstate.s_ok} ShenCode Version: {Version}',
-            'mods'           : f'{nstate.s_ok} Module count: {self.mod_count}',
-            'repo'           : f'{nstate.s_ok} Repository: {nstate.f_link}https://github.com/psycore8/shencode{nstate.f_end}',
-            'docs'           : f'{nstate.s_ok} Docs: {nstate.f_link}https://www.heckhausen.it/shencode/wiki{nstate.f_end}',
-            'msf'            : f'{nstate.s_ok} msfvenom: {msfvenom_path}',
-            'template'       : f'{nstate.s_ok} template dir: {tpl_path}',
-            'modules'        : f'{nstate.s_ok} module dir: {module_dir}',
+            'banner'         : f'{nstate.s_ok} Banners:'.ljust(self.s) + f'{len(self.header.headers)}',
+            'version'        : f'{nstate.s_ok} Version:'.ljust(self.s) + f'{Version}',
+            'mods'           : f'{nstate.s_ok} Modules:'.ljust(self.s) + f'{self.mod_count}',
+            'repo'           : f'{nstate.s_ok} Repository:'.ljust(self.s) + f'{nstate.f_link}https://github.com/psycore8/shencode{nstate.f_end}',
+            'docs'           : f'{nstate.s_ok} Docs:'.ljust(self.s) + f'{nstate.f_link}https://www.heckhausen.it/shencode/wiki{nstate.f_end}',
+            'msf'            : f'{nstate.s_ok} msfvenom:'.ljust(self.s) + f' {msfvenom_path}',
+            'template'       : f'{nstate.s_ok} template dir:'.ljust(self.s) + f'{tpl_path}',
+            'modules'        : f'{nstate.s_ok} module dir:'.ljust(self.s) + f'{module_dir}',
+            'out'            : f'{nstate.s_ok} {MsgVar}',
+            'fout'           : f'{nstate.s_ok} {left_msg}'.ljust(self.s) + f'{right_msg}',
             'modlist.s'      : f'{nstate.s_ok} List modules',
             'modlist'        : f'{nstate.s_note} Module {self.mod_count}:{self.mod_name.upper()}',
             'post.done'      : f'{nstate.s_ok} DONE!'
@@ -68,6 +73,7 @@ class module:
 
     def process(self):
         vi = variable_instruction_set()
+        m = self.msg
         self.msg('pre.head')
         self.msg('version')
         self.msg('banner')
@@ -91,6 +97,10 @@ class module:
         self.get_mod_count()
         self.msg('mods')
         self.msg('modules')
+        #self.msg('out', f'nasm:'.ljust(40) + f'{nasm}')
+        m('fout', None, 'nasm:', f'{nasm}')
+        m('fout', None, 'Resource dir:', f'{resource_dir}')
+        #self.msg('out', f'Resource directory:'.ljust(40) + f'{resource_dir}')
         self.msg('template')
         self.msg('msf')
         self.msg('repo')

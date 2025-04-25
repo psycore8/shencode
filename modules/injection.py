@@ -1,7 +1,7 @@
 ########################################################
 ### Injection Module
-### Status: untested
-### Passed: (x) manual tests () task
+### Status: migrated to 082
+### 
 ########################################################
 
 import os
@@ -12,7 +12,8 @@ from utils.winconst import *
 from utils.helper import nstate
 from utils.helper import CheckFile, GetFileInfo
 
-CATEGORY = 'inject'
+CATEGORY    = 'inject'
+DESCRIPTION = 'Inject shellcode into memory with CreateRemoteThread'
 
 def register_arguments(parser):
             parser.add_argument('-i', '--input', help='Input file or buffer for process injection')
@@ -30,8 +31,8 @@ class module:
     import threading
 
     Author = 'cpu0x00, psycore8'
-    Description = 'Inject shellcode to process'
-    Version = '2.1.3'
+    #Description = 'Inject shellcode to process'
+    Version = '2.1.4'
     DisplayName = 'INJECTION'
     delay = 5
     data_size = 0

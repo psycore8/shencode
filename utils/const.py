@@ -2,7 +2,7 @@ import os
 
 module_dir = 'modules'
 Version = '0.8.2'
-banner = 13
+banner = -1
 
 if os.name == 'nt':
   msfvenom_path = "msfvenom.bat"

@@ -1,7 +1,7 @@
 ########################################################
 ### WinExec Shellcode Module
-### Status: untested
-### 
+### Status: migrated to 082
+###
 ### DiceWare wordlist: https://github.com/ulif/diceware/blob/master/diceware/wordlists/wordlist_en_eff.txt
 ###
 ########################################################
@@ -11,7 +11,8 @@ from utils.asm import variable_instruction_set
 from utils.helper import nstate, GetFileInfo
 from utils.hashes import FunctionHash
 
-CATEGORY = 'core'
+CATEGORY    = 'payload'
+DESCRIPTION = 'Generate a dynamic WinExec shellcode'
 
 def register_arguments(parser):
     parser.add_argument('-c', '--command-line', required=True, help='Command to execute with WinExec')
@@ -21,8 +22,8 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Description = 'Generate a dynamic WinExec shellcode'
-    Version = '0.0.4'
+    #Description = 'Generate a dynamic WinExec shellcode'
+    Version = '0.0.5'
     DisplayName = 'WinEXEC'
     opcode = ''
     size = 0

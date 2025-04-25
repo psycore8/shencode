@@ -1,13 +1,14 @@
 ########################################################
 ### Output Module
-### Status: migrated to 081
-### Passed: (x) manual tests (x) task
+### Status: migrated to 082
+### 
 ########################################################
 
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileHash
 
-CATEGORY = 'core'
+CATEGORY    = 'core'
+DESCRIPTION = 'Output and inspect binaries in different formats'
 
 def register_arguments(parser):
       #parser.add_argument('-i', '--input', help='Input file for formatted output')
@@ -28,9 +29,9 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Description = 'create formatted output by filename'
+    #Description = 'create formatted output by filename'
     DisplayName = 'MODOUT'
-    Version = '0.2.0'
+    Version = '0.2.1'
     file_bytes = bytes
     offset_color = nstate.clLIGHTMAGENTA
     cFile = False

@@ -1,6 +1,7 @@
 ########################################################
 ### Extract Module
-### Status: migrated to 081
+### Status: migrated to 082
+###
 ########################################################
 
 from utils.helper import nstate
@@ -8,7 +9,8 @@ from utils.helper import CheckFile, GetFileInfo
 from os import path as os_path
 import struct
 
-CATEGORY = 'core'
+CATEGORY    = 'core'
+DESCRIPTION = 'Extract bytes or sections from PE files'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for extract module')
@@ -25,8 +27,8 @@ def register_arguments(parser):
 
 class module:
     Author =      'psycore8'
-    Description = 'extract shellcode from/to offset'
-    Version =     '2.1.4'
+    #Description = 'extract shellcode from/to offset'
+    Version =     '2.1.5'
     DisplayName = 'BYTE-XTRACT0R'
     hash = ''
     data_size = 0

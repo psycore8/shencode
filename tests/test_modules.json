@@ -148,7 +148,7 @@
             },
             "subproc": {
                 "args": {
-                    "command_line": ["ndisasm.exe", "tests\\calc.raw", ">", "tests\\0-cal.asm"]
+                    "command_line": ["ndisasm.exe", "tests\\calc.raw"]
                 },
                 "input_buffer": false,
                 "return_buffer": false
@@ -163,7 +163,8 @@
             "winexec": {
                 "args": {
                     "command_line": "whoami /user",
-                    "output": "tests\\0-wex.txt"
+                    "output": "tests\\0-wex.txt",
+                    "debug": true
                 },
                 "input_buffer": false,
                 "return_buffer": false

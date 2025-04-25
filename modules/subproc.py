@@ -1,20 +1,22 @@
 ########################################################
 ### Start Subprocess Module
-### Status: 
+### Status: migrated to 082
+###
 ########################################################
 
 from utils.helper import nstate
 import subprocess
 
-CATEGORY = 'core'
+CATEGORY    = 'core'
+DESCRIPTION = 'Execute a subprocess'
 
 def register_arguments(parser):
     parser.add_argument('-c', '--command-line', default=[], help='Command line to execute')
 
 class module:
     Author =      'psycore8'
-    Description = 'Helper module to execute a subprocess'
-    Version =     '0.0.1'
+    #Description = 'Helper module to execute a subprocess'
+    Version =     '0.0.2'
     DisplayName = 'SUBPR0CESS'
     hash = ''
     data_size = 0

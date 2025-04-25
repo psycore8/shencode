@@ -1,7 +1,7 @@
 ########################################################
 ### NtInjection Module
-### Status: migrated to 081
-### Passed: (x) manual tests (x) task
+### Status: migrated to 082
+### 
 ########################################################
 
 import os
@@ -12,7 +12,8 @@ from utils.winconst import *
 from utils.helper import nstate
 from utils.helper import CheckFile, GetFileInfo
 
-CATEGORY = 'inject'
+CATEGORY    = 'inject'
+DESCRIPTION = 'NT-Injection with native windows API (experimental)'
 
 def register_arguments(parser):
             parser.add_argument('-i', '--input', help='Input file for process injection')
@@ -32,8 +33,8 @@ class module:
     import threading
 
     Author = 'psycore8'
-    Description = 'native inject shellcode to process'
-    Version = '0.0.3'
+    #Description = 'native inject shellcode to process'
+    Version = '0.0.4'
     DisplayName = 'NATIVE-INJECTION'
     delay = 5
     data_size = 0

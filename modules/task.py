@@ -1,13 +1,14 @@
 ########################################################
 ### Task Module
-### Status: untested
-### Passed: (x) manual tests () task
+### Status: migrated to 082
+### 
 ########################################################
 
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileHash
 
-CATEGORY = 'core'
+CATEGORY    = 'core'
+DESCRIPTION = 'Create tasks to automate ShenCode'
 
 def register_arguments(parser):
       parser.add_argument('-i', '--input', help='Input task file')
@@ -16,9 +17,9 @@ class module:
     import json
     import importlib
     Author = 'psycore8'
-    Description = 'Create tasks to pipe ShenCode modules'
+    #Description = 'Create tasks to pipe ShenCode modules'
     DisplayName = 'TASKS'
-    Version = '0.0.6'
+    Version = '0.0.7'
     result = any
 
     def __init__(self, input):

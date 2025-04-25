@@ -1,21 +1,22 @@
 ########################################################
 ### UUID Module
-### Status: untested
-### Passed: (x) manual tests () task
+### Status: migrated to 082
+### 
 ########################################################
 
 from utils.helper import nstate as nstate
 from utils.helper import GetFileInfo
 
-CATEGORY = 'obfuscate'
+CATEGORY    = 'obfuscate'
+DESCRIPTION = 'Obfuscate shellcodes as UUID strings'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for UUID encoding')
 
 class module:
     Author = 'psycore8'
-    Description = 'obfuscate shellcodes as UUID strings'
-    Version = '2.2.1'
+    #Description = 'obfuscate shellcodes as UUID strings'
+    Version = '2.2.2'
     DisplayName = 'UUID-OBF'
     UUID_string = ''
     hash = ''

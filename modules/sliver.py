@@ -1,6 +1,7 @@
 ########################################################
 ### Sliver Module
-### Status: untested
+### Status: migrated to 082
+###
 ########################################################
 
 from utils.helper import nstate as nstate
@@ -13,7 +14,8 @@ from cryptography.hazmat.backends import default_backend
 #import utils.relay as relay
 import requests
 
-CATEGORY = 'stager'
+CATEGORY    = 'stager'
+DESCRIPTION = 'Connect to a Sliver HTTPS listener, download stage and execute'
 
 def register_arguments(parser):
         parser.add_argument('-p', '--port', default=4444, type=int, required=True, help='Remote port to connect to')
@@ -33,8 +35,8 @@ def register_arguments(parser):
 class module:
     
     Author = 'psycore8'
-    Description = 'Connect to a Sliver HTTPS listener, download stage and execute'
-    Version = '2.1.5'
+    #Description = 'Connect to a Sliver HTTPS listener, download stage and execute'
+    Version = '2.1.6'
     DisplayName = 'SLIVER-STAGER'
     payload_size = 0
     header_16bytes = ''

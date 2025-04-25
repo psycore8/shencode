@@ -1,7 +1,7 @@
 ########################################################
 ### DLL Inject Module
-### Status: migrated to 081
-### Passed: (x) manual tests (x) task
+### Status: migrated to 082
+### 
 ########################################################
 
 import os
@@ -11,7 +11,8 @@ from utils.helper import CheckFile, GetFileInfo
 from utils.windef import *
 from utils.winconst import *
 
-CATEGORY = 'inject'
+CATEGORY    = 'inject'
+DESCRIPTION = 'Inject a DLL into memory'
 
 def register_arguments(parser):
             parser.add_argument('-i', '--input', type=str, required=True, help='Input dll to inject')
@@ -22,8 +23,8 @@ class module:
     import wmi, threading
     from time import sleep
     Author = 'psycore8'
-    Description = 'DLL Injection Module'
-    Version = '0.1.3'
+    #Description = 'DLL Injection Module'
+    Version = '0.1.4'
     DisplayName = 'DLL-INJECTION'
     mem = any
     data_bytes = bytes

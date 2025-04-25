@@ -2,7 +2,7 @@
 
 **A versatile tool for working with shellcodes.**
 
-![](shencode-081.png)
+![](shencode-082.png)
 
 ## Features
 
@@ -50,20 +50,7 @@ Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more inf
 
 ## Release Notes
 
-- `general` - many bugfixes
-- `general` - implemented `tqdm` bar into some modules
-- `core/extract` - added nargs argument `--extract-range <start-byte> <end-byte>`
-- `core/extract` - added section extraction `--extract-section <section-name>`
-- `core/output` - Null-Byte highlighting
-- `core/output` - Added size info
-- `core/output` - Highlight search `--highlight "00 AF"`
-- `core/task` - automate and pipe ShenCode commands
-- `encoder/alphanum` - alphanumeric encoder to avoid zero bytes
-- `encoder/bytebert` - module is working now, as expected: create ASM-Script, compile, extract shellcode
-- `encoder/bytebert` - fixed some logic errors
-- `encoder/bytebert` - more random registers and instructions
-- `encoder/xor` - fixed typo
-- `stager/sliver` - changed AES argument to nargs: `--aes <aes-key> <aes-iv>`
+
 
 ## References
 

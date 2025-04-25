@@ -1,7 +1,7 @@
 ########################################################
 ### Alphanum Module
-### Status: untested
-### Passed: (x) manual tests () task
+### Status: migrated to 082
+### 
 ########################################################
 
 import os
@@ -14,7 +14,8 @@ from utils.const import *
 from utils.binary import get_coff_section
 from subprocess import run
 
-CATEGORY = 'encoder'
+CATEGORY    = 'encoder'
+DESCRIPTION = 'Encode bytes to alphanumeric output'
 
 def register_arguments(parser):
             parser.add_argument('-i', '--input', help='Input file to use')
@@ -26,8 +27,8 @@ def register_arguments(parser):
 
 class module:
     Author          = 'psycore8'
-    Description     = 'Encode bytes to alphanumeric output'
-    Version         = '0.1.3'
+    #Description     = 'Encode bytes to alphanumeric output'
+    Version         = '0.1.4'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''

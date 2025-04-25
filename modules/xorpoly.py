@@ -1,7 +1,7 @@
 ########################################################
 ### AES Module
-### Status: untested
-### Passed: (x) manual tests () task
+### Status: migrated to 082
+### 
 ########################################################
 
 from utils.helper import nstate as nstate
@@ -11,7 +11,8 @@ from utils.binary import replace_bytes_at_offset
 from os import path as osp
 from modules.xor import module as xormod
 
-CATEGORY = 'encoder'
+CATEGORY    = 'encoder'
+DESCRIPTION = 'Polymorphic XOR encoder'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for XOR stub')
@@ -24,8 +25,8 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Description = 'create payload from a raw file, encode with xor, add to xor stub'
-    Version = '2.1.2'
+    #Description = 'create payload from a raw file, encode with xor, add to xor stub'
+    Version = '2.1.3'
     DisplayName = 'X0RP0LY-ENC'
     shellcode = b''
     xored_shellcode = b''

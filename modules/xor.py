@@ -1,7 +1,7 @@
 ########################################################
 ### XOR Module
-### Status: migrated to 081
-### Passed: (x) manual tests () task
+### Status: migrated to 082
+### 
 ########################################################
 
 import base64
@@ -11,7 +11,8 @@ from utils.helper import nstate
 from utils.helper import CheckFile, GetFileInfo
 from tqdm import tqdm
 
-CATEGORY = 'encoder'
+CATEGORY    = 'encoder'
+DESCRIPTION = 'XOR encoder for payloads'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for XOR encoding')
@@ -29,8 +30,8 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Description = 'XOR encoder for payloads'
-    Version = '2.1.2'
+    #Description = 'XOR encoder for payloads'
+    Version = '2.1.3'
     DisplayName = 'XOR-ENCODER'
     hash = ''
     data_size = 0

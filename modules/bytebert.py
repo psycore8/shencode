@@ -1,7 +1,7 @@
 ########################################################
 ### ByteBert Module
-### Status: migrated to 081
-### Passed: (x) manual tests () task
+### Status: migrated to 082
+### 
 ########################################################
 
 ### DEFINITIONS
@@ -11,6 +11,7 @@
 # reg1, reg2 = random.sample(registers, 2)
 
 import random
+from utils.asm import variable_instruction_set
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileInfo
 from utils.binary import get_coff_section
@@ -22,7 +23,8 @@ from subprocess import run
 from tqdm import tqdm
 from utils.const import *
 
-CATEGORY = 'encoder'
+CATEGORY    = 'encoder'
+DESCRIPTION = 'ByteBert - Advanced polymorphic Encoder Stub'
 
 def register_arguments(parser):
             parser.add_argument('-i', '--input', help='Input file to use with bytebert')
@@ -33,8 +35,8 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Description = 'ByteBert - Advanced polymorphic Encoder Stub'
-    Version = '0.3.6'
+    #Description = 'ByteBert - Advanced polymorphic Encoder Stub'
+    Version = '0.3.7'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -241,8 +243,8 @@ class module:
             self.msg('error.nasm2')
 
     def generate_win64_stub(self):
-
-        reg1, reg2, reg3, reg4 = random.sample(multi_bit_registers, 4)
+        vi = variable_instruction_set()
+        reg1, reg2, reg3, reg4 = random.sample(vi.multi_bit_registers, 4)
 
         inst_asm_reg_zero = ['xor', 'sub']
         inst_asm_jmp_cond = ['jz', 'je']
