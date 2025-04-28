@@ -31,7 +31,7 @@ setup(
     ],
     install_requires=[
         'capstone==5.0.6',
-        'certifi==2025.1.31',
+        'certifi==2025.4.26',
         'cffi==1.17.1',
         'charset-normalizer==3.4.1',
         'colorama==0.4.6',
@@ -45,7 +45,7 @@ setup(
         'pypng==0.20220715.0',
         'qrcode==8.1',
         'requests==2.32.3',
-        'setuptools==79.0.1',
+        'setuptools==80.0.0',
         'sgmllib3k==1.0.0',
         'tqdm',
         'typing_extensions==4.13.2',
