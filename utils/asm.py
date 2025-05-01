@@ -34,7 +34,7 @@ class variable_instruction_set:
         instruction_set = [
             f'xor {register_name}, {register_name}',
             f'sub {register_name}, {register_name}',
-            f'mov {register_name}, 1111111111111111\n{ws}shl {register_name}, 64\n{ws}shr {register_name}, 64'
+            f'mov {register_name}, 0xFFFFFFFFFFFFFFFF\n{ws}add {register_name}, 1'
         ]
         return self.random.choice(instruction_set)
 
@@ -58,8 +58,8 @@ class variable_instruction_set:
         ws = ' ' * self.whitespaces
         instruction_set = [
             f'jmp {jump_target}',
-            f'call {jump_target}',
-            f'push {jump_target}\n{ws}ret'
+            f'call {jump_target}'
+            #f'mov {jump_register}, {jump_target}\n{ws}push {jump_register}\n{ws}ret'
         ]
         return self.random.choice(instruction_set)
     
