@@ -6,6 +6,7 @@
 
 import base64
 import os
+import pickle
 
 from utils.helper import nstate
 from utils.helper import GetFileInfo
@@ -19,7 +20,7 @@ CATEGORY    = 'dev'
 DESCRIPTION = 'En- / Decoder for different algorithms. Supports: base32, base64'
 
 def register_arguments(parser):
-    parser.add_argument('-a', '--algorithm' ,choices=['base32', 'base64'], required=True, help='')
+    parser.add_argument('-a', '--algorithm' ,choices=['base32', 'base64', 'aes'], required=True, help='')
     parser.add_argument('-m', '--mode', choices=['encode', 'decode'], required=True, help='Operation mode, choose encode / decode')
     parser.add_argument('-i', '--input', required=True, help='Input file')
     parser.add_argument('-k', '--key', required=False, default=None, help='If required, set the en- / decryption key')
@@ -132,16 +133,18 @@ class module:
     
     def aes(self):
         if self.mode == 'encode':
-            pass
+            buffer, salt, iv = self.aes_encrypt(self.data_bytes, self.key.encode('utf-8'))
+            processed_data = pickle.dumps((buffer, salt, iv))
         elif self.mode == 'decode':
-            salt, iv = None
+            buffer, salt, iv = pickle.loads(self.data_bytes)
+            processed_data = self.aes_decrypt(buffer, self.key.encode('utf-8'), salt, iv)
         else:
             processed_data = None
-        return processed_data, salt, iv
+        return processed_data
 
     def aes_encrypt(self, data: bytes, password: bytes):
-        salt, iv = os.urandom(16)
-        #iv = os.urandom(16)
+        salt = os.urandom(16)
+        iv = os.urandom(16)
         key = self.generate_key(password, salt)
         padder = padding.PKCS7(algorithms.AES.block_size).padder()
         padded_data = padder.update(data) + padder.finalize()
