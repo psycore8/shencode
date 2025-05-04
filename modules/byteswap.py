@@ -11,7 +11,7 @@ from utils.binary import replace_bytes_at_offset
 from os import path as osp
 
 CATEGORY    = 'encoder'
-DESCRIPTION = 'Polymorphic encoder stub'
+DESCRIPTION = '(Deprecated) Polymorphic encoder stub'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file or buffer to use with byteswap stub')
@@ -21,7 +21,7 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     #Description = 'create payload from a raw file, encode with byteswap-xor, add to byteswap stub'
-    Version = '2.1.3'
+    Version = '2.1.4'
     DisplayName = 'BYTESWAP-ENC'
     Shellcode = ''
     Shellcode_Length = 0

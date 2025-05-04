@@ -16,7 +16,7 @@ import pickle
 import os
 
 CATEGORY = 'encoder'
-DESCRIPTION = 'AES encoder for payloads'
+DESCRIPTION = '(Deprecated) AES encoder for payloads'
 
 def register_arguments(parser):
     parser.add_argument('-m', '--mode', choices=['encode', 'decode'], required=True, help='AES Operation mode, choose between encode and decode')
@@ -27,7 +27,7 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     #Description = 'AES encoder for payloads'
-    Version = '2.1.3'
+    Version = '2.1.4'
     DisplayName = 'AES-ENCODER'
     data_size = int
     hash = ''
