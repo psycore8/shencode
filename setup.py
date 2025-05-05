@@ -35,7 +35,7 @@ setup(
         'cffi==1.17.1',
         'charset-normalizer==3.4.1',
         'colorama==0.4.6',
-        'cryptography==44.0.2',
+        'cryptography==44.0.3',
         'feedparser==6.0.11',
         'idna==3.10',
         'lxml==5.4.0',
