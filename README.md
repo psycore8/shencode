@@ -40,6 +40,9 @@
 ```shell
 git clone https://github.com/psycore8/shencode
 cd shencode
+python -m venv .venv
+source .venv/bin/activate # only Linux
+.venv\bin\activate        # only Windows
 pip install .
 shencode -h
 ```

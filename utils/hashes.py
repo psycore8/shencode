@@ -30,9 +30,7 @@ class FunctionHash:
         hash = 0
         for c in api_name:
             hash = self.ror32(hash, shift_right_bits)
-            hash += ord(c)
-            #print(f'Ordinal: {ord(c)}')
-            #print(f'Hash: {hex(hash)}')        
+            hash += ord(c)       
         hash = hash & 0xFFFFFFFF
         return hash
 
@@ -43,8 +41,6 @@ class FunctionHash:
         hash = 0
         for c in api_name:
             hash = self.rol32(hash, shift_left_bits)
-            hash += ord(c)
-            #print(f'Ordinal: {ord(c)}')
-            #print(f'Hash: {hex(hash)}')        
+            hash += ord(c)    
         hash = hash & 0xFFFFFFFF
         return hash
