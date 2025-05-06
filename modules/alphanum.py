@@ -104,14 +104,14 @@ class module:
         #inst_asm_jmp_cond = ['jz', 'je']
         inst_asm_jmp_ncond = ['jnz', 'jne']
         inst_asm_inc_reg = [
-            f'inc {reg4[0]}',
-            f'add {reg4[0]}, 1',
-            f'lea {reg4[0]}, [{reg5[0]}+1]'
+            f'inc {reg5[0]}',
+            f'add {reg5[0]}, 1',
+            f'lea {reg5[0]}, [{reg5[0]}+1]'
             ]
         inst_asm_dec_reg = [
-            f'dec {reg3[0]}',
-            f'sub {reg3[0]}, 1',
-            f'lea {reg3[0]}, [{reg2[0]}-1]'
+            f'dec {reg2[0]}',
+            f'sub {reg2[0]}, 1',
+            f'lea {reg2[0]}, [{reg2[0]}-1]'
             ]
         
         rc = random.choice
