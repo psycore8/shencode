@@ -8,6 +8,7 @@ psy*
 nasm.exe
 .vscode/
 shencode_Repository.md
+.venv.bat
 
 _policy
 # Byte-compiled / optimized / DLL files
