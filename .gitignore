@@ -1,10 +1,9 @@
 *.bin
 *.raw
+*.pem
 dev/
 wiki/
 __pycache__
-_dev.*
-psy*
 nasm.exe
 .vscode/
 shencode_Repository.md

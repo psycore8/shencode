@@ -1,15 +1,16 @@
 # ShenCode
 
-**A versatile tool for working with shellcodes.**
+> **A versatile tool for working with shellcodes.**
 
 ![](shencode-082.png)
 
 ## Features
 
-### Version 0.8.2
+### Version 0.8.3
 
 | Category    | Module        | Description                                    | Docs                                                                      | Refs                                                                                                      |
 | ----------- | ------------- | ---------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `core`      | `download`    | Download remote files                          | [download](https://www.heckhausen.it/shencode/wiki/core/download)         |                                                                                                           |
 | `core`      | `extract`     | Extract a range of bytes from a file           | [extract](https://www.heckhausen.it/shencode/wiki/core/extract)           |                                                                                                           |
 | `core`      | `output`      | Inspect and display files in different formats | [output](https://www.heckhausen.it/shencode/wiki/core/output)             |                                                                                                           |
 | `core`      | `subproc`     | Execute an external subprocess                 | [subproc](https://www.heckhausen.it/shencode/wiki/core/subproc)           |                                                                                                           |
@@ -18,6 +19,7 @@
 | `encoder`   | `alphanum`    | Alphanumeric encoder to avoid null bytes       | [alphanum](https://www.heckhausen.it/shencode/wiki/encoder/alphanum)      |                                                                                                           |
 | `encoder`   | `bytebert`    | Advanced polymorphic encoder                   | [bytebert](https://www.heckhausen.it/shencode/wiki/encoder/bytebert)      |                                                                                                           |
 | `encoder`   | `byteswap`    | New XOR Encryption, Swapping Bytes             | [byteswap](https://www.heckhausen.it/shencode/wiki/encoder/byteswap)      | [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping)                        |
+| `encoder`   | `multicoder`  | Multi-Algorithm encoder                        | [multicoder](https://www.heckhausen.it/shencode/wiki/encoder/multicoder)  |                                                                                                           |
 | `encoder`   | `xor`         | Encode payload with custom XOR key             | [xor](https://www.heckhausen.it/shencode/wiki/encoder/xor)                |                                                                                                           |
 | `encoder`   | `xorpoly`     | Polymorphic x64 in-memory decoder              | [xorpoly](https://www.heckhausen.it/shencode/wiki/encoder/xorpoly)        | [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_polymorphic_in_memory_decoder)       |
 | `inject`    | `dll`         | Inject dll into a process                      | [dll](https://www.heckhausen.it/shencode/wiki/inject/dll)                 |                                                                                                           |
@@ -41,31 +43,23 @@
 git clone https://github.com/psycore8/shencode
 cd shencode
 python -m venv .venv
-source .venv/bin/activate # only Linux
-.venv\bin\activate        # only Windows
+<! ACTIVATE-VENV-SEE-BELOW !>
 pip install .
 shencode -h
 ```
 
+To activate the virtual environment use the following command:
+
+- Windows - `.venv\bin\activate`
+- Linux - `source .venv/bin/activate`
+
 #### General usage
 
-Check out the [ShenCode Docs](https://heckhausen.it/shencode/wiki/) for more information.
+Check out [ShenCode Docs](https://heckhausen.it/shencode/wiki/) and [the starter tutorial](https://heckhausen.it/shencode/wiki/getting-started) for more information.
 
 ## Release Notes
 
-- `general` - Function hashing support
-- `general` - New header
-- `general` - Added a diceware wordlist for jump label obfuscation
-- `general` - Added module description in `--help` output
-- `general` - Dependencies updated
-- `general` - Optimizations, typos, fixes
-- `core/subproc` - Execute a subprocess
-- `core/info` - Dev changes
-- `payload/msfvenom` - Moved to category payload
-- `payload/winexec` - Create a custom WinExec Shellcode with polymorphic features
-- `encoder/alphanum` - Instruction set changes
-- `utils` - Moved assembler instructions to asm.py
-- `utils` - Added ROL hashing
+- `encoder/alphanum` - fixed wrong register in decoder stub
 
 ## References
 

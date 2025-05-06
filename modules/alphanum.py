@@ -27,8 +27,8 @@ def register_arguments(parser):
 
 class module:
     Author          = 'psycore8'
-    #Description     = 'Encode bytes to alphanumeric output'
-    Version         = '0.1.4'
+    #Description     = 'Encode bytes to alphanumeric output' clean
+    Version         = '0.1.5'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
@@ -104,14 +104,14 @@ class module:
         #inst_asm_jmp_cond = ['jz', 'je']
         inst_asm_jmp_ncond = ['jnz', 'jne']
         inst_asm_inc_reg = [
-            f'inc {reg4[0]}',
-            f'add {reg4[0]}, 1',
-            f'lea {reg4[0]}, [{reg5[0]}+1]'
+            f'inc {reg5[0]}',
+            f'add {reg5[0]}, 1',
+            f'lea {reg5[0]}, [{reg5[0]}+1]'
             ]
         inst_asm_dec_reg = [
-            f'dec {reg3[0]}',
-            f'sub {reg3[0]}, 1',
-            f'lea {reg3[0]}, [{reg2[0]}-1]'
+            f'dec {reg2[0]}',
+            f'sub {reg2[0]}, 1',
+            f'lea {reg2[0]}, [{reg2[0]}-1]'
             ]
         
         rc = random.choice
@@ -191,6 +191,9 @@ class module:
     def process(self):
         m = self.msg
         m('pre.head')
+        fn_root, fn_extension = os.path.splitext(self.output)
+        fn_obj = f'{fn_root}.obj'
+        fn_asm = f'{fn_root}.nasm'
         self.load_shellcode()
         if self.decode:
             format_sc = self.shellcode.decode()
@@ -198,19 +201,18 @@ class module:
         else:
             format_sc = ''.join(f'\\x{byte:02x}' for byte in self.shellcode)
             sc = self.to_alphanum(format_sc)
-        #print(sc)
         self.encoded_data = sc
         if self.compile:
             sc = self.gen_x64_stub()
-            with open(self.output, 'wb') as f:
+            with open(fn_asm, 'wb') as f:
                 if isinstance(sc, str):
                     f.write(sc.encode('utf-8'))
                 else:
                     f.write(sc)
-            fn_root, fn_extension = os.path.splitext(self.output)
+            #fn_root, fn_extension = os.path.splitext(self.output)
             #run(f'{self.compiler_cmd} -f win64 {self.output} -o {fn_root}.o')
-            run([self.compiler_cmd, '-f', 'win64', self.output, '-o', f'{fn_root}.o'])
-            sc = get_coff_section(f'{fn_root}.o', '.text')
+            run([self.compiler_cmd, '-f', 'win64', fn_asm, '-o', fn_obj])
+            sc = get_coff_section(fn_obj, '.text')
         if self.relay_output:
             return sc
         else:

@@ -1,0 +1,54 @@
+{
+    "task": {
+        "name": "Getting started example Task",
+        "scheme": "V1",
+        "single_step": null,
+        "modules": {
+            "winexec": {
+                "args": {
+                    "command_line": "cmd /k net user",
+                    "output": "netuser.bin",
+                    "debug": false,
+                    "random_label": false
+                },
+                "input_buffer": false,
+                "return_buffer": false
+            },
+            "alphanum": {
+                "args": {
+                    "input": "netuser.bin",
+                    "output": "netuser_encoded.bin",
+                    "compile": true,
+                    "decode": false
+                },
+                "input_buffer": false,
+                "return_buffer": false
+            },
+            "output": {
+                "args": {
+                    "input": "netuser_encoded.bin",
+                    "syntax": "inspect",
+                    "bytes_per_row": 16,
+                    "decimal": true,
+                    "lines": null,
+                    "no_line_break": false,
+                    "range": [0, 0],
+                    "output": null
+                },
+                "input_buffer": false,
+                "return_buffer": false
+            },
+            "injection": {
+                "args": {
+                    "input": "netuser_encoded.bin",
+                    "process": "winver.exe",
+                    "start_process": true,
+                    "resume_thread": false,
+                    "virtual_protect": false
+                },
+                "input_buffer": false,
+                "return_buffer": false
+            }
+        }
+     }
+}
