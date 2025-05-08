@@ -1,6 +1,6 @@
 ########################################################
 ### MultiCODER Module
-### Status: dev
+### Status: RC
 ### 
 ########################################################
 
@@ -11,11 +11,6 @@ import pickle
 from utils.helper import nstate
 from utils.helper import GetFileInfo
 from utils.const import priv_key, pub_key
-# from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-# from cryptography.hazmat.backends import default_backend
-# from cryptography.hazmat.primitives import padding
-# from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-# from cryptography.hazmat.primitives import hashes
 
 CATEGORY    = 'dev'
 DESCRIPTION = 'En- / Decoder for different algorithms. Supports: AES, Base32, Base64, RSA'
@@ -27,15 +22,9 @@ def register_arguments(parser):
     parser.add_argument('-k', '--key', required=False, default=None, help='If required, set the en- / decryption key')
     parser.add_argument('-o', '--output', required=True, help= 'Output file')
 
-    #rsa = parser.add_argument_group('RSA arguments:')
-    #rsa.add_argument('--gen-keys', action='store_true', default=False, help='Generate a key pair')
-    #rsa.add_argument('--key-file', default='', help='Key to decode')
-    #rsa.add_argument('--priv-key', default='', help='Private key file')
-    #rsa.add_argument('--pub-key', default='', help='Public key file')
-
 class module:
     Author = 'psycore8'
-    Version = '0.0.6'
+    Version = '0.1.0'
     DisplayName = 'MultiC0DER'
     data_size = int
     hash = ''
@@ -49,8 +38,6 @@ class module:
         self.input = input
         self.key = key
         self.output = output
-
-        
 
     def msg(self, message_type, MsgVar=None, ErrorExit=False):
         messages = {

@@ -1,6 +1,6 @@
 ########################################################
 ### feed Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
@@ -23,8 +23,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    #Description = 'obfuscate shellcodes as XML Feed'
-    Version = '2.1.3'
+    Version = '2.1.4'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0
@@ -115,8 +114,6 @@ class module:
 
         xml_str = etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="utf-8")
         return xml_str
-        # with open(self.output_file, "wb") as file:
-        #     file.write(xml_str)
 
     def reassemble_shellcode(self):
         feed = feedparser.parse(self.uri)
@@ -124,8 +121,6 @@ class module:
             pos = entry.id.rfind('/')
             self.shellcode += entry.id[pos + 1:]
         return bytes.fromhex(self.shellcode)
-        # with open(self.output_file, 'wb') as file:
-        #     file.write(out_shellcode)
 
     def output_result(self):
         if self.relay_output:

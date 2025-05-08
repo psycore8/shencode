@@ -1,6 +1,6 @@
 ########################################################
 ### ROLHash Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
@@ -18,8 +18,7 @@ def register_arguments(parser):
 
 class module:
   Author = 'bordergate, psycore8'
-  #Description = 'change ROR13 to ROL encoding in metasploit payloads'
-  Version = '2.1.2'
+  Version = '2.1.3'
   DisplayName = 'ROLLIN-HASH'
   data_size = 0
   hash = ''
@@ -169,13 +168,11 @@ class module:
       self.lookup_functions(dll)
     # Read existing shellcode
     m('proc.input')
-    #print(f"{nstate.OKBLUE} Reading shellcode")
     try: 
       with open(self.input, "rb") as file:
         shellcode = file.read()
     except FileNotFoundError:
         m('error.input', None, True)
-        #print(f"{nstate.FAIL} File not found or cannot be opened.")
  
     new_shellcode = self.process_shellcode(shellcode,int(self.key))
  
@@ -185,21 +182,17 @@ class module:
     modified_shellcode = new_shellcode[:position] + bytes_to_insert + new_shellcode[position:]
    
     m('proc.sizemod', len(modified_shellcode))
-    #print(f"{nstate.OKBLUE} Shellcode size: " + str(len(modified_shellcode)))
     if self.relay:
        m('proc.done')
        return modified_shellcode
     else:
       m('proc.out')
-      #print(f"{nstate.OKBLUE} Writing bytes to file: {self.output}")
       with open(self.output, 'wb') as file:
         file.write(modified_shellcode)
       cf = ospath.isfile(self.output)
       if cf == True:
         m('proc.done')
-        #print(f"{nstate.OKGREEN} encoded shellcode created in {self.output}")
       else:
         m('proc.error')
-        #print(f"{nstate.FAIL} encoded Shellcode error, aborting script execution")
         exit()
       m('post.done')

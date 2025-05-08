@@ -184,7 +184,8 @@
                 "args": {
                     "command_line": "whoami /user",
                     "output": "tests\\0-wex.txt",
-                    "debug": true
+                    "debug": true,
+                    "random_label": false
                 },
                 "input_buffer": false,
                 "return_buffer": false

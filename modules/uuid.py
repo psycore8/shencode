@@ -1,6 +1,6 @@
 ########################################################
 ### UUID Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
@@ -15,8 +15,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    #Description = 'obfuscate shellcodes as UUID strings'
-    Version = '2.2.2'
+    Version = '2.2.3'
     DisplayName = 'UUID-OBF'
     UUID_string = ''
     hash = ''
@@ -49,8 +48,6 @@ class module:
     
     def open_file(self, filename):
         try:
-            # for b in open(filename, 'rb').read():
-            #     self.shellcode += b.to_bytes(1, 'big').hex()
             with open(filename, 'rb') as f:
                 self.shellcode = f.read()
             return True

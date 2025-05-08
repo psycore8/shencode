@@ -1,6 +1,6 @@
 ########################################################
 ### QRCode Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
@@ -19,8 +19,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    #Description = 'obfuscate shellcodes as QR-Codes'
-    Version = '2.1.4'
+    Version = '2.1.5'
     DisplayName = 'QRCODE-OBF'
     hash = ''
     data_size = 0
@@ -51,8 +50,6 @@ class module:
             self.shellcode = self.input_file
         else:
             try:
-                # for b in open(self.input_file, 'rb').read():
-                #     self.shellcode += b.to_bytes(1, 'big').hex()
                 with open(self.input_file, 'rb') as f:
                     self.shellcode = f.read()
                 return True

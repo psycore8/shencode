@@ -1,6 +1,6 @@
 ########################################################
 ### Task Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
@@ -17,9 +17,8 @@ class module:
     import json
     import importlib
     Author = 'psycore8'
-    #Description = 'Create tasks to pipe ShenCode modules'
     DisplayName = 'TASKS'
-    Version = '0.0.7'
+    Version = '0.1.0'
     result = any
 
     def __init__(self, input):

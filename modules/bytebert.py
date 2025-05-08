@@ -1,6 +1,6 @@
 ########################################################
 ### ByteBert Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
@@ -35,8 +35,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    #Description = 'ByteBert - Advanced polymorphic Encoder Stub'
-    Version = '0.3.8'
+    Version = '0.4.0'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -56,10 +55,6 @@ class module:
         self.variable_padding = variable_padding
         self.verbose = verbose
         self.compiler_cmd = nasm
-        # if os_name == 'nt':
-        #     self.compiler_cmd = 'nasm.exe'
-        # elif os_name == 'posix':
-        #     self.compiler_cmd = 'nasm'
 
     def msg(self, message_type, ErrorExit=False, MsgVar=any):
         messages = {
@@ -91,29 +86,6 @@ class module:
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
             exit()
-
-    # def read_coff_text_section(self, filename):
-    #     with open(filename, "rb") as f:
-    #         data = f.read()
-
-    #     # number of sections after DOS Header
-    #     num_sections = struct.unpack_from("<H", data, 2)[0]
-
-    #     # section table at offset 14h without optional header, section table has a length of 40 bytes
-    #     section_offset = 0x14 
-    #     section_size = 40 
-
-    #     for i in range(num_sections):
-    #         section_data = data[section_offset + i * section_size : section_offset + (i + 1) * section_size]
-    #         name = section_data[:8].strip(b"\x00").decode()
-    #         if name == ".text":
-    #             raw_data_offset = struct.unpack_from("<I", section_data, 20)[0]
-    #             raw_data_size = struct.unpack_from("<I", section_data, 16)[0]
-    #             text_data = data[raw_data_offset : raw_data_offset + raw_data_size]
-    #             return text_data
-
-    #     print(".text section not found!")
-    #     return None
 
     def CheckNasm(self)->bool:
         if osp.exists(self.compiler_cmd):
@@ -198,7 +170,6 @@ class module:
                 file.write(data)
 
     def CompileObjectFile(self, nasm_file, obj_file):
-        #run(f'{self.compiler_cmd} -f win64 {self.output} -o {self.OutputFile_Root}.o')
         run([self.compiler_cmd, '-f', 'win64', nasm_file, '-o', obj_file])
         
     def process(self):

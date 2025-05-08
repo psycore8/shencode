@@ -1,6 +1,6 @@
 ########################################################
 ### AES Module
-### Status: migrated to 082
+### Status: cleaned, deprecated, 083
 ### 
 ########################################################
 
@@ -26,8 +26,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    #Description = 'AES encoder for payloads'
-    Version = '2.1.4'
+    Version = '2.1.5'
     DisplayName = 'AES-ENCODER'
     data_size = int
     hash = ''
@@ -104,17 +103,6 @@ class module:
         for i in tqdm (range (100), colour='magenta', leave=False):
             enc_data, salt, iv = self.aes_encrypt(self.data_bytes, self.key)
         self.process_encoded_output(enc_data, salt, iv)
-        # with open(self.output_file, "wb") as f:
-        #     pickle.dump((enc_data, salt, iv), f)
-        # cf = os.path.isfile(self.output_file)
-        # if cf == True:
-        #     self.hash = GetFileHash(self.output_file)
-        #     self.msg('proc.out')
-        #     #print(f"{nstate.OKGREEN} [AES-ENC] file created in {self.output_file}")
-        # else:
-        #     self.msg('error.input', True)
-        #     #print(f"{nstate.FAIL} [AES-ENC] encrption error, aborting script execution")
-        #     #exit()
 
     def decode(self):
         enc_data = b''
@@ -131,16 +119,6 @@ class module:
         for i in tqdm (range (100), colour='magenta', leave=False):
             Shellcode = self.aes_decrypt(enc_data, self.key, salt, iv)
         self.process_decoded_output(Shellcode)
-        # with open(self.output_file, 'wb') as file:
-        #      file.write(Shellcode)
-        # cf = os.path.isfile(self.output_file)
-        # if cf == True:
-        #     self.hash = GetFileHash(self.output_file)
-        #     self.msg('proc.out')
-        #     #print(f"{nstate.OKGREEN} [AES-DEC] file created in {self.output_file}")
-        # else:
-        #     self.msg('error.input', True)
-            #print(f"{nstate.FAIL} [AES-DEC] encrption error, aborting script execution")
 
     def process_encoded_output(self, buffer, salt, iv):
         if self.relay:
@@ -180,20 +158,3 @@ class module:
         else:
             self.msg('error.mode', True)
         self.msg('post.done')
-
-    # def debug():
-    #     aes_encoder.Input_File = 'dev\\aes-debug-plain.txt'
-    #     aes_encoder.Output_File = 'dev\\aes-debug-crypt.txt'
-    #     file_processing = 'dev\\aes-debug-final.txt'
-    #     aes_encoder.Password = b'debugger'
-    #     data = b'SecretText'
-
-    #     crypted_data, salt, iv = aes_encoder.aes_encrypt(data, aes_encoder.Password)
-
-    #     print(f'AES Data: {crypted_data}')
-    #     print(f'AES Salt: {salt}')
-    #     print(f'AES IV: {iv}')
-
-    #     decrypted_data = aes_encoder.aes_decrypt(crypted_data, aes_encoder.Password, salt, iv)
-
-    #     print(f'AES Plaim: {decrypted_data}')

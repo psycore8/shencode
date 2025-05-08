@@ -1,6 +1,6 @@
 ########################################################
 ### Extract Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ###
 ########################################################
 
@@ -24,11 +24,9 @@ def register_arguments(parser):
     dpc.add_argument('-so', '--start-offset', help='begin extraction from this offset')
     dpc.add_argument('-eo', '--end-offset', help='extract until here')
 
-
 class module:
     Author =      'psycore8'
-    #Description = 'extract shellcode from/to offset'
-    Version =     '2.1.5'
+    Version =     '2.1.6'
     DisplayName = 'BYTE-XTRACT0R'
     hash = ''
     data_size = 0
@@ -86,8 +84,6 @@ class module:
     def process(self):
         self.msg('pre.head')
         self.msg('proc.input_try')
-        #
-        # short_fn = os_path.basename(self.input)
         try:
             with open(self.input, "rb") as file:
                 shellcode = file.read()

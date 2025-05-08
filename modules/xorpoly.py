@@ -1,6 +1,6 @@
 ########################################################
 ### AES Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
@@ -16,17 +16,14 @@ DESCRIPTION = 'Polymorphic XOR encoder'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for XOR stub')
-    #parser.add_argument('-o', '--output', help= 'Outputfile for XOR stub')
     parser.add_argument('-k', '--key', type=int, help='Key for XOR stub')
 
     grpout = parser.add_argument_group('output')
     grpout.add_argument('-o', '--output', help= 'Output file or buffer for XORPOLY encoding')
-    #grpout.add_argument('-r', '--relay', choices=relay.relay_options, help='Relay to module')
 
 class module:
     Author = 'psycore8'
-    #Description = 'create payload from a raw file, encode with xor, add to xor stub'
-    Version = '2.1.3'
+    Version = '2.1.4'
     DisplayName = 'X0RP0LY-ENC'
     shellcode = b''
     xored_shellcode = b''
@@ -40,11 +37,6 @@ class module:
        self.output_file = output
        self.template_file = f'{tpl_path}xor-stub.tpl'
        self.xor_key = key
-       #self.relay_command = relay_command
-    #    with open(self.input_file, 'rb') as file:
-    #       self.shellcode = file.read()
-    #    if relay_command != None:
-    #       self.relay = True
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
@@ -62,15 +54,10 @@ class module:
             'proc.try'       : f'{nstate.s_note} Try to append shellcode',
             'proc.key'       : f'{nstate.s_note} Changing key to {self.xor_key}',
             'proc.stats'     : f'{nstate.s_note} Shellcode size: {len(self.shellcode)} bytes'
-            #'proc.verbose'   : f'\n{self.out}\n'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
             exit()
-
-    # def LoadInputFile(self):
-    #    with open(self.input_file, 'rb') as file:
-    #       self.shellcode = file.read()
 
     def LoadHeader(self):
         with open(self.template_file, "rb") as file:
@@ -83,19 +70,12 @@ class module:
     def AppendShellcode(self):
         self.shellcode += self.xored_shellcode
 
-    # def replace_bytes_at_offset(data, offset, new_bytes):
-    #     data = bytearray(data)
-    #     data[offset] = new_bytes
-    #     data.append(int(new_bytes))
-    #     return bytes(data)
-
     def WriteToFile(self):
       outputfile = self.output_file #xor.Output_File
       with open(outputfile, 'wb') as file:
         file.write(self.shellcode)
 
     def process(self):
-        #Offset = 5
         self.msg('pre.head')
         xor_enc = xormod('', '', 0, False, 'encode')
         self.xored_shellcode = xor_enc.xor_crypt_bytes(self.shellcode, self.xor_key)
@@ -132,7 +112,6 @@ class module:
         else:
            self.msg('post.done')
            print('\n')
-           #relay.start_relay(self.relay_command, self.shellcode)
            return self.shellcode
         self.msg('post.done')
 

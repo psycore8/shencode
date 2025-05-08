@@ -1,6 +1,6 @@
 ########################################################
 ### Download Module
-### Status: dev
+### Status: RC
 ###
 ########################################################
 
@@ -8,7 +8,7 @@ import requests
 from utils.helper import nstate, GetFileInfo
 from tqdm import tqdm
 
-CATEGORY    = 'dev'
+CATEGORY    = 'core'
 DESCRIPTION = 'Download files'
 
 def register_arguments(parser):

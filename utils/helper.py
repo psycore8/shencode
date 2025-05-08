@@ -2,43 +2,6 @@ from utils.hashes import sha1
 from os import name, path, rename, stat
 import re
 
-# def prepare_str_to_stack(string_to_convert, register_name):
-#     hasPadding = False
-#     str_list = []
-#     b = string_to_convert.encode('utf-8')
-
-#     # 8-Byte padding
-#     orig_len = len(b)
-#     padd_len = (8 - orig_len % 8) % 8
-
-#     if padd_len:
-#         b += b'\x11' * padd_len
-#         hasPadding = True
-    
-#     #if len(b) % 8 != 0:
-#         #b = b + b'\x11' * (8 - len(b) % 8)
-
-#     # 8-Byte chunks
-#     chunks = [b[i:i+8] for i in range(0, len(b), 8)]
-
-#     for chunk in reversed(chunks):
-#         word = int.from_bytes(chunk, byteorder='little')
-#         if hasPadding:
-#             pbits = padd_len * 8
-#             str_list += [
-#                 f'mov {register_name}, 0x{word:08x}            ; {chunk.decode()}', 
-#                 f'shl {register_name}, {pbits}', 
-#                 f'shr {register_name}, {pbits}',
-#                 f'push {register_name}'
-#                 ]
-#             hasPadding = False
-#         else:
-#             str_list += [
-#                 f'mov {register_name}, 0x{word:08x}            ; {chunk.decode()}',
-#                 f'push {register_name}'
-#                 ]
-#     return str_list
-
 def CheckFile(file):
     cf = path.isfile(file)
     if cf:
@@ -108,28 +71,6 @@ class nstate:
         print(messages.get(mtype, 'Unknown Message'))
 
 class FileCheck:
-
-    # def __init__(self):
-    #     self = self
-
-    # # https://stackoverflow.com/a/39988702
-    # def convert_bytes(self, num):
-    #     """
-    #     this function will convert bytes to MB.... GB... etc
-    #     """
-    #     for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-    #         if num < 1024.0:
-    #             return f'{num: 1f} {x}'
-    #             #return "%3.1f %s" % (num, x)
-    #         num /= 1024.0
-
-    # def file_size(self, file_path):
-    #     """
-    #     this function will return the file size
-    #     """
-    #     if path.isfile(file_path):
-    #         file_info = stat(file_path)
-    #         return convert_bytes(file_info.st_size)
 
     def CheckWrittenFile(file, module_message):
         cf = path.isfile(file)
