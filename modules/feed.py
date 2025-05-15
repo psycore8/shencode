@@ -6,6 +6,10 @@
 
 import datetime
 import feedparser
+import random
+import urllib.parse
+from datetime import timedelta
+from utils.const import *
 from lxml import etree
 from utils.helper import nstate as nstate
 from utils.helper import GetFileInfo, CheckFile
@@ -23,7 +27,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.1.4'
+    Version = '2.2.0'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0
@@ -69,6 +73,28 @@ class module:
                 return True
             except FileNotFoundError:
                 return False
+            
+    def generate_fake_title(self):
+        diceware_dict = {}
+        title_raw = []
+        with open(f'{resource_dir}wordlist_en_eff.txt', 'r') as file:
+            for line in file:
+                key, value = line.strip().split(maxsplit=1)
+                diceware_dict[key] = value
+        title_length = random.randint(2, 10)
+        for i in range(1, title_length):
+            dice_roll = ''.join(str(random.randint(1, 6)) for _ in range(5))
+            word = diceware_dict.get(dice_roll, 'Nothing found')
+            title_raw.append(word)
+        return ' '.join(title_raw)
+    
+    def generate_fake_date(self):
+        start_date = datetime.date(2016, 1, 1)
+        end_date   = datetime.date.today()
+        difference = (end_date - start_date).days
+        random_days = random.randint(0, difference)
+        random_date = start_date + timedelta(days=random_days)
+        return random_date
 
     def convert_bytes_to_fake_id(self, block_size=16):
         s = self.shellcode.encode('utf-8')
@@ -100,14 +126,20 @@ class module:
         # Entries
         i = 1
         for id in self.feed_fake_ids:
+            title = self.generate_fake_title()
+            date = self.generate_fake_date()
+            h = random.randint(0, 23)
+            m = random.randint(0, 59)
+            time = f'{h:02}:{m:02}'
             entry = etree.SubElement(root, 'entry')
             entry_title = etree.SubElement(entry, 'title', attrib={'type': 'html'})
-            entry_title.text = f'Title {i}'
-            entry_link = etree.SubElement(entry, 'link', attrib={'href': f'{self.feed_fake_uri}0{i}/02/title{i}', 'rel': 'alternate', 'type': 'text/html', 'title': 'Title 1'})
+            #entry_title.text = f'Title {i}'
+            entry_title.text = title
+            entry_link = etree.SubElement(entry, 'link', attrib={'href': f'{self.feed_fake_uri}0{i}/{random.randint(1, 31)}/{urllib.parse.quote(title)}', 'rel': 'alternate', 'type': 'text/html', 'title': title})
             entry_published = etree.SubElement(entry, 'published')
-            entry_published.text = f'{date_time}'
+            entry_published.text = f'{date} {time}'
             entry_updated = etree.SubElement(entry, 'updated')
-            entry_updated.text = f'{date_time}'
+            entry_updated.text = f'{date} {time}'
             entry_id = etree.SubElement(entry, 'id')
             entry_id.text = f'{self.feed_fake_uri}{id.decode('utf-8')}' # 16 bytes part of shellcode
             i += 1
