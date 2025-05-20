@@ -8,6 +8,10 @@
 
 ### Version 0.8.3
 
+#### General usage
+
+Check out [ShenCode Docs](https://heckhausen.it/shencode/wiki/) and [the starter tutorial](https://heckhausen.it/shencode/wiki/getting-started) for more information.
+
 | Category    | Module        | Description                                    | Docs                                                                      | Refs                                                                                                      |
 | ----------- | ------------- | ---------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | `core`      | `download`    | Download remote files                          | [download](https://www.heckhausen.it/shencode/wiki/core/download)         |                                                                                                           |
@@ -53,13 +57,18 @@ To activate the virtual environment use the following command:
 - Windows - `.venv\bin\activate`
 - Linux - `source .venv/bin/activate`
 
-#### General usage
-
-Check out [ShenCode Docs](https://heckhausen.it/shencode/wiki/) and [the starter tutorial](https://heckhausen.it/shencode/wiki/getting-started) for more information.
-
 ## Release Notes
 
+- `general` - Task file for starters tutorial 
+- `core/download `- Download module for different protocols 
+- `core/formatout` - deleted module
+- `encoder/aes` - marked as deprecated
 - `encoder/alphanum` - fixed wrong register in decoder stub
+- `encoder/bytebert` - outputs nasm file, object file and final output file now
+- `encoder/byteswap` - marked as deprecated
+- `encoder/multicoder `- Encoder module for different encoding techniques
+- `obfuscate/feed` - randomized title, date and URL parts
+- `payload/winexec` - enhanced shellcode randomness 
 
 ## References
 
