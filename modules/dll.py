@@ -1,6 +1,6 @@
 ########################################################
 ### DLL Inject Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
@@ -23,7 +23,6 @@ class module:
     import wmi, threading
     from time import sleep
     Author = 'psycore8'
-    #Description = 'DLL Injection Module'
     Version = '0.1.4'
     DisplayName = 'DLL-INJECTION'
     mem = any

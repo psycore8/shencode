@@ -1,13 +1,11 @@
 ########################################################
 ### MSFVenom Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ###
 ########################################################
 
-#import utils.arg
 from utils.helper import nstate
 from utils.const import msfvenom_path
-#from utils.helper import GetFileHash, CheckFile
 import subprocess
 
 CATEGORY    = 'payload'
@@ -18,8 +16,7 @@ def register_arguments(parser):
 
 class module:
   Author        = 'psycore8'
-  #Description   = 'Generate payloads with metasploit'
-  Version       = '2.1.2'
+  Version       = '2.1.3'
   DisplayName   = 'MSF-VENOM'
   Args          = []
   

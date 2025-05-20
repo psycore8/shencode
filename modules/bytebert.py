@@ -1,6 +1,6 @@
 ########################################################
 ### ByteBert Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
@@ -35,14 +35,12 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    #Description = 'ByteBert - Advanced polymorphic Encoder Stub'
-    Version = '0.3.7'
+    Version = '0.4.0'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
     Shellcode_Length = 0
     Modified_Shellcode = ''
-    OutputFile_Root = ''
     key = 0
     stub_size = 0
     data_size = 0
@@ -57,10 +55,6 @@ class module:
         self.variable_padding = variable_padding
         self.verbose = verbose
         self.compiler_cmd = nasm
-        # if os_name == 'nt':
-        #     self.compiler_cmd = 'nasm.exe'
-        # elif os_name == 'posix':
-        #     self.compiler_cmd = 'nasm'
 
     def msg(self, message_type, ErrorExit=False, MsgVar=any):
         messages = {
@@ -69,20 +63,20 @@ class module:
             'proc.ssize'    : f'{nstate.s_note} ASM script generated with a size of {self.stub_size} bytes',
             'proc.rkey'     : f'{nstate.s_note} Random key: {self.key} ({hex(self.key)})',
             'error.input'   : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'  : f'{nstate.s_fail} File {self.output} not found or cannot be opened.',
+            'error.output'  : f'{nstate.s_fail} File {MsgVar} not found or cannot be opened.',
             'proc.psize'    : f'{nstate.s_note} Payload size: {self.Shellcode_Length}',
             'proc.xor_ok'   : f'{nstate.s_ok} Encoded payload appended!',
-            'proc.out'      : f'{nstate.s_ok} File created in {self.output}\n{nstate.s_note} Hash: {self.hash}',
+            'proc.out'      : f'{nstate.s_ok} File created in {MsgVar}\n{nstate.s_note} Hash: {self.hash}',
             'proc.comp_try' : f'{nstate.s_note} Try to compile object file',
             'proc.input_ok' : f'{nstate.s_ok} File {self.input} loaded\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
-            'proc.compile'  : f'{nstate.s_ok} File {self.OutputFile_Root}.o created\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
+            'proc.compile'  : f'{nstate.s_ok} File {MsgVar} created\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
             'proc.ext'      : f'{nstate.s_info} Extract .text section from object file',
             'proc.fsize'    : f'{nstate.s_info} Final shellcode size: {MsgVar} bytes',
             'error.xor_ok'  : f"{nstate.s_fail} XOR encoded Shellcode error, aborting script execution",
             'error.nasm1'   : f'{nstate.s_fail} nasm.exe not found! Download and place it into the shencode directory: {nstate.f_link}https://nasm.us/{nstate.f_end}',
             'key.try'       : f'{nstate.s_info} Bruteforcing XOR key',
             'error.key'     : f'{nstate.s_fail} \\x00 detected! Proceeding with random key',
-            'error.nasm2'   : f'{nstate.s_info} You can compile it by hand: nasm.exe -f win64 {self.output} -o {self.OutputFile_Root}.o',
+            'error.nasm2'   : f'{nstate.s_info} You can compile it by hand: nasm.exe -f win64 {MsgVar}',
             # Verbose
             'v.registers'   : f'{nstate.s_info} Selected registers: {MsgVar}',
             'v.inst'        : f'{nstate.s_info} {MsgVar}',
@@ -92,29 +86,6 @@ class module:
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
             exit()
-
-    # def read_coff_text_section(self, filename):
-    #     with open(filename, "rb") as f:
-    #         data = f.read()
-
-    #     # number of sections after DOS Header
-    #     num_sections = struct.unpack_from("<H", data, 2)[0]
-
-    #     # section table at offset 14h without optional header, section table has a length of 40 bytes
-    #     section_offset = 0x14 
-    #     section_size = 40 
-
-    #     for i in range(num_sections):
-    #         section_data = data[section_offset + i * section_size : section_offset + (i + 1) * section_size]
-    #         name = section_data[:8].strip(b"\x00").decode()
-    #         if name == ".text":
-    #             raw_data_offset = struct.unpack_from("<I", section_data, 20)[0]
-    #             raw_data_size = struct.unpack_from("<I", section_data, 16)[0]
-    #             text_data = data[raw_data_offset : raw_data_offset + raw_data_size]
-    #             return text_data
-
-    #     print(".text section not found!")
-    #     return None
 
     def CheckNasm(self)->bool:
         if osp.exists(self.compiler_cmd):
@@ -198,13 +169,15 @@ class module:
             with open(filename, 'w') as file:
                 file.write(data)
 
-    def CompileObjectFile(self):
-        self.OutputFile_Root, output_file_extension = osp.splitext(self.output)
-        #run(f'{self.compiler_cmd} -f win64 {self.output} -o {self.OutputFile_Root}.o')
-        run([self.compiler_cmd, '-f', 'win64', self.output, '-o', f'{self.OutputFile_Root}.o'])
+    def CompileObjectFile(self, nasm_file, obj_file):
+        run([self.compiler_cmd, '-f', 'win64', nasm_file, '-o', obj_file])
         
     def process(self):
         self.msg('pre.head')
+
+        fn_Root, output_file_extension = osp.splitext(self.output)
+        fn_nasm = f'{fn_Root}.nasm'
+        fn_obj = f'{fn_Root}.obj'
 
         if not self.relay_input and CheckFile(self.input):
             self.LoadShellcode()
@@ -217,20 +190,20 @@ class module:
         self.LoadHeader()
         self.ConvertShellCodeToStr()
         self.AppendShellcode()
-        self.WriteToFile(self.Modified_Shellcode, self.output)
-        if CheckFile(self.output):
-            self.data_size, self.hash = GetFileInfo(self.output)
-            self.msg('proc.out')
+        self.WriteToFile(self.Modified_Shellcode, fn_nasm)
+        if CheckFile(fn_nasm):
+            self.data_size, self.hash = GetFileInfo(fn_nasm)
+            self.msg('proc.out', False, f'{fn_nasm}')
         else:
-            self.msg('error.output', True)
+            self.msg('error.output', True, f'{fn_nasm}')
         if self.CheckNasm():
             self.msg('proc.comp_try')
-            self.CompileObjectFile()
-            if CheckFile(f'{self.OutputFile_Root}.o'):
-                self.data_size, self.hash = GetFileInfo(f'{self.OutputFile_Root}.o')
-                self.msg('proc.compile')
+            self.CompileObjectFile(fn_nasm, fn_obj)
+            if CheckFile(fn_obj):
+                self.data_size, self.hash = GetFileInfo(fn_obj)
+                self.msg('proc.compile', False, f'{fn_obj}')
                 self.msg('proc.ext')
-                final_shellcode = get_coff_section(f'{self.OutputFile_Root}.o', '.text')
+                final_shellcode = get_coff_section(fn_obj, '.text')
                 self.msg('proc.fsize', False, len(final_shellcode))
                 if self.relay_output:
                     self.msg('post.done')
@@ -240,7 +213,7 @@ class module:
                     self.msg('post.done')
         else:
             self.msg('error.nasm1')
-            self.msg('error.nasm2')
+            self.msg('error.nasm2', True, f'{fn_nasm} -o {fn_obj}')
 
     def generate_win64_stub(self):
         vi = variable_instruction_set()
@@ -285,10 +258,10 @@ class module:
             self.msg('v.size', False, f'{sc_size}')
         
         stub64 = f"""
-                    section .data
+            section .data
 
-                    section .text
-                        global _start
+            section .text
+                global _start
 
                     _start:
                         {rc(inst_asm_reg_zero)} {reg1[0]}, {reg1[0]}

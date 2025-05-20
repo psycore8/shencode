@@ -1,13 +1,12 @@
 ########################################################
 ### Meterpreter Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ###
 ########################################################
 
 from utils.helper import nstate as nstate
 from utils.windef import *
 from utils.winconst import *
-#from utils.helper import CheckFile, GetFileHash
 from time import sleep
 import socket
 import struct
@@ -27,8 +26,7 @@ def register_arguments(parser):
 class module:
     
     Author          = 'raptor@0xdeadbeef.info, psycore8'
-    #Description     = 'Connect back (reverse_tcp) to remote host and receive a stage'
-    Version         = '1.2.3'
+    Version         = '1.2.4'
     DisplayName      = 'METERPRETER-STAGER'
     payload         = any
     payload_size    = int

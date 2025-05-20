@@ -1,6 +1,6 @@
 ########################################################
 ### Output Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
@@ -11,9 +11,7 @@ CATEGORY    = 'core'
 DESCRIPTION = 'Output and inspect binaries in different formats'
 
 def register_arguments(parser):
-      #parser.add_argument('-i', '--input', help='Input file for formatted output')
       parser.add_argument('-i', '--input', help='Input file or buffer for formatted output')
-      #parser.add_argument('-it', '--input-type', choices=['file', 'buffer'], default='file', help='Specify input type')
       parser.add_argument('-s', '--syntax', choices=['c','casm','cs','ps1','py','hex','inspect'], help='formatting the shellcode in C, Casm, C#, Powershell, python or hex')
 
       src = parser.add_argument_group('formatting')
@@ -29,9 +27,8 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    #Description = 'create formatted output by filename'
     DisplayName = 'MODOUT'
-    Version = '0.2.1'
+    Version = '0.2.2'
     file_bytes = bytes
     offset_color = nstate.clLIGHTMAGENTA
     cFile = False

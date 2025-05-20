@@ -1,14 +1,12 @@
 ########################################################
 ### Injection Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
 import os
-#import subprocess
 from utils.windef import *
 from utils.winconst import *
-
 from utils.helper import nstate
 from utils.helper import CheckFile, GetFileInfo
 
@@ -31,8 +29,7 @@ class module:
     import threading
 
     Author = 'cpu0x00, psycore8'
-    #Description = 'Inject shellcode to process'
-    Version = '2.1.4'
+    Version = '2.1.5'
     DisplayName = 'INJECTION'
     delay = 5
     data_size = 0
@@ -75,11 +72,9 @@ class module:
 
     def Start_Process(self):
         self.msg('inj.run')
-        #subprocess.Popen([self.target_process], creationflags=subprocess.DETACHED_PROCESS)
         os.system(self.target_process)
 
     def get_proc_id(self):
-        #print(self.target_process)
         processes = self.wmi.WMI().Win32_Process(name=self.target_process)
         self.pid = processes[0].ProcessId
         self.msg('inj.pid')
@@ -89,9 +84,6 @@ class module:
         if self.process_start:
             s = self.threading.Thread(target=self.Start_Process)
             s.start()
-            #self.Start_Process()
-            #print('x')
-            #subprocess.Popen([self.target_process], creationflags=subprocess.DETACHED_PROCESS)
             self.sleep(3)
 
         process_id = self.get_proc_id()

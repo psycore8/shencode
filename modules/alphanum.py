@@ -27,8 +27,7 @@ def register_arguments(parser):
 
 class module:
     Author          = 'psycore8'
-    #Description     = 'Encode bytes to alphanumeric output'
-    Version         = '0.1.4'
+    Version         = '0.1.6'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
@@ -41,10 +40,6 @@ class module:
             self.decode = decode
             self.compile = compile
             self.compiler_cmd = nasm
-            # if os.name == 'nt':
-            #     self.compiler_cmd = 'nasm.exe'
-            # elif os.name == 'posix':
-            #     self.compiler_cmd = 'nasm'
 
     def msg(self, message_type, ErrorExit=False, MsgVar=str):
         messages = {
@@ -66,7 +61,6 @@ class module:
     def to_alphanum(self, encoded_shellcode):
         self.msg('note', False, 'Encoder running...')
         alphanum_shellcode = ''
-        #for i in tqdm (range (100), colour='magenta', leave=False):
         for hex_byte in tqdm.tqdm (encoded_shellcode.split('\\x')[1:], colour='magenta'):
             num = int(hex_byte, 16)
             high = (num >> 4) + 0x41  # A-Z (65-90)
@@ -84,13 +78,12 @@ class module:
         for i in range(0, len(alphanum_shellcode), 2):
             high_char, low_char = alphanum_shellcode[i], alphanum_shellcode[i + 1]
 
-            # Validierungsprüfung der Zeichen
             if not ('A' <= high_char <= 'Z') or not ('a' <= low_char <= 'p'):
                 raise ValueError(f'Char combination not valid: {high_char}{low_char}')
 
             high = ord(high_char) - 0x41  # A-Z → High-Nibble
             low = ord(low_char) - 0x61    # a-p → Low-Nibble
-            decoded_byte = (high << 4) | low  # Zusammensetzen des Bytes
+            decoded_byte = (high << 4) | low
 
             decoded_bytes.append(decoded_byte)
 
@@ -121,7 +114,6 @@ class module:
         asm_inc_reg     = random.choice(inst_asm_inc_reg)
         asm_dec_reg     = random.choice(inst_asm_dec_reg)
 
-        ### Check logic, bytes/2 -> seems ok -> 2 chars = 1 byte
         size = len(self.encoded_data)//2
         if size <= 255:
            sc_size = f'mov {reg2[3]}, {size}'
@@ -191,6 +183,9 @@ class module:
     def process(self):
         m = self.msg
         m('pre.head')
+        fn_root, fn_extension = os.path.splitext(self.output)
+        fn_obj = f'{fn_root}.obj'
+        fn_asm = f'{fn_root}.nasm'
         self.load_shellcode()
         if self.decode:
             format_sc = self.shellcode.decode()
@@ -198,19 +193,16 @@ class module:
         else:
             format_sc = ''.join(f'\\x{byte:02x}' for byte in self.shellcode)
             sc = self.to_alphanum(format_sc)
-        #print(sc)
         self.encoded_data = sc
         if self.compile:
             sc = self.gen_x64_stub()
-            with open(self.output, 'wb') as f:
+            with open(fn_asm, 'wb') as f:
                 if isinstance(sc, str):
                     f.write(sc.encode('utf-8'))
                 else:
                     f.write(sc)
-            fn_root, fn_extension = os.path.splitext(self.output)
-            #run(f'{self.compiler_cmd} -f win64 {self.output} -o {fn_root}.o')
-            run([self.compiler_cmd, '-f', 'win64', self.output, '-o', f'{fn_root}.o'])
-            sc = get_coff_section(f'{fn_root}.o', '.text')
+            run([self.compiler_cmd, '-f', 'win64', fn_asm, '-o', fn_obj])
+            sc = get_coff_section(fn_obj, '.text')
         if self.relay_output:
             return sc
         else:

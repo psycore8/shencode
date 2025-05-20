@@ -1,6 +1,6 @@
 ########################################################
 ### Start Subprocess Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ###
 ########################################################
 
@@ -15,8 +15,7 @@ def register_arguments(parser):
 
 class module:
     Author =      'psycore8'
-    #Description = 'Helper module to execute a subprocess'
-    Version =     '0.0.2'
+    Version =     '0.1.0'
     DisplayName = 'SUBPR0CESS'
     hash = ''
     data_size = 0

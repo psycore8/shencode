@@ -52,6 +52,15 @@
                 "input_buffer": false,
                 "return_buffer": false
             },
+            "download": {
+                "args": {
+                    "output": "tests\\0-dl.iso",
+                    "protocol": "http",
+                    "uri": "https://www.nosociety.de/cfe2e896-c087-41ce-a3ed-65b242f849ab.tmp"
+                },
+                "input_buffer": false,
+                "return_buffer": false
+            },
             "extract": {
                 "args": {
                     "input": "tests\\calc.raw",
@@ -86,7 +95,7 @@
                 "input_buffer": false,
                 "return_buffer": false
             },
-            "bypass": {
+            "msfvenom": {
                 "args": {
                     "remote_host": "127.0.0.1",
                     "remote_port": 8501,
@@ -97,6 +106,17 @@
                 "input_buffer": false,
                 "return_buffer": true
                 },
+            "multicoder": {
+                "args": {
+                    "input": "tests\\calc.raw",
+                    "output": "tests\\0-rsa_encoded.mc",
+                    "mode": "encode",
+                    "algorithm": "rsa",
+                    "key": "shenpa$$"
+                },
+                "input_buffer": false,
+                "return_buffer": false
+            },
             "ntinjection": {
                 "args": {
                     "input": "tests\\calc.raw",
@@ -164,7 +184,8 @@
                 "args": {
                     "command_line": "whoami /user",
                     "output": "tests\\0-wex.txt",
-                    "debug": true
+                    "debug": true,
+                    "random_label": false
                 },
                 "input_buffer": false,
                 "return_buffer": false

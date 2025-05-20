@@ -1,6 +1,6 @@
 ########################################################
 ### Info Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ###
 ########################################################
 
@@ -24,8 +24,7 @@ class module:
     import utils.header as header
     from os import listdir, path
     Author = 'psycore8'
-    #Description = 'Info'
-    Version = '0.0.7'
+    Version = '0.1.0'
     DisplayName = 'SHENCODE-DEViNFO'
     mod_dir = module_dir
     mod_count = 0
@@ -77,30 +76,22 @@ class module:
         self.msg('pre.head')
         self.msg('version')
         self.msg('banner')
-        #print(self.function_hash)
         if self.function_hash != None:
-            #value_to_hash = self.function_hash.lower().encode('ascii') + b'\x00'
             print(f"[DEBUG] Eingabewert: {self.function_hash}")
-            #print(self.function_hash.encode().hex())
             fh = FunctionHash()
             hash_r = fh.ror_hash(self.function_hash, 13)
-            #hash_l = FunctionHash.rol_hash(self.function_hash, 13)
             print(f'[ROR13] {self.function_hash} : {hex(hash_r)}')
-            #print(f'[ROL13] {self.function_hash} : 0x{hash_l:08X}')
             exit()
         if self.prep_str != None:
             stack_list = vi.prepare_str_to_stack(self.prep_str)
-            #print(f"push 0x{stack_str:08x}")
             for stack_string in stack_list:
                 print(stack_string)
             exit()
         self.get_mod_count()
         self.msg('mods')
         self.msg('modules')
-        #self.msg('out', f'nasm:'.ljust(40) + f'{nasm}')
         m('fout', None, 'nasm:', f'{nasm}')
         m('fout', None, 'Resource dir:', f'{resource_dir}')
-        #self.msg('out', f'Resource directory:'.ljust(40) + f'{resource_dir}')
         self.msg('template')
         self.msg('msf')
         self.msg('repo')

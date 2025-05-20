@@ -7,10 +7,12 @@ from utils.const import *
 class variable_instruction_set:
     import random
 
-    def __init__(self):
+    def __init__(self, whitespaces=0):
         self = self
+        self.whitespaces = whitespaces
 
     register_set_zero = ['xor', 'sub']
+    test_condition = ['test', 'or']
     jump_conditional_positive = ['jz', 'je']  
     jump_conditional_negative = ['jnz', 'jne']
     multi_bit_registers = [
@@ -27,6 +29,15 @@ class variable_instruction_set:
     ]
     hash_algorithm = [ 'rol', 'ror']
 
+    def zero_register(self, register_name):
+        ws = ' ' * self.whitespaces
+        instruction_set = [
+            f'xor {register_name}, {register_name}',
+            f'sub {register_name}, {register_name}',
+            f'mov {register_name}, 0xFFFFFFFFFFFFFFFF\n{ws}add {register_name}, 1'
+        ]
+        return self.random.choice(instruction_set)
+
     def increase_register(self, register_name, value=1):
         instruction_set = [
             f'inc {register_name}',
@@ -41,6 +52,15 @@ class variable_instruction_set:
             f'sub {register_name}, {value}',
             f'lea {register_name}, [{register_name} - {value}]'
             ]
+        return self.random.choice(instruction_set)
+    
+    def jump_instruction(self, jump_target):
+        ws = ' ' * self.whitespaces
+        instruction_set = [
+            f'jmp {jump_target}',
+            f'call {jump_target}'
+            #f'mov {jump_register}, {jump_target}\n{ws}push {jump_register}\n{ws}ret'
+        ]
         return self.random.choice(instruction_set)
     
     def generate_jump_label(self):

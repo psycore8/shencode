@@ -1,6 +1,6 @@
 ########################################################
 ### PSOverwrite Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ###
 ########################################################
 
@@ -26,8 +26,7 @@ class STARTUPINFOEX(ctypes.Structure):
 
 class module:
         Author = 'psycore8'
-        #Description = 'Process_Overwrite Module, depends on https://github.com/hasherezade/process_overwriting'
-        Version = '0.1.4'
+        Version = '0.1.5'
         DisplayName = 'PROCESS-OVERWRITE'
         pid = 0
         attr_list = any

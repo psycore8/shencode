@@ -1,6 +1,6 @@
 ########################################################
 ### AES Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
@@ -11,7 +11,7 @@ from utils.binary import replace_bytes_at_offset
 from os import path as osp
 
 CATEGORY    = 'encoder'
-DESCRIPTION = 'Polymorphic encoder stub'
+DESCRIPTION = '(Deprecated) Polymorphic encoder stub'
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file or buffer to use with byteswap stub')
@@ -20,8 +20,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    #Description = 'create payload from a raw file, encode with byteswap-xor, add to byteswap stub'
-    Version = '2.1.3'
+    Version = '2.1.4'
     DisplayName = 'BYTESWAP-ENC'
     Shellcode = ''
     Shellcode_Length = 0
@@ -52,9 +51,7 @@ class module:
             'proc.stub'      : f'{nstate.s_note} Try to load stub from {self.template_file}',
             'proc.try'       : f'{nstate.s_note} Try to append shellcode',
             'proc.key'       : f'{nstate.s_note} Changing key to {self.xor_key} and patching length',
-            #'proc.offsets'   : f'{nstate.s_note}'
             'proc.stats'     : f'{nstate.s_note} Shellcode size: {len(self.Shellcode)} bytes'
-            #'proc.verbose'   : f'\n{self.out}\n'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
@@ -89,12 +86,6 @@ class module:
         self.Modified_Shellcode += self.encrypt(self.Shellcode, int(self.xor_key))
         size = len(self.Modified_Shellcode)
         print(f'{nstate.OKBLUE} XORed payload added, size of shellcode {size} bytes')
-
-    # def replace_bytes_at_offset(self, data, offset, new_bytes):
-    #     data = bytearray(data)
-    #     data[offset] = new_bytes
-    #     data.append(int(new_bytes))
-    #     return bytes(data)
 
     def WriteToFile(self):
       with open(self.output, 'wb') as file:

