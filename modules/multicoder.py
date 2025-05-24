@@ -12,7 +12,7 @@ from utils.helper import nstate
 from utils.helper import GetFileInfo
 from utils.const import priv_key, pub_key
 
-CATEGORY    = 'dev'
+CATEGORY    = 'encoder'
 DESCRIPTION = 'En- / Decoder for different algorithms. Supports: AES, Base32, Base64, RSA'
 
 def register_arguments(parser):
