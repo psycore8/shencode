@@ -29,7 +29,7 @@ class module:
     import threading
 
     Author = 'cpu0x00, psycore8'
-    Version = '2.1.5'
+    Version = '2.1.6'
     DisplayName = 'INJECTION'
     delay = 5
     data_size = 0
@@ -54,9 +54,9 @@ class module:
             'proc.input_try' : f'{nstate.s_note} Try to open file {self.input}',
             'proc.try'       : f'{nstate.s_note} Try to execute shellcode',
             'inj.run'        : f'{nstate.s_note} starting {self.target_process}',
-            'inj.pid'        : f'{nstate.s_ok} {self.target_process} process id: {self.pid}',
-            'inj.handle'     : f'{nstate.s_ok} Opened a Handle to the process',
-            'inj.alloc'      : f'{nstate.s_ok} Allocated Memory in the process',
+            'inj.pid'        : f'{nstate.s_note} {self.target_process} process id: {self.pid}',
+            'inj.handle'     : f'{nstate.s_note} Opened a Handle to the process',
+            'inj.alloc'      : f'{nstate.s_note} Allocated Memory in the process',
             'inj.write'      : f'{nstate.s_ok} Wrote The shellcode to memory',
             'inj.nacc'       : f'{nstate.s_note} VirtualProtectEx: PAGE_NO_ACCESS',
             'inj.susp'       : f'{nstate.s_note} CreateRemoteThread: START_SUSPENDED',

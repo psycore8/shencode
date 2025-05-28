@@ -35,7 +35,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.4.0'
+    Version = '0.4.1'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -304,8 +304,10 @@ class module:
                   """
         
         if self.variable_padding:
+            nop = vi.nop_instruction()
             paddy = stub64.split('\n')
-            noppy = '                        nop'
+            spacer = ' ' * 24
+            noppy = f'{spacer}{nop}'
             random_noppy_index = random.randint(6, len(paddy)-2)
             paddy.insert(random_noppy_index, noppy)
             stub64_paddy = '\n'.join(paddy)
