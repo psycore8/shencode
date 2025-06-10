@@ -4,6 +4,7 @@
 ### 
 ########################################################
 
+from keystone import *
 from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileHash
 
@@ -12,7 +13,7 @@ DESCRIPTION = 'Output and inspect binaries in different formats'
 
 def register_arguments(parser):
       parser.add_argument('-i', '--input', help='Input file or buffer for formatted output')
-      parser.add_argument('-s', '--syntax', choices=['c','casm','cs','ps1','py','hex','inspect'], help='formatting the shellcode in C, Casm, C#, Powershell, python or hex')
+      parser.add_argument('-s', '--syntax', choices=['asm','c','casm','cs','ps1','py','hex','inspect'], help='formatting the shellcode in C, Casm, C#, Powershell, python or hex')
 
       src = parser.add_argument_group('formatting')
       src.add_argument('-b', '--bytes-per-row', required=False, default=16, type=int, help='Define how many bytes per row will be displayed', metavar='INT')
@@ -28,11 +29,23 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     DisplayName = 'MODOUT'
-    Version = '0.2.2'
+    Version = '0.2.3'
     file_bytes = bytes
     offset_color = nstate.clLIGHTMAGENTA
     cFile = False
+    shell_path = '::core::output'
 
+    arglist = {
+        'input':            None,
+        'syntax':           '',
+        'bytes_per_row':    16,
+        'decimal':          False,
+        'highlight':        None,
+        'lines':            False,
+        'range':            [None, None], 
+        'no_line_break':    False,
+        'output':           None
+    }
 
     def __init__(self, input=any, syntax=str, bytes_per_row=int, decimal=bool, highlight=None, lines=bool, range=[None, None], no_line_break=bool, output=None):
         self.input = input
@@ -142,6 +155,13 @@ class module:
             self.file_bytes = self.input
         else:
             self.msg('error.input', True)
+        if self.syntax == 'asm':
+            try:
+                ks = Ks(KS_ARCH_X86, KS_MODE_64)
+                self.file_bytes, count = ks.asm(self.file_bytes)
+                print(f'{self.file_bytes} // {count}')
+            except KsError as e:
+                print("ERROR: %s" %e)
         self.msg('process')
         output, size = self.GenerateOutput()
         if not self.output == None:
@@ -155,6 +175,15 @@ class module:
         self.msg('post.done')
         
     lang = {
+        'asm': {
+            'code_begin':   '',
+            'byte_sep':     '\\x',
+            'row_prefix':   '',
+            'row_suffix':   '\n',
+            'row_cut':      None,
+            'code_add':     '',
+            'code_cut':     None
+        },
         'c': {
             'code_begin':   '',
             'byte_sep':     '\\x',
