@@ -1,6 +1,6 @@
 ########################################################
 ### Download Module
-### Status: RC
+### Status: migrated 084
 ###
 ########################################################
 
@@ -11,20 +11,27 @@ from tqdm import tqdm
 CATEGORY    = 'core'
 DESCRIPTION = 'Download files'
 
+arglist ={
+    'output':               { 'value': None, 'desc': 'Output file' },
+    'protocol':             { 'value': None, 'desc': 'Download protocol: http' },
+    'uri':                  { 'value': None, 'desc': 'URI to file' }
+}
+
 def register_arguments(parser):
-    parser.add_argument('-o', '--output', required=True, help= 'Output file')
-    parser.add_argument('-p', '--protocol', choices=['http'], required=True, help='Download protocol')
-    parser.add_argument('-u', '--uri', required=True, help='URI to file')
+    parser.add_argument('-o', '--output', required=True, help=arglist['output']['desc'])
+    parser.add_argument('-p', '--protocol', choices=['http'], required=True, help=arglist['protocol']['desc'])
+    parser.add_argument('-u', '--uri', required=True, help=arglist['uri']['desc'])
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.0'
+    Version = '0.1.1'
     DisplayName = 'D0WNL04D3R'
     data_size = int
     hash = ''
     data_bytes = bytes
     #relay_input = False
     relay_output = False
+    shell_path = '::core::download'
 
     def __init__(self, output, protocol, uri):
         self.output = output

@@ -8,9 +8,11 @@
 ########################################################################
 
 from utils.args import parse_arguments
+import utils.args
 from utils.helper import nstate as nstate
 from utils.const import *
 import utils.header
+import utils.interactive
 #import utils.helper
 import importlib
 import json
@@ -28,6 +30,8 @@ if arguments.config != None:
 def main(command_line=None):
   if config != None:
      argd = config
+  elif arguments.interactive:
+     utils.interactive.interactive_mode()
   else:
     argd = arguments.__dict__
   mod = importlib.import_module(f'modules.{argd['command']}')

@@ -39,7 +39,9 @@ def load_modules():
 
 def create_parser():
     parser = argparse.ArgumentParser(description='dynamic module parser', formatter_class=FixedWidthHelpFormatter)
+    #group = parser.add_mutually_exclusive_group()
     parser.add_argument('--config', help='load a json config file')
+    parser.add_argument('--interactive', action='store_true', help='Interactive mode (experimental)')
     subparsers = parser.add_subparsers(dest='module', required=True, help='Available modules')
 
     modules_by_category = load_modules()

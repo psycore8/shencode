@@ -1,6 +1,6 @@
 ########################################################
 ### Output Module
-### Status: cleaned, 083
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -11,43 +11,55 @@ from utils.helper import CheckFile, GetFileHash
 CATEGORY    = 'core'
 DESCRIPTION = 'Output and inspect binaries in different formats'
 
+arglist = {
+    'input':            { 'value': None, 'desc': 'Input file or buffer for formatted output' },
+    'syntax':           { 'value': '', 'desc': 'Formatting the shellcode in C, Casm, C#, Powershell, python or hex' },
+    'bytes_per_row':    { 'value': 16, 'desc': 'Define how many bytes per row will be displayed' },
+    'decimal':          { 'value': False, 'desc': 'Output decimal offsets instead of hex' },
+    'highlight':        { 'value': None, 'desc': 'Highlights bytes' },
+    'lines':            { 'value': False, 'desc': 'Adds a line numbering after each 8 bytes' },
+    'range':            { 'value': [0,0], 'desc': 'Set a range of bytes to output: <start> <end>' },
+    'no_line_break':    { 'value': False, 'desc': 'No line break during output' },
+    'output':           { 'value': None, 'desc': 'Save output to file' }
+}
+
 def register_arguments(parser):
-      parser.add_argument('-i', '--input', help='Input file or buffer for formatted output')
-      parser.add_argument('-s', '--syntax', choices=['asm','c','casm','cs','ps1','py','hex','inspect'], help='formatting the shellcode in C, Casm, C#, Powershell, python or hex')
+      parser.add_argument('-i', '--input', help=arglist['input']['desc'])
+      parser.add_argument('-s', '--syntax', choices=['asm','c','casm','cs','ps1','py','hex','inspect'], help=arglist['syntax']['desc'])
 
       src = parser.add_argument_group('formatting')
-      src.add_argument('-b', '--bytes-per-row', required=False, default=16, type=int, help='Define how many bytes per row will be displayed', metavar='INT')
-      src.add_argument('-hl', '--highlight', default=None, help='highlights bytes')
-      src.add_argument('-n', '--no-line-break', action='store_true', default=False, help='no line break during output')
-      src.add_argument('-r', '--range', nargs=2, default=[0, 0], type=int, help='Set a range of bytes to output: <start> <end>')
+      src.add_argument('-b', '--bytes-per-row', required=False, default=16, type=int, help=arglist['bytes_per_row']['desc'] , metavar='INT')
+      src.add_argument('-hl', '--highlight', default=None, help=arglist['highlight']['desc'])
+      src.add_argument('-n', '--no-line-break', action='store_true', default=False, help=arglist['no_line_break']['desc'])
+      src.add_argument('-r', '--range', nargs=2, default=[0, 0], type=int, help=arglist['range']['desc'])
 
       grp = parser.add_argument_group('additional')
-      grp.add_argument('-d', '--decimal', action='store_true', required=False, default=False, help='Output decimal offsets instead of hex')
-      grp.add_argument('-l', '--lines', action='store_true', default=False, help='adds a line numbering after each 8 bytes')
-      grp.add_argument('-o', '--output', required=False, type=str, default=None, help='save output to file')
+      grp.add_argument('-d', '--decimal', action='store_true', required=False, default=False, help=arglist['decimal']['desc'])
+      grp.add_argument('-l', '--lines', action='store_true', default=False, help=arglist['lines']['desc'])
+      grp.add_argument('-o', '--output', required=False, type=str, default=None, help=arglist['output']['desc'])
 
 class module:
     Author = 'psycore8'
     DisplayName = 'MODOUT'
-    Version = '0.2.3'
+    Version = '0.2.4'
     file_bytes = bytes
     offset_color = nstate.clLIGHTMAGENTA
     cFile = False
     shell_path = '::core::output'
 
-    arglist = {
-        'input':            None,
-        'syntax':           '',
-        'bytes_per_row':    16,
-        'decimal':          False,
-        'highlight':        None,
-        'lines':            False,
-        'range':            [None, None], 
-        'no_line_break':    False,
-        'output':           None
-    }
+    # arglist = {
+    #     'input':            { 'val': None, 'dt': str },
+    #     'syntax':           { 'val': '', 'dt': str },
+    #     'bytes_per_row':    { 'val': 16, 'dt': int },
+    #     'decimal':          { 'val': False, 'dt': bool },
+    #     'highlight':        { 'val': None, 'dt': bool },
+    #     'lines':            { 'val': False, 'dt': bool },
+    #     'range':            { 'val': [None, None], 'dt': list }, 
+    #     'no_line_break':    { 'val': False, 'dt': bool },
+    #     'output':           { 'val': None, 'dt': str }
+    # }
 
-    def __init__(self, input=any, syntax=str, bytes_per_row=int, decimal=bool, highlight=None, lines=bool, range=[None, None], no_line_break=bool, output=None):
+    def __init__(self, input=any, syntax=str, bytes_per_row=int, decimal=bool, highlight=None, lines=bool, range=[0, 0], no_line_break=bool, output=None):
         self.input = input
         self.syntax = syntax
         self.lines = lines

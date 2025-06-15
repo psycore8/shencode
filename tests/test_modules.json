@@ -19,7 +19,8 @@
                     "input": "tests\\calc.raw",
                     "output": "tests\\0-sc.an",
                     "decode": false,
-                    "compile": true
+                    "compile": true,
+                    "variable_padding": true
                 },
                 "input_buffer": false,
                 "return_buffer": false

@@ -1,6 +1,6 @@
 ########################################################
 ### Alphanum Module
-### Status: migrated to 082
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -17,23 +17,32 @@ from subprocess import run
 CATEGORY    = 'encoder'
 DESCRIPTION = 'Encode bytes to alphanumeric output'
 
+arglist = {
+    'input':                { 'value': None,    'desc': 'Input file to use' },
+    'output':               { 'value': None,    'desc': 'Output file to use' },
+    'decode':               { 'value': False,   'desc': 'Decode the input to bytes' },
+    'compile':              { 'value': False,   'desc': 'Compile object file and extract shellcode' },
+    'variable_padding':     { 'value': False,   'desc': 'Inserts a random NOP to differ the padding' },
+}
+
 def register_arguments(parser):
-            parser.add_argument('-i', '--input', help='Input file to use')
-            parser.add_argument('-o', '--output', help='Output file to use')
+            parser.add_argument('-i', '--input', help=arglist['input']['desc'])
+            parser.add_argument('-o', '--output', help=arglist['output']['desc'])
 
             add = parser.add_argument_group('Additional')
-            add.add_argument('-c', '--compile', default=False, action='store_true' ,help='Compile object file and extract shellcode')
-            add.add_argument('-d', '--decode', default=False, action='store_true' ,help='Decode the input to bytes')
-            add.add_argument('-v', '--variable-padding', action='store_true', help='Inserts a random NOP to differ the padding')
+            add.add_argument('-c', '--compile', default=False, action='store_true' ,help=arglist['compile']['desc'])
+            add.add_argument('-d', '--decode', default=False, action='store_true' ,help=arglist['decode']['desc'])
+            add.add_argument('-v', '--variable-padding', action='store_true', help=arglist['variable_padding']['desc'])
 
 class module:
     Author          = 'psycore8'
-    Version         = '0.1.7'
+    Version         = '0.1.8'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
     relay_input     = False
     relay_output    = False
+    shell_path      = '::encoder::alphanum'
 
     def __init__(self, input, output, decode=False, compile=False, variable_padding=False):
             self.input = input

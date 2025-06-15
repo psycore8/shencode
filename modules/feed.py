@@ -1,6 +1,6 @@
 ########################################################
 ### feed Module
-### Status: cleaned, 083
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -17,36 +17,43 @@ from utils.helper import GetFileInfo, CheckFile
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Obfuscate shellcodes as XML Feed'
 
+arglist = {
+    'input':            { 'value': None, 'desc': 'Input file for feed encoding' },
+    'output':           { 'value': None, 'desc': 'Output file for feed encoding' },
+    'uri':              { 'value': None, 'desc': 'URI to fake feed' },
+    'reassemble':       { 'value': False, 'desc': 'Reassemble fake feed to Shellcode' },
+    'feed_author':      { 'value': None, 'desc': 'Author of your fake feed' },
+    'feed_title':       { 'value': None, 'desc': 'Title of your fake feed' },
+    'feed_subtitle':    { 'value': None, 'desc': 'Subtitle of your fake feed' },
+    'feed_uri':         { 'value': None, 'desc': 'URI of your fake feed' }
+}
+
 def register_arguments(parser):
-    parser.add_argument('-i', '--input', help='Input file for feed encoding')
-    parser.add_argument('-o', '--output', help='Output file for feed encoding')
+    parser.add_argument('-i', '--input', help=arglist['input']['desc'])
+    parser.add_argument('-o', '--output', help=arglist['output']['desc'])
 
     grp = parser.add_argument_group('additional')
-    grp.add_argument('-r', '--reassemble', action='store_true', help='Reassemble fake feed to Shellcode')
-    grp.add_argument('-u', '--uri', help='URI to fake feed')
+    grp.add_argument('-r', '--reassemble', action='store_true', help=arglist['reassemble']['desc'])
+    grp.add_argument('-u', '--uri', help=arglist['uri']['desc'])
 
     fs = parser.add_argument_group('feed settings')
-    fs.add_argument('-fa', '--feed-author', default=None, help='Author of your fake feed')
-    fs.add_argument('-ft', '--feed-title', default=None, help='Title of your fake feed')
-    fs.add_argument('-fs', '--feed-subtitle', default=None, help='Subtitle of your fake feed')
-    fs.add_argument('-fu', '--feed-uri', default=None, help='URI of your fake feed')
+    fs.add_argument('-fa', '--feed-author', default=None, help=arglist['feed_author']['desc'])
+    fs.add_argument('-ft', '--feed-title', default=None, help=arglist['feed_title']['desc'])
+    fs.add_argument('-fs', '--feed-subtitle', default=None, help=arglist['feed_subtitle']['desc'])
+    fs.add_argument('-fu', '--feed-uri', default=None, help=arglist['feed_uri']['desc'])
 
 
 class module:
     Author = 'psycore8'
-    Version = '2.2.1'
+    Version = '2.2.2'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0
-
-    # feed_fake_uri = 'https://www.microloft.com/'
-    # feed_fake_title = 'Developer News'
-    # feed_fake_subtitle = 'The latest developer news from microloft.com'
-    # feed_fake_author = 'Bill Ports'
     feed_fake_ids = []
     shellcode = ''
     relay_input = False
     relay_output = False
+    shell_path = '::obfuscate::feed'
 
     def __init__(self, input, output, uri, reassemble, feed_author, feed_title, feed_subtitle, feed_uri):
         self.input_file = input

