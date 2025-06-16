@@ -44,7 +44,7 @@ setup(
         'pycparser==2.22',
         'pypng==0.20220715.0',
         'qrcode==8.2',
-        'requests==2.32.3',
+        'requests==2.32.4',
         'setuptools==80.9.0',
         'sgmllib3k==1.0.0',
         'tqdm',
