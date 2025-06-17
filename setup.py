@@ -31,7 +31,7 @@ setup(
     ],
     install_requires=[
         'capstone==5.0.6',
-        'certifi==2025.4.26',
+        'certifi==2025.6.15',
         'cffi==1.17.1',
         'charset-normalizer==3.4.2',
         'colorama==0.4.6',
