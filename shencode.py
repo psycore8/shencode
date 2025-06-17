@@ -38,6 +38,7 @@ def main(command_line=None):
   del argd['config']
   del argd['module']
   del argd['command']
+  del argd['interactive']
   class_init = mod.module(**argd)
   class_init.process()
 

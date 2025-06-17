@@ -1,6 +1,6 @@
 ########################################################
 ### Extract Module
-### Status: cleaned, 083
+### Status: migrated 084
 ###
 ########################################################
 
@@ -12,31 +12,42 @@ import struct
 CATEGORY    = 'core'
 DESCRIPTION = 'Extract bytes or sections from PE files'
 
+arglist = {
+    'input':                { 'value': None, 'desc': 'Input file for extract module'},
+    'output':               { 'value': None, 'desc': 'Output file with extracted bytes'},
+    'extract_range':        { 'value': [0,0], 'desc': 'Defines the range to extract, takes 2 arguments: -e 100 150'},
+    #'start_offset':         { 'value': None, 'desc': 'Begin extraction from this offset'},
+    #'end_offset':           { 'value': None, 'desc': 'Extract until here'},
+    'extract_section':      { 'value': None, 'desc': 'Extract a section from exe, dll, obj'}
+}
+
 def register_arguments(parser):
-    parser.add_argument('-i', '--input', help='Input file for extract module')
-    parser.add_argument('-o', '--output', help='Output file with extracted bytes')
+    parser.add_argument('-i', '--input', help=arglist['input']['desc'])
+    parser.add_argument('-o', '--output', help=arglist['output']['desc'])
 
     exd = parser.add_argument_group('Extract data')
-    exd.add_argument('-e', '--extract-range', nargs=2, default=[0, 0], type=int, help='Defines the range to extract, takes 2 arguments: -e 100 150')
-    exd.add_argument('-s', '--extract-section', help='Extract a section from exe, dll, obj')
+    exd.add_argument('-e', '--extract-range', nargs=2, default=[0, 0], help=arglist['extract_range']['desc'])
+    exd.add_argument('-s', '--extract-section', help=arglist['extract_section']['desc'])
 
-    dpc = parser.add_argument_group('Deprecated, will be removed in a future release')
-    dpc.add_argument('-so', '--start-offset', help='begin extraction from this offset')
-    dpc.add_argument('-eo', '--end-offset', help='extract until here')
+    #dpc = parser.add_argument_group('Deprecated, will be removed in a future release')
+    #dpc.add_argument('-so', '--start-offset', help='')
+    #dpc.add_argument('-eo', '--end-offset', help='')
 
 class module:
     Author =      'psycore8'
-    Version =     '2.1.6'
+    Version =     '2.2.0'
     DisplayName = 'BYTE-XTRACT0R'
     hash = ''
     data_size = 0
+    shell_path = '::core::extract'
 
-    def __init__(self, input, output, extract_range, start_offset, end_offset, extract_section=None):
+    #def __init__(self, input, output, extract_range, start_offset, end_offset, extract_section=None):
+    def __init__(self, input, output, extract_range=[0, 0], extract_section=None):
         self.input = input
         self.output = output
         self.extract_range = extract_range
-        self.start_offset = start_offset
-        self.end_offset = end_offset
+        #self.start_offset = start_offset
+        #self.end_offset = end_offset
         self.extract_section = extract_section
 
     def msg(self, message_type, ErrorExit=False):
@@ -49,7 +60,7 @@ class module:
             'proc.output_ok' : f'{nstate.s_ok} File {self.output} created\n{nstate.s_ok} Size {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
             'proc.input_try' : f'{nstate.s_note} Try to open file {self.input}',
             'proc.output_try': f'{nstate.s_note} Writing to file...',
-            'proc.try'       : f'{nstate.s_note} Try to extract bytes from 0x{self.start_offset} to 0x{self.end_offset}',
+            #'proc.try'       : f'{nstate.s_note} Try to extract bytes from 0x{self.start_offset} to 0x{self.end_offset}',
             'proc.try2'       : f'{nstate.s_note} Try to extract bytes from {self.extract_range[0]} to {self.extract_range[1]}',
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
@@ -78,7 +89,7 @@ class module:
                 section_buffer = data[raw_data_offset : raw_data_offset + raw_data_size]
                 return section_buffer
 
-        print(".text section not found!")
+        print(f'{section_name} section not found!')
         return None
 
     def process(self):
@@ -92,12 +103,15 @@ class module:
         except FileNotFoundError:
             self.msg('error.input', True)
         if self.extract_section == None:
-            if self.start_offset != None and self.end_offset != None:
-                self.msg('proc.try')
-                shellcode_new = shellcode[int(self.start_offset):int(self.end_offset)]
-            elif self.extract_range[0] > -1 and self.extract_range[1] > 0:
+            #if self.start_offset != None and self.end_offset != None:
+                #self.msg('proc.try')
+                #shellcode_new = shellcode[int(self.start_offset):int(self.end_offset)]
+            if isinstance(self.extract_range, str): pass
+            bytes_from = self.extract_range[0]
+            bytes_until = self.extract_range[1]
+            if bytes_from > -1 and bytes_until > 0:
                 self.msg('proc.try2')
-                shellcode_new = shellcode[int(self.extract_range[0]):int(self.extract_range[1])]
+                shellcode_new = shellcode[bytes_from:bytes_until]
         else:
             shellcode_new = self.extract_section_from_file(self.input, self.extract_section)
         self.msg('proc.output_try')

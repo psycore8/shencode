@@ -67,8 +67,6 @@
                     "input": "tests\\calc.raw",
                     "output": "tests\\0-ext.txt",
                     "extract_range": [10,40],
-                    "start_offset": 0,
-                    "end_offset": 0,
                     "extract_section": null
                 },
                 "input_buffer": false,
@@ -143,9 +141,8 @@
             },
             "psoverwrite": {
                 "args": {
-                    "payload": "tests\\msgbox.exe",
-                    "target": "C:\\windows\\system32\\svchost.exe",
-                    "nocfg": true
+                    "payload": "tests\\msgbox2.exe",
+                    "target": "C:\\windows\\system32\\svchost.exe"
                 },
                 "input_buffer": false,
                 "return_buffer": false

@@ -1,6 +1,6 @@
 ########################################################
 ### MSFVenom Module
-### Status: cleaned, 083
+### Status: migrated 084
 ###
 ########################################################
 
@@ -11,15 +11,20 @@ import subprocess
 CATEGORY    = 'payload'
 DESCRIPTION = 'Generate payloads with msfvenom'
 
+arglist = {
+   'command_line':      { 'value': None, 'desc': 'Msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"' }
+}
+
 def register_arguments(parser):
-      parser.add_argument('-c', '--command-line', help='msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"')
+      parser.add_argument('-c', '--command-line', help=arglist['command_line']['desc'])
 
 class module:
   Author        = 'psycore8'
-  Version       = '2.1.3'
+  Version       = '2.1.4'
   DisplayName   = 'MSF-VENOM'
   Args          = []
-  
+  shell_path    = '::payload::msfvenom'
+
   def __init__(self, command_line):
     self.command_line = command_line
     self.msfvenom_path = msfvenom_path

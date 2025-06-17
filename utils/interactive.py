@@ -5,6 +5,11 @@ from utils.const import *
 from utils.helper import nstate
 from os import path, get_terminal_size, listdir
 
+#import readline
+#import rlcompleter
+#readline.parse_and_bind("tab: complete")
+
+
 help_list = {
     'asm':      { 'desc': 'Assemble shellcode instructions: asm "nop; mov ecx, 1"' },
     'exit':     { 'desc': 'Exit ShenCode' },
@@ -44,6 +49,11 @@ def command_parser(command):
     elif split_cmd[0] == 'exit':
         exit()
 
+    # elif split_cmd[0] == 'info':
+    #     args = { 'get': True, 'modlist': True, 'function_hash': '', 'interactive': False, 'prep_str': None }
+    #     load_mod('info')
+        
+
     elif split_cmd[0] == 'list':
         for file in listdir(module_dir):
             if file.endswith(".py") and not file.startswith("__"):
@@ -72,9 +82,13 @@ def command_parser(command):
         mod.process()
 
     elif split_cmd[0] == 'set':
-        evaluated_data = split_cmd[2]
-        arg_list[split_cmd[1]]['value'] = evaluated_data
-        print(f'{split_cmd[1].upper()} set to {split_cmd[2]}')
+        cmd = ' '.join(split_cmd).replace(f'set {split_cmd[1]} ', '')
+        try:
+            evaluated_data = eval_data_types(cmd)
+            arg_list[split_cmd[1]]['value'] = evaluated_data
+            print(f'{split_cmd[1].upper()} set to {cmd}')
+        except KeyError:
+            print(f'{split_cmd[1]} is not a valid field')
 
     else:
         print(f'Sorry, {split_cmd[0]} is unknown...')
@@ -82,7 +96,12 @@ def command_parser(command):
 
 def eval_data_types(user_input):
     #key_data_type = ast.literal_eval(arg_list.get(json_key))
-    result = ast.literal_eval(user_input)
+    try:
+        result = ast.literal_eval(user_input)
+    except Exception as e:
+        print(f'DEBUG: an error has occured, during type evaluation: {e}')
+        result = user_input
+    #print(result)
     return result
     # if isinstance(data, key_data_type):
     #     return 
