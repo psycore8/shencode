@@ -24,7 +24,7 @@ def register_arguments(parser):
 
 class module:
         Author = 'psycore8'
-        Version = '0.2.0'
+        Version = '0.2.1'
         DisplayName = 'PROCESS-OVERWRITE'
         pid = 0
         attr_list = any
@@ -166,7 +166,7 @@ class module:
                 m('error')
                 m('merror', 'CreateProcess failed', True)
 
-            m(f'CreateProcess successful! PID: {pi.dwProcessId}')
+            m('mok', f'CreateProcess successful! PID: {pi.dwProcessId}')
             kernel32.DeleteProcThreadAttributeList(attr_list)
 
             base_address = self.get_remote_base_address(pi.hProcess)

@@ -106,6 +106,12 @@ class aes_worker:
         )
         return kdf.derive(password)
     
+    def generate_key_iv_salt(self, password):
+        salt = self.urandom(16)
+        iv = self.urandom(16)
+        key = self.generate_key(password, salt)
+        return key, iv, salt
+    
     def aes_encrypt(self, data: bytes, password: bytes):
         salt = self.urandom(16)
         iv = self.urandom(16)

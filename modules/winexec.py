@@ -1,6 +1,6 @@
 ########################################################
 ### WinExec Shellcode Module
-### Status: migrated to 082
+### Status: migrated 084
 ###
 ### DiceWare wordlist: https://github.com/ulif/diceware/blob/master/diceware/wordlists/wordlist_en_eff.txt
 ###
@@ -18,23 +18,31 @@ import os
 CATEGORY    = 'payload'
 DESCRIPTION = 'Generate a dynamic WinExec shellcode'
 
+arglist = {
+    'command_line':     { 'value': None, 'desc': 'Command to execute with WinExec' },
+    'debug':            { 'value': False, 'desc': 'Save nasm code only' },
+    'output':           { 'value': None, 'desc': 'Output file' },
+    'random_label':     { 'value': False, 'desc': 'Replace jump labels with random words' }
+}
+
 def register_arguments(parser):
-    parser.add_argument('-c', '--command-line', required=True, help='Command to execute with WinExec')
-    parser.add_argument('-o', '--output', required=True, help='Output file')
+    parser.add_argument('-c', '--command-line', required=True, help=arglist['command_line']['desc'])
+    parser.add_argument('-o', '--output', required=True, help=arglist['output']['desc'])
     opt = parser.add_argument_group('additional')
-    opt.add_argument('-d', '--debug', action='store_true', default=False, help='Save nasm code only')
+    opt.add_argument('-d', '--debug', action='store_true', default=False, help=arglist['debug']['desc'])
     #opt.add_argument('-n', '--no-comment', action='store_true', default=False, help='No comments in nasm file')
-    opt.add_argument('-r', '--random-label', action='store_true', default=False, help='Replace jump labels with random words')
+    opt.add_argument('-r', '--random-label', action='store_true', default=False, help=arglist['random_label']['desc'])
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.2'
+    Version = '0.1.3'
     DisplayName = 'WinEXEC'
     opcode = ''
     size = 0
     hash = ''
     relay_input = False
     relay_output = False
+    shell_path = '::payload::winexec'
 
     def __init__(self, command_line, debug, output, random_label):
         self.command_line = command_line
