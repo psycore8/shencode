@@ -112,7 +112,7 @@ class module:
          self.msg('proc.header')
 
     def process(self):
-        if self.aes != '':
+        if self.aes != ['', '']:
              aes_key = self.aes[0]
              aes_iv = self.aes[1]
              print(f'{aes_key} - {aes_iv}')

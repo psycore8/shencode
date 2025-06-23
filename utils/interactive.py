@@ -1,5 +1,6 @@
 import ast
 import importlib
+import json
 from keystone import *
 from utils.crypt import aes_worker
 from utils.const import *
@@ -18,15 +19,16 @@ print('For error reporting use https://github.com/psycore8/shencode')
 cmd = ''
 
 help_list = {
-    'aeskey':   { 'desc': 'Generate an AES key, iv and salt: aeskey password' },
-    'asm':      { 'desc': 'Assemble shellcode instructions: asm "nop; mov ecx, 1"' },
-    'exit':     { 'desc': 'Exit ShenCode' },
-    'help':     { 'desc': 'List available commands' },
-    'list':     { 'desc': 'List available modules' },
-    'load':     { 'desc': 'Load a module' },
-    'options':  { 'desc': 'List module options' },
-    'run':      { 'desc': 'Run module' },
-    'set':      { 'desc': 'Set module options' }
+    'aeskey':       { 'desc': 'Generate an AES key, iv and salt: aeskey password' },
+    'asm':          { 'desc': 'Assemble shellcode instructions: asm "nop; mov ecx, 1"' },
+    'config':       { 'desc': 'Save or restore module configuration (overwrites old configs): config save/restore' },
+    'exit':         { 'desc': 'Exit ShenCode' },
+    'help':         { 'desc': 'List available commands' },
+    'list':         { 'desc': 'List available modules' },
+    'load':         { 'desc': 'Load a module' },
+    'options':      { 'desc': 'List module options' },
+    'run':          { 'desc': 'Run module' },
+    'set':          { 'desc': 'Set module options' }
 }
 
 auto_complete = []
@@ -40,15 +42,18 @@ imods = {
     'stager':       [ 'meterpreter', 'sliver' ]
 }
 
-def completer(text, state):
-    options = [cmd for cmd in x if cmd.startswith(text)]
-    if state < len(options):
-        return options[state]
-    else:
-        return None
+append_keywords = [ 'save', 'restore' ]
+
+# def completer(text, state):
+#     options = [cmd for cmd in x if cmd.startswith(text)]
+#     if state < len(options):
+#         return options[state]
+#     else:
+#         return None
 
 arg_list = {}
 loaded_module = None
+loaded_module_name = None
 
 left_just = 25
 shell_prefix = 'shencode'
@@ -61,6 +66,8 @@ style = styles.Style.from_dict({
 })
 
 def command_parser(command):
+    global arg_list, loaded_module_name
+    #print(f'DEBUG: {arg_list}')
     split_cmd = command.split(' ')
     if split_cmd[0] == 'help':
         print('\n')
@@ -77,6 +84,26 @@ def command_parser(command):
         except KsError as e:
             print("ERROR: %s" %e)
 
+    elif split_cmd[0] == 'config':
+        if split_cmd[1] == 'save':
+            if loaded_module != None:
+                fn = f'{json_dir}{loaded_module_name}.json'
+                with open(fn, 'w') as f:
+                    #f.write(arg_list)
+                    json.dump(arg_list, f, ensure_ascii=False, indent=4)
+            else:
+                print('No module loaded. Use the load command before.')
+        elif split_cmd[1] == 'restore':
+            if loaded_module != None:
+                fn = f'{json_dir}{loaded_module_name}.json'
+                with open(fn, 'r') as f:
+                    #arg_list = f.read()
+                    arg_list = json.load(f)
+            else:
+                print('No module loaded. Use the load command before.')
+        else:
+            print('The given argument was not recognized, use save or restore.')
+
     elif split_cmd[0] == 'exit':
         exit()
         
@@ -90,6 +117,7 @@ def command_parser(command):
     elif split_cmd[0] == 'load':
         #if path.exists(module_dir)
         load_mod(split_cmd[1])
+        loaded_module_name = split_cmd[1]
 
     elif split_cmd[0] == 'options':
         size = get_terminal_size()
@@ -119,10 +147,12 @@ def command_parser(command):
 
     elif split_cmd[0] == 'aeskey':
         aw = aes_worker()
-        key, iv, salt = aw.generate_key_iv_salt(split_cmd[1].encode('utf-8'))
-        print(f'Key: {key.decode('utf-8')}')
+        #key, iv, salt = aw.generate_key_iv_salt(split_cmd[1].encode('utf-8'))
+        key = aw.generate_password(32)
+        iv = aw.generate_password(16)
+        print(f'Key: {key}')
         print(f'IV: {iv}')
-        print(f'Salt: {salt}')
+        #print(f'Salt: {salt}')
 
     else:
         print(f'Sorry, {split_cmd[0]} is unknown...')
@@ -132,7 +162,7 @@ def eval_data_types(user_input):
     try:
         result = ast.literal_eval(user_input)
     except Exception as e:
-        print(f'DEBUG: an error has occured, during type evaluation: {e}')
+        #print(f'DEBUG: an error has occured, during type evaluation: {e}')
         result = user_input
     return result
         
@@ -148,6 +178,8 @@ def load_mod(module):
         loaded_module = importlib.import_module(f'{module_dir}.{module}')
         shell_infix = loaded_module.module.shell_path
         arg_list = loaded_module.arglist
+        for item in append_keywords:
+            auto_complete.append(item)
         for arg in arg_list:
             auto_complete.append(arg)
         for module in imods:
@@ -159,6 +191,8 @@ def load_mod(module):
 def interactive_mode():
     prompt_text = HTML('<prompt>Befehl&gt; </prompt>')
     if loaded_module == None:
+        for item in append_keywords:
+            auto_complete.append(item)
         for item in help_list:
             auto_complete.append(item)
         for module in imods:

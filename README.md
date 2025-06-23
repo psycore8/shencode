@@ -6,7 +6,17 @@
 
 ## Features
 
-### Version 0.8.3
+ShenCode is a framework for developing, analyzing and testing shellcodes. It comes with 3 operating modes:
+
+- Argument mode
+	- `shencode core output -i file.raw -s inspect`
+- [[getting-started#Interactive|Interactive mode]]
+	- `shencode$ load output`
+	- `shencode::core::output$`
+- [[task|Task mode]]
+	- Automate modules in different steps with `json`
+
+### Version 0.8.4
 
 #### General usage
 
@@ -19,7 +29,6 @@ Check out [ShenCode Docs](https://heckhausen.it/shencode/wiki/) and [the starter
 | `core`      | `output`      | Inspect and display files in different formats | [output](https://www.heckhausen.it/shencode/wiki/core/output)             |                                                                                                           |
 | `core`      | `subproc`     | Execute an external subprocess                 | [subproc](https://www.heckhausen.it/shencode/wiki/core/subproc)           |                                                                                                           |
 | `core`      | `task`        | Execute tasks to automate ShenCode             | [task](https://www.heckhausen.it/shencode/wiki/core/task)                 |                                                                                                           |
-| `encoder`   | `aes`         | Encrypt with AES                               | [aes](https://www.heckhausen.it/shencode/wiki/encoder/aes)                |                                                                                                           |
 | `encoder`   | `alphanum`    | Alphanumeric encoder to avoid null bytes       | [alphanum](https://www.heckhausen.it/shencode/wiki/encoder/alphanum)      |                                                                                                           |
 | `encoder`   | `bytebert`    | Advanced polymorphic encoder                   | [bytebert](https://www.heckhausen.it/shencode/wiki/encoder/bytebert)      |                                                                                                           |
 | `encoder`   | `byteswap`    | New XOR Encryption, Swapping Bytes             | [byteswap](https://www.heckhausen.it/shencode/wiki/encoder/byteswap)      | [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping)                        |
