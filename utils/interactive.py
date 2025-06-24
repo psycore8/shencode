@@ -4,11 +4,9 @@ import json
 from keystone import *
 from utils.crypt import aes_worker
 from utils.const import *
-from utils.helper import nstate
+#from utils.helper import nstate
 from os import path, get_terminal_size, listdir
 
-#from pyreadline3 import Readline
-#import rlcompleter
 from prompt_toolkit import prompt, styles
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.formatted_text import HTML
@@ -43,13 +41,6 @@ imods = {
 }
 
 append_keywords = [ 'save', 'restore' ]
-
-# def completer(text, state):
-#     options = [cmd for cmd in x if cmd.startswith(text)]
-#     if state < len(options):
-#         return options[state]
-#     else:
-#         return None
 
 arg_list = {}
 loaded_module = None
@@ -89,16 +80,17 @@ def command_parser(command):
             if loaded_module != None:
                 fn = f'{json_dir}{loaded_module_name}.json'
                 with open(fn, 'w') as f:
-                    #f.write(arg_list)
                     json.dump(arg_list, f, ensure_ascii=False, indent=4)
             else:
                 print('No module loaded. Use the load command before.')
         elif split_cmd[1] == 'restore':
             if loaded_module != None:
                 fn = f'{json_dir}{loaded_module_name}.json'
-                with open(fn, 'r') as f:
-                    #arg_list = f.read()
-                    arg_list = json.load(f)
+                try:
+                    with open(fn, 'r') as f:
+                        arg_list = json.load(f)
+                except FileNotFoundError as e:
+                    print(f'ERROR: {e}')
             else:
                 print('No module loaded. Use the load command before.')
         else:
@@ -115,7 +107,6 @@ def command_parser(command):
 
 
     elif split_cmd[0] == 'load':
-        #if path.exists(module_dir)
         load_mod(split_cmd[1])
         loaded_module_name = split_cmd[1]
 
@@ -132,7 +123,6 @@ def command_parser(command):
         args = {}
         for arg in arg_list:
             args[arg] = arg_list[arg]['value']
-        #arg_list
         mod = loaded_module.module(**args)
         mod.process()
 
@@ -147,12 +137,10 @@ def command_parser(command):
 
     elif split_cmd[0] == 'aeskey':
         aw = aes_worker()
-        #key, iv, salt = aw.generate_key_iv_salt(split_cmd[1].encode('utf-8'))
         key = aw.generate_password(32)
         iv = aw.generate_password(16)
         print(f'Key: {key}')
         print(f'IV: {iv}')
-        #print(f'Salt: {salt}')
 
     else:
         print(f'Sorry, {split_cmd[0]} is unknown...')
@@ -199,7 +187,6 @@ def interactive_mode():
             for entry in imods[module]:
                 auto_complete.append(entry)
     completer = WordCompleter(auto_complete, ignore_case=True)
-    #cmd = prompt(f'{nstate.BOLD}{nstate.clLIGHTMAGENTA}{shell_prefix}{shell_infix}{shell_suffix}{nstate.ENDC}', completer=completer)
     cmd = prompt(f'{shell_prefix}{shell_infix}{shell_suffix}', completer=completer, style=style)
     command_parser(cmd)
     interactive_mode()

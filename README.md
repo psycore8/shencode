@@ -2,8 +2,7 @@
 
 > **A versatile tool for working with shellcodes.**
 
-![](shencode-082.png)
-
+![](shencode-084.png)
 ## Features
 
 ShenCode is a framework for developing, analyzing and testing shellcodes. It comes with 3 operating modes:
@@ -24,9 +23,9 @@ Check out [ShenCode Docs](https://heckhausen.it/shencode/wiki/) and [the starter
 
 | Category    | Module        | Description                                    | Docs                                                                      | Refs                                                                                                      |
 | ----------- | ------------- | ---------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `core`      | `download`    | Download remote files                          | [download](https://www.heckhausen.it/shencode/wiki/core/download)         |                                                                                                           |
-| `core`      | `extract`     | Extract a range of bytes from a file           | [extract](https://www.heckhausen.it/shencode/wiki/core/extract)           |                                                                                                           |
-| `core`      | `output`      | Inspect and display files in different formats | [output](https://www.heckhausen.it/shencode/wiki/core/output)             |                                                                                                           |
+| `core`      | `download`    | Download remote files                          | [download](https://www.heckhausen.it/shencode/core/download)         |                                                                                                           |
+| `core`      | `extract`     | Extract a range of bytes from a file           | [extract](https://www.heckhausen.it/shencode/core/extract)           |                                                                                                           |
+| `core`      | `output`      | Inspect and display files in different formats | [output](https://www.heckhausen.it/shencode/core/output)             |                                                                                                           |
 | `core`      | `subproc`     | Execute an external subprocess                 | [subproc](https://www.heckhausen.it/shencode/wiki/core/subproc)           |                                                                                                           |
 | `core`      | `task`        | Execute tasks to automate ShenCode             | [task](https://www.heckhausen.it/shencode/wiki/core/task)                 |                                                                                                           |
 | `encoder`   | `alphanum`    | Alphanumeric encoder to avoid null bytes       | [alphanum](https://www.heckhausen.it/shencode/wiki/encoder/alphanum)      |                                                                                                           |
@@ -69,16 +68,13 @@ To activate the virtual environment use the following command:
 ## Release Notes
 
 - `general` - Task file for starters tutorial 
-- `core/download `- Download module for different protocols 
-- `core/formatout` - deleted module
-- `encoder/aes` - marked as deprecated
-- `encoder/alphanum` - fixed wrong register in decoder stub
-- `encoder/bytebert` - outputs nasm file, object file and final output file now
-- `encoder/byteswap` - marked as deprecated
-- `encoder/multicoder `- Encoder module for different encoding techniques
-- `obfuscate/feed` - randomized title, date and URL parts
-- `payload/winexec` - enhanced shellcode randomness 
-
+-  `general` - interactive mode
+- `core/extract` - deleted deprecated `start_offset` and `end_offset` arguments 
+- `core/output `- assemble x64 instructions 
+- `encoder/alphanum `- added variable padding option 
+- `inject/psoverwrite` - fixed broken CFGuard mitigation
+- `obfuscate/feed` - customize feed parameters (author, title, subtitle, uri)
+- `stager/sliver` - implemented new `aes` argument with nargs support
 ## References
 
 - [Byte-Swapping](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping)

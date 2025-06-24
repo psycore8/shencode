@@ -41,6 +41,7 @@ setup(
         'keystone-engine',
         'lxml==5.4.0',
         'pefile==2024.8.26',
+        "prompt_toolkit",
         'psutil',
         'pycparser==2.22',
         'pypng==0.20220715.0',
@@ -50,7 +51,7 @@ setup(
         'sgmllib3k==1.0.0',
         'tqdm',
         'typing_extensions==4.14.0',
-        'urllib3==2.4.0',
+        'urllib3==2.5.0',
         ] + extras,
         py_modules=['shencode'],
         # py_modules=[

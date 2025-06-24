@@ -35,7 +35,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.3'
+    Version = '0.1.4'
     DisplayName = 'WinEXEC'
     opcode = ''
     size = 0
@@ -257,6 +257,7 @@ class module:
                 add {rsi[0]}, 4                
                 {vi.decrease_register(rcx[0])}
                 cmp {rcx[0]}, 0
+                ;test {rcx[0]}, {rcx[0]}
                 {rc(vi.jump_conditional_negative)} {lb_findFuncPos}
                 jmp {lb_exit}
 
