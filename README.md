@@ -19,6 +19,8 @@ ShenCode is a framework for developing, analyzing and testing shellcodes. It com
 
 #### General usage
 
+> Help docs are currently not up to date. I am working on a new publishing system. This will be done in a few days.
+
 Check out [ShenCode Docs](https://heckhausen.it/shencode/wiki/) and [the starter tutorial](https://heckhausen.it/shencode/wiki/getting-started) for more information.
 
 | Category    | Module        | Description                                    | Docs                                                                      | Refs                                                                                                      |
@@ -74,6 +76,8 @@ To activate the virtual environment use the following command:
 - `encoder/alphanum `- added variable padding option 
 - `inject/psoverwrite` - fixed broken CFGuard mitigation
 - `obfuscate/feed` - customize feed parameters (author, title, subtitle, uri)
+- `payload/winexec` - new instructions producing 00 `cmp rcx, 0`
+- `payload/winexec` - xor rdx and  rdi for correct stack alignment
 - `stager/sliver` - implemented new `aes` argument with nargs support
 ## References
 
