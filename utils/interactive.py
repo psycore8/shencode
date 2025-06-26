@@ -1,18 +1,20 @@
 import ast
 import importlib
 import json
+import shlex
 from keystone import *
 from utils.crypt import aes_worker
 from utils.const import *
-#from utils.helper import nstate
+from utils.helper import nstate
 from os import path, get_terminal_size, listdir
 
 from prompt_toolkit import prompt, styles
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.formatted_text import HTML
 
-print('Interactive mode is still experimental')
-print('For error reporting use https://github.com/psycore8/shencode')
+n = nstate
+print(f'{n.clRED}Interactive mode is still experimental{n.ENDC}')
+print(f'For error reporting use: {n.f_link}https://github.com/psycore8/shencode{n.ENDC}')
 
 cmd = ''
 
@@ -59,7 +61,10 @@ style = styles.Style.from_dict({
 def command_parser(command):
     global arg_list, loaded_module_name
     #print(f'DEBUG: {arg_list}')
-    split_cmd = command.split(' ')
+    #split_cmd = command.split(' ')
+    #lex = shlex.shlex(command, posix=False)
+    split_cmd = shlex.split(command, posix=False)
+    #print(f'DEBUG: {split_cmd}')
     if split_cmd[0] == 'help':
         print('\n')
         for help in help_list:
@@ -67,7 +72,8 @@ def command_parser(command):
         print('\n')
 
     elif split_cmd[0] == 'asm':
-        asm = ' '.join(split_cmd).replace('asm ', '')
+        #asm = ' '.join(split_cmd).replace('asm ', '')
+        asm = shlex.join(split_cmd).replace('asm ', '')
         try:
             ks = Ks(KS_ARCH_X86, KS_MODE_64)
             code, count = ks.asm(asm)
@@ -127,7 +133,8 @@ def command_parser(command):
         mod.process()
 
     elif split_cmd[0] == 'set':
-        cmd = ' '.join(split_cmd).replace(f'set {split_cmd[1]} ', '')
+        #cmd = ' '.join(split_cmd).replace(f'set {split_cmd[1]} ', '')
+        cmd = shlex.join(split_cmd).replace(f'set {split_cmd[1]} ', '')
         try:
             evaluated_data = eval_data_types(cmd)
             arg_list[split_cmd[1]]['value'] = evaluated_data

