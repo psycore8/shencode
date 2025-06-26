@@ -1,6 +1,6 @@
 ########################################################
 ### ROLHash Module
-### Status: cleaned, 083
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -11,14 +11,20 @@ from utils.helper import nstate as nstate
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Change ROR13 to ROL encoding in metasploit payloads'
 
+arglist = {
+   'input':       { 'value': None, 'desc': 'Input file for UUID encoding' },
+   'output':      { 'value': None, 'desc': 'Outputfile for ROR13 to ROL conversion' },
+   'key':         { 'value': 0, 'desc': 'Key to process ROR13 to ROL' }
+}
+
 def register_arguments(parser):
-    parser.add_argument('-i', '--input', help='Input file for UUID encoding')
-    parser.add_argument('-o', '--output', help='Outputfile for ROR13 to ROL conversion')
-    parser.add_argument('-k', '--key', type=int, help='Key to process ROR13 to ROL')
+    parser.add_argument('-i', '--input', help=arglist['input']['desc'])
+    parser.add_argument('-o', '--output', help=arglist['output']['desc'])
+    parser.add_argument('-k', '--key', type=int, help=arglist['key']['desc'])
 
 class module:
   Author = 'bordergate, psycore8'
-  Version = '2.1.3'
+  Version = '2.1.4'
   DisplayName = 'ROLLIN-HASH'
   data_size = 0
   hash = ''
@@ -30,6 +36,7 @@ class module:
                 'C:\\Windows\\System32\\mswsock.dll'
              ]
   relay = False
+  shell_path = '::obfuscate::rolhash'
   
   def __init__(self, input, output, key):
      self.input = input

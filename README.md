@@ -2,24 +2,34 @@
 
 > **A versatile tool for working with shellcodes.**
 
-![](shencode-082.png)
-
+![](shencode-084.png)
 ## Features
 
-### Version 0.8.3
+ShenCode is a framework for developing, analyzing and testing shellcodes. It comes with 3 operating modes:
+
+- Argument mode
+	- `shencode core output -i file.raw -s inspect`
+- [[getting-started#Interactive|Interactive mode]]
+	- `shencode$ load output`
+	- `shencode::core::output$`
+- [[task|Task mode]]
+	- Automate modules in different steps with `json`
+
+### Version 0.8.4
 
 #### General usage
+
+> Help docs are currently not up to date. I am working on a new publishing system. This will be done in a few days.
 
 Check out [ShenCode Docs](https://heckhausen.it/shencode/wiki/) and [the starter tutorial](https://heckhausen.it/shencode/wiki/getting-started) for more information.
 
 | Category    | Module        | Description                                    | Docs                                                                      | Refs                                                                                                      |
 | ----------- | ------------- | ---------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| `core`      | `download`    | Download remote files                          | [download](https://www.heckhausen.it/shencode/wiki/core/download)         |                                                                                                           |
-| `core`      | `extract`     | Extract a range of bytes from a file           | [extract](https://www.heckhausen.it/shencode/wiki/core/extract)           |                                                                                                           |
-| `core`      | `output`      | Inspect and display files in different formats | [output](https://www.heckhausen.it/shencode/wiki/core/output)             |                                                                                                           |
+| `core`      | `download`    | Download remote files                          | [download](https://www.heckhausen.it/shencode/core/download)         |                                                                                                           |
+| `core`      | `extract`     | Extract a range of bytes from a file           | [extract](https://www.heckhausen.it/shencode/core/extract)           |                                                                                                           |
+| `core`      | `output`      | Inspect and display files in different formats | [output](https://www.heckhausen.it/shencode/core/output)             |                                                                                                           |
 | `core`      | `subproc`     | Execute an external subprocess                 | [subproc](https://www.heckhausen.it/shencode/wiki/core/subproc)           |                                                                                                           |
 | `core`      | `task`        | Execute tasks to automate ShenCode             | [task](https://www.heckhausen.it/shencode/wiki/core/task)                 |                                                                                                           |
-| `encoder`   | `aes`         | Encrypt with AES                               | [aes](https://www.heckhausen.it/shencode/wiki/encoder/aes)                |                                                                                                           |
 | `encoder`   | `alphanum`    | Alphanumeric encoder to avoid null bytes       | [alphanum](https://www.heckhausen.it/shencode/wiki/encoder/alphanum)      |                                                                                                           |
 | `encoder`   | `bytebert`    | Advanced polymorphic encoder                   | [bytebert](https://www.heckhausen.it/shencode/wiki/encoder/bytebert)      |                                                                                                           |
 | `encoder`   | `byteswap`    | New XOR Encryption, Swapping Bytes             | [byteswap](https://www.heckhausen.it/shencode/wiki/encoder/byteswap)      | [Blog Post](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping)                        |
@@ -60,16 +70,15 @@ To activate the virtual environment use the following command:
 ## Release Notes
 
 - `general` - Task file for starters tutorial 
-- `core/download `- Download module for different protocols 
-- `core/formatout` - deleted module
-- `encoder/aes` - marked as deprecated
-- `encoder/alphanum` - fixed wrong register in decoder stub
-- `encoder/bytebert` - outputs nasm file, object file and final output file now
-- `encoder/byteswap` - marked as deprecated
-- `encoder/multicoder `- Encoder module for different encoding techniques
-- `obfuscate/feed` - randomized title, date and URL parts
-- `payload/winexec` - enhanced shellcode randomness 
-
+-  `general` - interactive mode
+- `core/extract` - deleted deprecated `start_offset` and `end_offset` arguments 
+- `core/output `- assemble x64 instructions 
+- `encoder/alphanum `- added variable padding option 
+- `inject/psoverwrite` - fixed broken CFGuard mitigation
+- `obfuscate/feed` - customize feed parameters (author, title, subtitle, uri)
+- `payload/winexec` - new instructions producing 00 `cmp rcx, 0`
+- `payload/winexec` - xor rdx and  rdi for correct stack alignment
+- `stager/sliver` - implemented new `aes` argument with nargs support
 ## References
 
 - [Byte-Swapping](https://www.nosociety.de/en:it-security:blog:obfuscation_byteswapping)

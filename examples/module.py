@@ -4,11 +4,18 @@ from utils.helper import nstate as nstate
 CATEGORY    = 'example'
 DESCRIPTION = 'An example module for ShenCode'
 
+# the arglist defines argument defaults and descriptions
+arglist = {
+   'base':      { 'value': None, 'desc': 'The base' },
+   'exponent':  { 'value': None, 'desc': 'The exponent' },
+   'verbose':   { 'value': False, 'desc': 'Verbose output' }
+}
+
 # defines the parser arguments
 def register_arguments(parser):
-    parser.add_argument('-b', '--base', type=int, help='the base')
-    parser.add_argument('-e', '--exponent', type=int, help='the exponent')
-    parser.add_argument('-v', '--verbose', action='store_true', help='verbose output')
+    parser.add_argument('-b', '--base', type=int, help=arglist['base']['desc'])
+    parser.add_argument('-e', '--exponent', type=int, help=arglist['exponent']['desc'])
+    parser.add_argument('-v', '--verbose', action='store_true', help=arglist['verbose']['desc'])
 
 class module:
   # general information
@@ -18,6 +25,7 @@ class module:
   # relay is used in tasked mode
   relay_input = False
   relay_output = False
+  shell_path = '::example::power'
 
   # class init
   def __init__(self, base=0, exponent=0, power=0, verbose=False):

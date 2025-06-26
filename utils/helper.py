@@ -48,7 +48,7 @@ class nstate:
     clLIGHTBLUE = '\033[36m'
     clRED = '\033[91m'
     clGRAY = '\033[90m'
-    clLIGHTMAGENTA = '\x1b[35m'
+    clLIGHTMAGENTA = '\033[95m'
 
     def FormatModuleHeader(ModHeadText, ModVersion):
         f = f'{nstate.f_bold}{nstate.clGRAY}[{nstate.clRED}{ModHeadText}{nstate.clGRAY}]-[{nstate.clRED}{ModVersion}{nstate.clGRAY}]{nstate.f_end}'
@@ -119,7 +119,7 @@ class FirstRun:
 
     def WinOnlyModules(ActivationState:bool):
         Mod_Dir = 'modules'
-        FileList = [ 'injection', 'dll', 'meterpreter', 'ntinjection', 'psoverwrite', 'sliver', 'rolhash' ]
+        FileList = [ 'injection', 'dll', 'meterpreter', 'ntinjection', 'psoverwrite', 'rolhash', 'sliver' ]
         if ActivationState:
             for file in FileList:
                 src_file = f'{Mod_Dir}\\{file}.px'

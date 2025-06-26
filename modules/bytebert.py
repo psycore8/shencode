@@ -1,6 +1,6 @@
 ########################################################
 ### ByteBert Module
-### Status: cleaned, 083
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -26,16 +26,23 @@ from utils.const import *
 CATEGORY    = 'encoder'
 DESCRIPTION = 'ByteBert - Advanced polymorphic Encoder Stub'
 
+arglist = {
+    'input':                    { 'value': None, 'desc': 'Input file to use with bytebert' },
+    'output':                   { 'value': None, 'desc': 'Outputfile for bytebert' },
+    'variable_padding':         { 'value': False, 'desc': 'Inserts a random NOP to differ the padding' },
+    'verbose':                  { 'value': False, 'desc': 'Verbose mode' }
+}
+
 def register_arguments(parser):
-            parser.add_argument('-i', '--input', help='Input file to use with bytebert')
-            parser.add_argument('-o', '--output', help='outputfile for bytebert')
-            parser.add_argument('-v', '--variable-padding', action='store_true', help='Inserts a random NOP to differ the padding')
+            parser.add_argument('-i', '--input', help=arglist['input']['desc'])
+            parser.add_argument('-o', '--output', help=arglist['output']['desc'])
+            parser.add_argument('-v', '--variable-padding', action='store_true', help=arglist['variable_padding']['desc'])
             add = parser.add_argument_group('Additional')
-            add.add_argument('--verbose', action='store_true', help='Verbose mode')
+            add.add_argument('--verbose', action='store_true', help=arglist['verbose']['desc'])
 
 class module:
     Author = 'psycore8'
-    Version = '0.4.0'
+    Version = '0.4.2'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -48,6 +55,7 @@ class module:
     relay = False
     relay_input = False
     relay_output = False
+    shell_path = '::encoder::ByteBert'
 
     def __init__(self, input, output, variable_padding=bool, verbose=bool):
         self.input = input
@@ -304,8 +312,10 @@ class module:
                   """
         
         if self.variable_padding:
+            nop = vi.nop_instruction()
             paddy = stub64.split('\n')
-            noppy = '                        nop'
+            spacer = ' ' * 24
+            noppy = f'{spacer}{nop}'
             random_noppy_index = random.randint(6, len(paddy)-2)
             paddy.insert(random_noppy_index, noppy)
             stub64_paddy = '\n'.join(paddy)

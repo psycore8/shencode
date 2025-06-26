@@ -1,6 +1,6 @@
 ########################################################
 ### QRCode Module
-### Status: cleaned, 083
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -13,18 +13,24 @@ import qrcode.constants
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Obfuscate shellcodes as QR-Codes'
 
+arglist = {
+    'input':        { 'value': None, 'desc': 'Input file for QR-Code encoding' },
+    'output':       { 'value': None, 'desc': 'Output file for QR-Code encoding' }
+}
+
 def register_arguments(parser):
-    parser.add_argument('-i', '--input', help='Input file for QR-Code encoding')
-    parser.add_argument('-o', '--output', help='Output file for QR-Code encoding')
+    parser.add_argument('-i', '--input', help=arglist['input']['desc'])
+    parser.add_argument('-o', '--output', help=arglist['output']['desc'])
 
 class module:
     Author = 'psycore8'
-    Version = '2.1.5'
+    Version = '2.1.6'
     DisplayName = 'QRCODE-OBF'
     hash = ''
     data_size = 0
     shellcode = b''
     relay_input = False
+    shell_path = '::obfuscate::qrcode'
 
     def __init__(self, input, output):
          self.input_file = input

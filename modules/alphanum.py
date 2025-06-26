@@ -1,6 +1,6 @@
 ########################################################
 ### Alphanum Module
-### Status: migrated to 082
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -17,29 +17,40 @@ from subprocess import run
 CATEGORY    = 'encoder'
 DESCRIPTION = 'Encode bytes to alphanumeric output'
 
+arglist = {
+    'input':                { 'value': None,    'desc': 'Input file to use' },
+    'output':               { 'value': None,    'desc': 'Output file to use' },
+    'decode':               { 'value': False,   'desc': 'Decode the input to bytes' },
+    'compile':              { 'value': False,   'desc': 'Compile object file and extract shellcode' },
+    'variable_padding':     { 'value': False,   'desc': 'Inserts a random NOP to differ the padding' },
+}
+
 def register_arguments(parser):
-            parser.add_argument('-i', '--input', help='Input file to use')
-            parser.add_argument('-o', '--output', help='Output file to use')
+            parser.add_argument('-i', '--input', help=arglist['input']['desc'])
+            parser.add_argument('-o', '--output', help=arglist['output']['desc'])
 
             add = parser.add_argument_group('Additional')
-            add.add_argument('-c', '--compile', default=False, action='store_true' ,help='Compile object file and extract shellcode')
-            add.add_argument('-d', '--decode', default=False, action='store_true' ,help='Decode the input to bytes')
+            add.add_argument('-c', '--compile', default=False, action='store_true' ,help=arglist['compile']['desc'])
+            add.add_argument('-d', '--decode', default=False, action='store_true' ,help=arglist['decode']['desc'])
+            add.add_argument('-v', '--variable-padding', action='store_true', help=arglist['variable_padding']['desc'])
 
 class module:
     Author          = 'psycore8'
-    Version         = '0.1.6'
+    Version         = '0.1.8'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
     relay_input     = False
     relay_output    = False
+    shell_path      = '::encoder::alphanum'
 
-    def __init__(self, input, output, decode=False, compile=False):
+    def __init__(self, input, output, decode=False, compile=False, variable_padding=False):
             self.input = input
             self.output = output
             self.decode = decode
             self.compile = compile
             self.compiler_cmd = nasm
+            self.variable_padding = variable_padding
 
     def msg(self, message_type, ErrorExit=False, MsgVar=str):
         messages = {
@@ -156,15 +167,23 @@ class module:
                         add {reg1[0]}, 2                  ; jump 2 chars
                         {rc(inst_asm_dec_reg)}
                         jmp decode_loop                   ; using jmp, loop auto decrements rcx
-                        ;loop decode_loop                 ; repeat until it is done
-
-                        ;jmp {reg1[0]}                    ; jump to shellcode
 
                     call_decoder:
                         call decoder
                         encoded_shellcode: db '{self.encoded_data}'
             """
-        return stub
+        if self.variable_padding:
+            nop = vi.nop_instruction()
+            paddy = stub.split('\n')
+            spacer = ' ' * 24
+            noppy = f'{spacer}{nop}'
+            random_noppy_index = random.randint(4, len(paddy)-4)
+            paddy.insert(random_noppy_index, noppy)
+            stub64_paddy = '\n'.join(paddy)
+            self.msg('note', False, f'NOP inserted at line {random_noppy_index}: {nop}')
+            return stub64_paddy
+        else:
+            return stub
     
     def load_shellcode(self):
         if self.relay_input:

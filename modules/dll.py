@@ -1,6 +1,6 @@
 ########################################################
 ### DLL Inject Module
-### Status: cleaned, 083
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -14,16 +14,22 @@ from utils.winconst import *
 CATEGORY    = 'inject'
 DESCRIPTION = 'Inject a DLL into memory'
 
+arglist = {
+     'input':                    { 'value': '', 'desc': 'Input dll to inject' },
+     'process':                  { 'value': None, 'desc': 'Process to inject into' },
+     'start_process':            { 'value': False, 'desc': 'If set, the process will be started' }
+}
+
 def register_arguments(parser):
-            parser.add_argument('-i', '--input', type=str, required=True, help='Input dll to inject')
-            parser.add_argument('-p', '--process', required=True, help='Process to inject into')
-            parser.add_argument('-s', '--start-process', action='store_true', required=False, default=False, help='If set, the process will be started')
+            parser.add_argument('-i', '--input', type=str, required=True, help=arglist['input']['desc'])
+            parser.add_argument('-p', '--process', required=True, help=arglist['process']['desc'])
+            parser.add_argument('-s', '--start-process', action='store_true', required=False, default=False, help=arglist['start_process']['desc'])
 
 class module:
     import wmi, threading
     from time import sleep
     Author = 'psycore8'
-    Version = '0.1.4'
+    Version = '0.1.5'
     DisplayName = 'DLL-INJECTION'
     mem = any
     data_bytes = bytes
@@ -31,6 +37,7 @@ class module:
     hash = ''
     pid = 0
     relay_input = False
+    shell_path = '::inject::dll'
 
     def __init__(self, input, process, start_process):
             self.input_file: str = input

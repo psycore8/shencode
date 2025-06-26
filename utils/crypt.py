@@ -1,4 +1,7 @@
 from cryptography.hazmat.backends import default_backend
+import random
+import string
+
 
 class rsa_worker:
         from cryptography.hazmat.primitives.asymmetric import rsa
@@ -105,6 +108,20 @@ class aes_worker:
             backend=default_backend()
         )
         return kdf.derive(password)
+    
+    def generate_password(self, length=16):
+        characters = string.ascii_letters + string.digits #+ string.punctuation
+        password = ''.join(random.choice(characters) for i in range(length))
+        return password
+    
+    def generate_key_iv_salt(self, password, as_string):
+        if as_string:
+            pass
+        else:
+            salt = self.urandom(16)
+            iv = self.urandom(16)
+            key = self.generate_key(password, salt)
+        return key, iv, salt
     
     def aes_encrypt(self, data: bytes, password: bytes):
         salt = self.urandom(16)

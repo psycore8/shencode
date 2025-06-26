@@ -1,6 +1,6 @@
 ########################################################
 ### MultiCODER Module
-### Status: RC
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -15,22 +15,31 @@ from utils.const import priv_key, pub_key
 CATEGORY    = 'encoder'
 DESCRIPTION = 'En- / Decoder for different algorithms. Supports: AES, Base32, Base64, RSA'
 
+arglist = {
+    'algorithm':     { 'value': None, 'desc': 'Choose an algorithm: base32, base64, aes, rsa' },
+    'mode':          { 'value': None, 'desc': 'Operation mode, choose encode / decode' },
+    'input':         { 'value': None, 'desc': 'Input file to process' },
+    'key':           { 'value': None, 'desc': 'If required, set the en- / decryption key' },
+    'output':        { 'value': None, 'desc': 'Output file' }
+}
+
 def register_arguments(parser):
-    parser.add_argument('-a', '--algorithm' ,choices=['base32', 'base64', 'aes', 'rsa'], required=True, help='')
-    parser.add_argument('-m', '--mode', choices=['encode', 'decode'], required=True, help='Operation mode, choose encode / decode')
-    parser.add_argument('-i', '--input', required=True, help='Input file')
-    parser.add_argument('-k', '--key', required=False, default=None, help='If required, set the en- / decryption key')
-    parser.add_argument('-o', '--output', required=True, help= 'Output file')
+    parser.add_argument('-a', '--algorithm' ,choices=['base32', 'base64', 'aes', 'rsa'], required=True, help=arglist['algorithm']['desc'])
+    parser.add_argument('-m', '--mode', choices=['encode', 'decode'], required=True, help=arglist['mode']['desc'])
+    parser.add_argument('-i', '--input', required=True, help=arglist['input']['desc'])
+    parser.add_argument('-k', '--key', required=False, default=None, help=arglist['key']['desc'])
+    parser.add_argument('-o', '--output', required=True, help=arglist['output']['desc'])
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.0'
+    Version = '0.1.1'
     DisplayName = 'MultiC0DER'
     data_size = int
     hash = ''
     data_bytes = bytes
     relay_input = False
     relay_output = False
+    shell_path = '::encoder::multicoder'
 
     def __init__(self, algorithm, mode, input, key, output):
         self.algorithm = algorithm

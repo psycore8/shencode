@@ -11,6 +11,7 @@ BYTE        = ctypes.wintypes.BYTE
 DWORD       = ctypes.wintypes.DWORD
 HANDLE      = ctypes.wintypes.HANDLE
 HMODULE     = ctypes.wintypes.HMODULE
+HRESULT     = ctypes.c_long
 LARGE_INT   = ctypes.wintypes.LARGE_INTEGER
 LONG        = ctypes.wintypes.LONG
 LPDWORD     = ctypes.wintypes.LPDWORD
@@ -49,8 +50,9 @@ ZwUnmapViewOfSection = ntdll.ZwUnmapViewOfSection
 ZwUnmapViewOfSection.argtypes = [ HANDLE, LPVOID ]
 ZwUnmapViewOfSection.restype = LONG
 
-# Process-Overwriting
+# Process-Overwriting / Hardware Breakpoints
 
+AddVectoredExceptionHandler = kernel32.AddVectoredExceptionHandler
 CreateProcess = kernel32.CreateProcessW
 GetThreadContext = kernel32.GetThreadContext
 SetThreadContext = kernel32.SetThreadContext
@@ -73,7 +75,14 @@ class STARTUPINFO(ctypes.Structure):
                 ("lpReserved2", ctypes.POINTER(ctypes.c_ubyte)),
                 ("hStdInput", HANDLE),
                 ("hStdOutput", HANDLE),
-                ("hStdError", HANDLE)]
+                ("hStdError", HANDLE),
+                ]
+    
+class STARTUPINFOEX(ctypes.Structure):
+    _fields_ = [
+        ("StartupInfo", STARTUPINFO),
+        ("lpAttributeList", LPVOID),
+        ]
 
 class PROCESS_INFORMATION(ctypes.Structure):
     _fields_ = [("hProcess", HANDLE),
@@ -81,6 +90,82 @@ class PROCESS_INFORMATION(ctypes.Structure):
                 ("dwProcessId", DWORD),
                 ("dwThreadId", DWORD)]
     
+class PEB(ctypes.Structure):
+    _fields_ = [
+        ("Reserved1", BYTE * 2),
+        ("BeingDebugged", BYTE),
+        ("Reserved2", BYTE),
+        ("Reserved3", BYTE * 2),
+        ("Ldr", BYTE), 
+        ("ProcessParameters", BYTE),
+        ("Reserved4", BYTE * 3),
+        ("AtlThunkSListPtr", BYTE),
+        ("Reserved5", BYTE),
+        ("Reserved6", BYTE),
+        ("Reserved7", BYTE),
+        ("ImageBaseAddress", LPCVOID) 
+    ]
+class PROCESS_BASIC_INFORMATION(ctypes.Structure):
+    _fields_ = [
+        ("Reserved1", LPVOID),
+        ("PebBaseAddress", LPCVOID),
+        ("Reserved2", LPVOID * 4)
+    ]
+    
+class M128A(ctypes.Structure):
+    _fields_ = [
+        ('High',            ctypes.c_ulonglong),
+        ('Low',             ctypes.c_longlong)
+    ]
+
+class XSAVE_FORMAT64(ctypes.Structure):
+    _fields_ = [
+        ('ControlWord',     ctypes.c_ushort),
+        ('StatusWord',      ctypes.c_ushort),
+        ('TagWord',         ctypes.c_ubyte),
+        ('Reserved1',       ctypes.c_ubyte),
+        ('ErrorOpcode',     ctypes.c_ushort),
+        ('ErrorOffset',     ctypes.c_uint),
+        ('ErrorSelector',   ctypes.c_ushort),
+        ('Reserved2',       ctypes.c_ushort),
+        ('DataOffset',      ctypes.c_uint),
+        ('DataSelector',    ctypes.c_ushort),
+        ('Reserved3',       ctypes.c_ushort),
+        ('MxCsr',           ctypes.c_uint),
+        ('MxCsr_Mask',      ctypes.c_uint),
+        ('FloatRegisters',  M128A * 8),
+        ('XmmRegisters',    M128A * 16),
+        ('Reserved4',       ctypes.c_ubyte * 96)
+    ]
+
+# class CONTEXTEX(ctypes.Structure):
+#     _fields_ = [
+#         ('DummyUnion',  XSAVE_FORMAT64),
+#         ('VectorRegister',  M128A * 26),
+#         ('VectorControl',   ctypes.c_ulonglong),
+#         ('DebugControl',    ctypes.c_ulonglong),
+#         ('LastBranchToRip', ctypes.c_ulonglong),
+#         ('LastBranchFromRip', ctypes.c_ulonglong),
+#         ('LastExceptionToRip', ctypes.c_ulonglong),
+#         ('LastExceptionFromRip', ctypes.c_ulonglong)
+#     ]
+
+class EXCEPTION_RECORD(ctypes.Structure):
+    _fields_ = [
+        ("ExceptionCode", ctypes.c_uint),
+        ("ExceptionFlags", ctypes.c_uint),
+        ("ExceptionRecord", ctypes.c_void_p),
+        ("ExceptionAddress", ctypes.c_void_p),
+        ("NumberParameters", ctypes.c_uint),
+        ("ExceptionInformation", ctypes.c_uint * 15)
+    ]
+
+class EXCEPTION_POINTERS(ctypes.Structure):
+    _fields_ = [
+        ("pExceptionRecord", ctypes.c_void_p),
+        ("pContextRecord", ctypes.c_void_p)
+    ]
+
 class CONTEXT(ctypes.Structure):
     _fields_ = [
         ("P1Home", ctypes.c_ulonglong),
@@ -121,6 +206,14 @@ class CONTEXT(ctypes.Structure):
         ("R14", ctypes.c_ulonglong),
         ("R15", ctypes.c_ulonglong),
         ("Rip", ctypes.c_ulonglong),  # Instruktionszeiger für 64-Bit
+        #('DummyUnion',  XSAVE_FORMAT64),
+        #('VectorRegister',  M128A * 26),
+        #('VectorControl',   ctypes.c_ulonglong),
+        #('DebugControl',    ctypes.c_ulonglong),
+        #('LastBranchToRip', ctypes.c_ulonglong),
+        #('LastBranchFromRip', ctypes.c_ulonglong),
+        #('LastExceptionToRip', ctypes.c_ulonglong),
+        #('LastExceptionFromRip', ctypes.c_ulonglong)
     ]
     
 NtCreateSection = ntdll.NtCreateSection
@@ -227,6 +320,10 @@ def pNtWriteVirtualMemory(
 OpenProcess = kernel32.OpenProcess
 OpenProcess.argtypes = [DWORD, BOOL, DWORD]
 OpenProcess.restype = HANDLE
+
+OpenThread = kernel32.OpenThread
+GetCurrentThreadId = kernel32.GetCurrentThreadId
+SuspendThread = kernel32.SuspendThread
 
 ResumeThread = kernel32.ResumeThread
 ResumeThread.argtypes = [HANDLE]

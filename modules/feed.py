@@ -1,6 +1,6 @@
 ########################################################
 ### feed Module
-### Status: cleaned, 083
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -17,35 +17,53 @@ from utils.helper import GetFileInfo, CheckFile
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Obfuscate shellcodes as XML Feed'
 
+arglist = {
+    'input':            { 'value': None, 'desc': 'Input file for feed encoding' },
+    'output':           { 'value': None, 'desc': 'Output file for feed encoding' },
+    'uri':              { 'value': None, 'desc': 'URI to fake feed' },
+    'reassemble':       { 'value': False, 'desc': 'Reassemble fake feed to Shellcode' },
+    'feed_author':      { 'value': None, 'desc': 'Author of your fake feed' },
+    'feed_title':       { 'value': None, 'desc': 'Title of your fake feed' },
+    'feed_subtitle':    { 'value': None, 'desc': 'Subtitle of your fake feed' },
+    'feed_uri':         { 'value': None, 'desc': 'URI of your fake feed' }
+}
+
 def register_arguments(parser):
-    parser.add_argument('-i', '--input', help='Input file for feed encoding')
-    parser.add_argument('-o', '--output', help='Output file for feed encoding')
+    parser.add_argument('-i', '--input', help=arglist['input']['desc'])
+    parser.add_argument('-o', '--output', help=arglist['output']['desc'])
 
     grp = parser.add_argument_group('additional')
-    grp.add_argument('-r', '--reassemble', action='store_true', help='Reassemble fake feed to Shellcode')
-    grp.add_argument('-u', '--uri', help='URI to fake feed')
+    grp.add_argument('-r', '--reassemble', action='store_true', help=arglist['reassemble']['desc'])
+    grp.add_argument('-u', '--uri', help=arglist['uri']['desc'])
+
+    fs = parser.add_argument_group('feed settings')
+    fs.add_argument('-fa', '--feed-author', default=None, help=arglist['feed_author']['desc'])
+    fs.add_argument('-ft', '--feed-title', default=None, help=arglist['feed_title']['desc'])
+    fs.add_argument('-fs', '--feed-subtitle', default=None, help=arglist['feed_subtitle']['desc'])
+    fs.add_argument('-fu', '--feed-uri', default=None, help=arglist['feed_uri']['desc'])
+
 
 class module:
     Author = 'psycore8'
-    Version = '2.2.0'
+    Version = '2.2.2'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0
-
-    feed_fake_uri = 'https://www.microloft.com/'
-    feed_fake_title = 'Developer News'
-    feed_fake_subtitle = 'The latest developer news from microloft.com'
-    feed_fake_author = 'Bill Ports'
     feed_fake_ids = []
     shellcode = ''
     relay_input = False
     relay_output = False
+    shell_path = '::obfuscate::feed'
 
-    def __init__(self, input, output, uri, reassemble):
+    def __init__(self, input, output, uri, reassemble, feed_author, feed_title, feed_subtitle, feed_uri):
         self.input_file = input
         self.output_file = output
         self.uri = uri
         self.reassemble = reassemble
+        self.feed_author = feed_author
+        self.feed_title = feed_title
+        self.feed_subtitle = feed_subtitle
+        self.feed_uri = feed_uri
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
@@ -61,7 +79,7 @@ class module:
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
-            exit()
+            exit()        
 
     def open_file(self):
         if self.relay_input:
@@ -73,6 +91,9 @@ class module:
                 return True
             except FileNotFoundError:
                 return False
+            
+    def ensure_trailing_slash(self, s: str) -> str:
+        return s if s.endswith('/') else s + '/'
             
     def generate_fake_title(self):
         diceware_dict = {}
@@ -100,6 +121,18 @@ class module:
         s = self.shellcode.encode('utf-8')
         self.feed_fake_ids.extend([s[i:i + block_size] for i in range(0, len(s), block_size)])
 
+    def generate_additional_attributes(self):
+        if self.feed_uri == None:
+            self.feed_uri = 'https://www.microloft.com/'
+        else:
+            self.feed_uri = self.ensure_trailing_slash(self.feed_uri)
+        if self.feed_title == None:
+            self.feed_title = 'Developer News'
+        if self.feed_subtitle == None:
+            self.feed_subtitle = 'The latest developer news from microloft.com'
+        if self.feed_author == None:
+            self.feed_author = 'Bill Ports'
+
     def generate_feed(self):
         date_time = datetime.datetime.now()
         root = etree.Element('feed')
@@ -107,21 +140,21 @@ class module:
         # Header
         feed_link = etree.SubElement(root, 'link', attrib=
                                   {
-                                      'href': f'{self.feed_fake_uri}feed.xml',
+                                      'href': f'{self.feed_uri}feed.xml',
                                       'rel': 'self',
                                       'type': 'application/atom+xml'
                                       })
         feed_updated = etree.SubElement(root, 'updated')
         feed_updated.text = f'{date_time}'
         feed_id = etree.SubElement(root, 'id')
-        feed_id.text = f'{self.feed_fake_uri}feed.xml'
+        feed_id.text = f'{self.feed_uri}feed.xml'
         feed_title = etree.SubElement(root, 'title', attrib={'type': 'html'})
-        feed_title.text = f'{self.feed_fake_title}'
+        feed_title.text = f'{self.feed_title}'
         feed_subtitle = etree.SubElement(root, 'subtitle')
-        feed_subtitle.text = f'{self.feed_fake_subtitle}'
+        feed_subtitle.text = f'{self.feed_subtitle}'
         feed_author = etree.SubElement(root, 'author')
         feed_author_name = etree.SubElement(feed_author, 'name')
-        feed_author_name.text = f'{self.feed_fake_author}'
+        feed_author_name.text = f'{self.feed_author}'
 
         # Entries
         i = 1
@@ -135,13 +168,13 @@ class module:
             entry_title = etree.SubElement(entry, 'title', attrib={'type': 'html'})
             #entry_title.text = f'Title {i}'
             entry_title.text = title
-            entry_link = etree.SubElement(entry, 'link', attrib={'href': f'{self.feed_fake_uri}0{i}/{random.randint(1, 31)}/{urllib.parse.quote(title)}', 'rel': 'alternate', 'type': 'text/html', 'title': title})
+            entry_link = etree.SubElement(entry, 'link', attrib={'href': f'{self.feed_uri}0{i}/{random.randint(1, 31)}/{urllib.parse.quote(title)}', 'rel': 'alternate', 'type': 'text/html', 'title': title})
             entry_published = etree.SubElement(entry, 'published')
             entry_published.text = f'{date} {time}'
             entry_updated = etree.SubElement(entry, 'updated')
             entry_updated.text = f'{date} {time}'
             entry_id = etree.SubElement(entry, 'id')
-            entry_id.text = f'{self.feed_fake_uri}{id.decode('utf-8')}' # 16 bytes part of shellcode
+            entry_id.text = f'{self.feed_uri}{id.decode('utf-8')}' # 16 bytes part of shellcode
             i += 1
 
         xml_str = etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="utf-8")
@@ -163,6 +196,7 @@ class module:
 
     def process(self):
         self.msg('pre.head')
+        self.generate_additional_attributes()
         if self.reassemble:
             self.msg('proc.retry')
             self.shellcode = self.reassemble_shellcode()

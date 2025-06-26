@@ -1,6 +1,6 @@
 ########################################################
 ### Injection Module
-### Status: cleaned, 083
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -13,14 +13,23 @@ from utils.helper import CheckFile, GetFileInfo
 CATEGORY    = 'inject'
 DESCRIPTION = 'Inject shellcode into memory with CreateRemoteThread'
 
+arglist = {
+    'input':           { 'value': None, 'desc': 'Input file or buffer for process injection' },
+    'process':         { 'value': None, 'desc': 'Processname to inject the shellcode' },
+    'start_process':   { 'value': False, 'desc': 'If not active, start the process before injection' },
+    'shellcode':       { 'value': None, 'desc': 'Internal use only, don\'t change!' },
+    'resume_thread':   { 'value': False, 'desc': 'Start thread suspended and resume after speciefied time' },
+    'virtual_protect': { 'value': False, 'desc': 'Deny access on memory for a specified time' }
+}
+
 def register_arguments(parser):
-            parser.add_argument('-i', '--input', help='Input file or buffer for process injection')
-            parser.add_argument('-p', '--process', help='Processname to inject the shellcode')
+            parser.add_argument('-i', '--input', help=arglist['input']['desc'])
+            parser.add_argument('-p', '--process', help=arglist['process']['desc'])
 
             grp = parser.add_argument_group('additional')
-            grp.add_argument('-r', '--resume-thread', action='store_true', help='Start thread suspended and resume after speciefied time')
-            grp.add_argument('-s', '--start-process', action='store_true', help='If not active, start the process before injection')
-            grp.add_argument('-v', '--virtual-protect', action='store_true', help='Deny access on memory for a specified time')
+            grp.add_argument('-r', '--resume-thread', action='store_true', help=arglist['resume_thread']['desc'])
+            grp.add_argument('-s', '--start-process', action='store_true', help=arglist['start_process']['desc'])
+            grp.add_argument('-v', '--virtual-protect', action='store_true', help=arglist['virtual_protect']['desc'])
 
 class module:
     from urllib import request
@@ -29,15 +38,17 @@ class module:
     import threading
 
     Author = 'cpu0x00, psycore8'
-    Version = '2.1.5'
+    Version = '2.1.7'
     DisplayName = 'INJECTION'
     delay = 5
     data_size = 0
     hash = ''
     pid = int
     relay = False
+    shell_path = '::inject::injection'
 
     def __init__(self, input, process, start_process, shellcode=None, resume_thread=None, virtual_protect=None):
+    #def __init__(self, **arglist):
         self.input = input
         self.process_start = start_process
         self.target_process = process
@@ -54,9 +65,9 @@ class module:
             'proc.input_try' : f'{nstate.s_note} Try to open file {self.input}',
             'proc.try'       : f'{nstate.s_note} Try to execute shellcode',
             'inj.run'        : f'{nstate.s_note} starting {self.target_process}',
-            'inj.pid'        : f'{nstate.s_ok} {self.target_process} process id: {self.pid}',
-            'inj.handle'     : f'{nstate.s_ok} Opened a Handle to the process',
-            'inj.alloc'      : f'{nstate.s_ok} Allocated Memory in the process',
+            'inj.pid'        : f'{nstate.s_note} {self.target_process} process id: {self.pid}',
+            'inj.handle'     : f'{nstate.s_note} Opened a Handle to the process',
+            'inj.alloc'      : f'{nstate.s_note} Allocated Memory in the process',
             'inj.write'      : f'{nstate.s_ok} Wrote The shellcode to memory',
             'inj.nacc'       : f'{nstate.s_note} VirtualProtectEx: PAGE_NO_ACCESS',
             'inj.susp'       : f'{nstate.s_note} CreateRemoteThread: START_SUSPENDED',

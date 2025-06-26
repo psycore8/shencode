@@ -1,6 +1,6 @@
 ########################################################
 ### UUID Module
-### Status: cleaned, 083
+### Status: migrated 084
 ### 
 ########################################################
 
@@ -10,12 +10,16 @@ from utils.helper import GetFileInfo
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Obfuscate shellcodes as UUID strings'
 
+arglist = {
+    'input':       { 'value': None, 'desc': 'Input file for UUID encoding' }
+}
+
 def register_arguments(parser):
-    parser.add_argument('-i', '--input', help='Input file for UUID encoding')
+    parser.add_argument('-i', '--input', help=arglist['input']['desc'])
 
 class module:
     Author = 'psycore8'
-    Version = '2.2.3'
+    Version = '2.2.4'
     DisplayName = 'UUID-OBF'
     UUID_string = ''
     hash = ''
@@ -23,6 +27,7 @@ class module:
     shellcode = b''
     obf_String = ''
     var_counter = 0
+    shell_path = '::obfuscate::uuid'
 
 
     def __init__(self, input):

@@ -63,6 +63,22 @@ class variable_instruction_set:
         ]
         return self.random.choice(instruction_set)
     
+    def nop_instruction(self):
+        instruction_set = [
+            'xchg eax, eax',
+            'xchg esi, esi',
+            'xchg edi, edi',
+            'lea eax, [eax]',
+            'lea esi, [esi]',
+            'lea edx, [edx]',
+            'mov edi, edi',
+            'mov ebx, ebx',
+            'nop'
+            #'nop dword ptr [ecx]',
+            #'nop dword ptr [eax+eax*1+01]'
+        ]
+        return self.random.choice(instruction_set)
+    
     def generate_jump_label(self):
         diceware_dict = {}
         with open(f'{resource_dir}wordlist_en_eff.txt', 'r') as file:
