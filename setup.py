@@ -50,7 +50,7 @@ setup(
         'setuptools==80.9.0',
         'sgmllib3k==1.0.0',
         'tqdm',
-        'typing_extensions==4.14.0',
+        'typing_extensions==4.14.1',
         'urllib3==2.5.0',
         ] + extras,
         py_modules=['shencode'],
