@@ -45,7 +45,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.2.2'
+    Version = '2.2.3'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0
@@ -174,7 +174,7 @@ class module:
             entry_updated = etree.SubElement(entry, 'updated')
             entry_updated.text = f'{date} {time}'
             entry_id = etree.SubElement(entry, 'id')
-            entry_id.text = f'{self.feed_uri}{id.decode('utf-8')}' # 16 bytes part of shellcode
+            entry_id.text = f'{self.feed_uri}{id.decode("utf-8")}' # 16 bytes part of shellcode
             i += 1
 
         xml_str = etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="utf-8")

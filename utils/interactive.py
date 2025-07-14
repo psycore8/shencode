@@ -68,7 +68,7 @@ def command_parser(command):
     if split_cmd[0] == 'help':
         print('\n')
         for help in help_list:
-            print(f'{help}'.ljust(left_just) + f'{help_list[help].get('desc')}')
+            print(f'{help}'.ljust(left_just) + f'{help_list[help].get("desc")}')
         print('\n')
 
     elif split_cmd[0] == 'asm':
@@ -122,7 +122,7 @@ def command_parser(command):
         print('Option'.ljust(left_just) + 'Value'.ljust(left_just) + 'Help')
         print('-'*size.columns)
         for arg in arg_list:
-            print(f'{arg}'.ljust(left_just) + f'{arg_list[arg]['value']}'.ljust(left_just) + f'{arg_list.get(arg)['desc']}')
+            print(f'{arg}'.ljust(left_just) + f'{arg_list[arg]["value"]}'.ljust(left_just) + f'{arg_list.get(arg)["desc"]}')
         print('\n')
 
     elif split_cmd[0] == 'run':

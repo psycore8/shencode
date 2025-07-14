@@ -24,7 +24,7 @@ def register_arguments(parser):
 
 class module:
         Author = 'psycore8'
-        Version = '0.2.2'
+        Version = '0.2.3'
         DisplayName = 'PROCESS-OVERWRITE'
         pid = 0
         attr_list = any
@@ -187,7 +187,7 @@ class module:
             pe['target']['image_base'] = pe_target.OPTIONAL_HEADER.ImageBase
             #target_img_base = pe_target.OPTIONAL_HEADER.ImageBase
             #target_info = f'image base: {hex(target_img_base)} - Size: {target_image_size}'
-            target_info = f'image base: {hex(pe["target"]['image_base'])} - Size: {pe['target']['image_size']}'
+            target_info = f'image base: {hex(pe["target"]["image_base"])} - Size: {pe["target"]["image_size"]}'
             m('mok', f'Target: {target_info}')
 
             m('mnote', 'Processing payload image')
@@ -198,7 +198,7 @@ class module:
             pe['payload']['image_size'] = pe_payl.OPTIONAL_HEADER.SizeOfImage
 
             #payload_info = f'image base: {hex(payload_img_base)} - Size: {payload_image_size}'
-            payload_info = f'image base: {hex(pe["payload"]['image_base'])} - Size: {pe["payload"]["image_size"]}'
+            payload_info = f'image base: {hex(pe["payload"]["image_base"])} - Size: {pe["payload"]["image_size"]}'
             m('mok', f'Payload: {payload_info}')
 
             #if payload_image_size > target_image_size:

@@ -41,7 +41,7 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     DisplayName = 'MODOUT'
-    Version = '0.2.4'
+    Version = '0.2.5'
     file_bytes = bytes
     offset_color = nstate.clLIGHTMAGENTA
     cFile = False
@@ -121,14 +121,14 @@ class module:
             if self.lines:
                 offset = self.GenerateOffset(i)
             chunk = self.file_bytes[i:i+self.bytes_per_row]
-            formatted_row = ''.join(f'{s['byte_sep']}{byte:02x}' for byte in chunk)
+            formatted_row = ''.join(f'{s["byte_sep"]}{byte:02x}' for byte in chunk)
             formatted_row = self.highlight_word(formatted_row, '00', nstate.clRED)
             if self.highlight != None:
                 formatted_row = self.highlight_word(formatted_row, self.highlight, nstate.clLIGHTBLUE)
-            formatted_bytes += f'{offset}{s['row_prefix']}{formatted_row[s['row_cut']:]}{s['row_suffix']}'
+            formatted_bytes += f'{offset}{s["row_prefix"]}{formatted_row[s["row_cut"]:]}{s["row_suffix"]}'
         if self.no_line_break:
             formatted_bytes = formatted_bytes.replace('\n', '')
-        return f'{formatted_bytes[:s['code_cut']]}{s["code_add"]}', size
+        return f'{formatted_bytes[:s["code_cut"]]}{s["code_add"]}', size
 
     def GenerateHeader(self):
         if not self.syntax == 'inspect':

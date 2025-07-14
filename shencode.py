@@ -19,7 +19,7 @@ import json
 
 print(f"{nstate.HEADER}")
 print(f'{utils.header.get_header(banner)}')
-print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink('https://www.nosociety.de')}\n')
+print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink("https://www.nosociety.de")}\n')
 arguments = parse_arguments()
 
 config = None
@@ -34,7 +34,7 @@ def main(command_line=None):
      utils.interactive.interactive_mode()
   else:
     argd = arguments.__dict__
-  mod = importlib.import_module(f'modules.{argd['command']}')
+  mod = importlib.import_module(f'modules.{argd["command"]}')
   del argd['config']
   del argd['module']
   del argd['command']
