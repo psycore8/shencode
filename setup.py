@@ -39,7 +39,7 @@ setup(
         'feedparser==6.0.11',
         'idna==3.10',
         'keystone-engine',
-        'lxml==5.4.0',
+        'lxml==6.0.0',
         'pefile==2024.8.26',
         "prompt_toolkit",
         'psutil',
