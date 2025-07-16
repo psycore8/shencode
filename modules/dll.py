@@ -1,12 +1,13 @@
 ########################################################
 ### DLL Inject Module
-### Status: migrated 084
+### Status: migrated 085
 ### 
 ########################################################
 
 import os
 
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
+from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from utils.windef import *
 from utils.winconst import *
@@ -29,7 +30,7 @@ class module:
     import wmi, threading
     from time import sleep
     Author = 'psycore8'
-    Version = '0.1.5'
+    Version = '0.1.6'
     DisplayName = 'DLL-INJECTION'
     mem = any
     data_bytes = bytes
@@ -46,18 +47,18 @@ class module:
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',
-            'error.inject'   : f'{nstate.s_fail} Error during injection process',    
-            'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.input_ok'  : f'{nstate.s_ok} File {self.input_file} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{nstate.s_note} Try to open dll file {self.input_file}',
-            'inj.run'        : f'{nstate.s_note} starting {self.target_process}',
-            'inj.pid'        : f'{nstate.s_note} {self.target_process} process id: {self.pid}',
-            'inj.handle'     : f'{nstate.s_note} Opened a Handle to the process',
-            'inj.alloc'      : f'{nstate.s_note} Allocated Memory at 0x{self.mem}',
-            'inj.write'      : f'{nstate.s_note} Write to memory',
-            'inj.inj_ok'     : f'{nstate.s_ok} Injected {self.input_file} into {self.target_process}',
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.input'    : f'{s_fail} File {self.input_file} not found or cannot be opened.',
+            'error.inject'   : f'{s_fail} Error during injection process',    
+            'post.done'      : f'{s_ok} DONE!',
+            'proc.input_ok'  : f'{s_ok} File {self.input_file} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
+            'proc.input_try' : f'{s_note} Try to open dll file {self.input_file}',
+            'inj.run'        : f'{s_note} starting {self.target_process}',
+            'inj.pid'        : f'{s_note} {self.target_process} process id: {self.pid}',
+            'inj.handle'     : f'{s_note} Opened a Handle to the process',
+            'inj.alloc'      : f'{s_note} Allocated Memory at 0x{self.mem}',
+            'inj.write'      : f'{s_note} Write to memory',
+            'inj.inj_ok'     : f'{s_ok} Injected {self.input_file} into {self.target_process}',
 
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))

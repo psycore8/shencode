@@ -1,12 +1,13 @@
 ########################################################
 ### ROLHash Module
-### Status: migrated 084
+### Status: migrated 085
 ### 
 ########################################################
 
 import pefile
 from os import path as ospath
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
+from utils.style import *
 
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Change ROR13 to ROL encoding in metasploit payloads'
@@ -24,7 +25,7 @@ def register_arguments(parser):
 
 class module:
   Author = 'bordergate, psycore8'
-  Version = '2.1.4'
+  Version = '2.1.5'
   DisplayName = 'ROLLIN-HASH'
   data_size = 0
   hash = ''
@@ -45,18 +46,18 @@ class module:
 
   def msg(self, message_type, MsgVar=any, ErrorExit=False):
     messages = {
-        'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-        'error.input'    : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
-        'error.enc'      : f'{nstate.s_fail} En-/Decrption error, aborting script execution',
-        'error.mode'     : f'{nstate.s_fail} Please provide a valid mode: encode / decode',
-        'post.done'      : f'{nstate.s_ok} DONE!',
-        'proc.input_ok'  : f'{nstate.s_ok} File {self.input} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
-        'proc.out'       : f'{nstate.s_ok} File created in {self.output}\n{nstate.s_ok} Hash: {self.hash}',
-        'proc.error'     : f'{nstate.s_fail} encoded Shellcode error, aborting script execution',
-        'proc.done'      : f'{nstate.s_ok} encoded shellcode created in {self.output}',
-        'proc.sizemod'   : f'{nstate.s_note} Shellcode size: {MsgVar}',
-        'proc.out'       : f'{nstate.s_note} Writing bytes to file: {self.output}',
-        'proc.input'     : f'{nstate.s_ok} Reading shellcode'
+        'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+        'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
+        'error.enc'      : f'{s_fail} En-/Decrption error, aborting script execution',
+        'error.mode'     : f'{s_fail} Please provide a valid mode: encode / decode',
+        'post.done'      : f'{s_ok} DONE!',
+        'proc.input_ok'  : f'{s_ok} File {self.input} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
+        'proc.out'       : f'{s_ok} File created in {self.output}\n{s_ok} Hash: {self.hash}',
+        'proc.error'     : f'{s_fail} encoded Shellcode error, aborting script execution',
+        'proc.done'      : f'{s_ok} encoded shellcode created in {self.output}',
+        'proc.sizemod'   : f'{s_note} Shellcode size: {MsgVar}',
+        'proc.out'       : f'{s_note} Writing bytes to file: {self.output}',
+        'proc.input'     : f'{s_ok} Reading shellcode'
     }
     print(messages.get(message_type, f'{message_type} - this message type is unknown'))
     if ErrorExit:
@@ -144,18 +145,18 @@ class module:
         index = self.check_shellcode(shellcode, key)
         if index != -1:
             #self.msg('proc.func')
-            print(f'{nstate.s_note} 0x%08X = %s offset: %s' % (key, value, index))
+            print(f'{s_note} 0x%08X = %s offset: %s' % (key, value, index))
             dll_name = value.split('!')[0]
             function_name = value.split('!')[1]
             hash = self.calculate_hash(dll_name, function_name, ror_key, "rol")
             #self.msg('proc.newfunc')
-            print(f'{nstate.s_ok} New value: 0x%08X' % (hash))
+            print(f'{s_ok} New value: 0x%08X' % (hash))
             byte_data = hash.to_bytes(4, 'big')
             reversed_bytes = byte_data[::-1]
             new_shellcode = self.replace_bytes_at_offset(new_shellcode, index, reversed_bytes)
             hex_string = ''.join('\\x{:02X}'.format(byte) for byte in new_shellcode)
  
-    print(f"{nstate.s_note} Changing ROR key")
+    print(f"{s_note} Changing ROR key")
     
     # \xC1\xCF\x0D ror edi,D
 

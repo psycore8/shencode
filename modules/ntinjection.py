@@ -1,13 +1,14 @@
 ########################################################
 ### NtInjection Module
-### Status: cleaned, 083
+### Status: migrated 085
 ### 
 ########################################################
 
 import os
 from utils.windef import *
 from utils.winconst import *
-from utils.helper import nstate
+#from utils.helper import nstate
+from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 
 CATEGORY    = 'inject'
@@ -27,7 +28,7 @@ class module:
     import threading
 
     Author = 'psycore8'
-    Version = '0.0.6'
+    Version = '0.0.7'
     DisplayName = 'NATIVE-INJECTION'
     delay = 5
     data_size = 0
@@ -46,15 +47,15 @@ class module:
 
     def msg(self, message_type, MsgVar=None, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',    
-            'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.input_ok'  : f'{nstate.s_ok} File {self.input_file} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input_file}',
-            'proc.try'       : f'{nstate.s_note} Try to execute shellcode',
-            'mok'            : f'{nstate.s_ok} {MsgVar}',
-            'mnote'          : f'{nstate.s_note} {MsgVar}',
-            'merror'         : f'{nstate.s_fail} {MsgVar}'
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.input'    : f'{s_fail} File {self.input_file} not found or cannot be opened.',    
+            'post.done'      : f'{s_ok} DONE!',
+            'proc.input_ok'  : f'{s_ok} File {self.input_file} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
+            'proc.input_try' : f'{s_note} Try to open file {self.input_file}',
+            'proc.try'       : f'{s_note} Try to execute shellcode',
+            'mok'            : f'{s_ok} {MsgVar}',
+            'mnote'          : f'{s_note} {MsgVar}',
+            'merror'         : f'{s_fail} {MsgVar}'
 
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))

@@ -1,10 +1,11 @@
 ########################################################
 ### Task Module
-### Status: cleaned, 083
+### Status: cleaned, 085
 ### 
 ########################################################
 
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
+from utils.style import *
 from utils.helper import CheckFile, GetFileHash
 
 CATEGORY    = 'core'
@@ -18,7 +19,7 @@ class module:
     import importlib
     Author = 'psycore8'
     DisplayName = 'TASKS'
-    Version = '0.1.0'
+    Version = '0.1.1'
     result = any
 
     def __init__(self, input):
@@ -26,12 +27,12 @@ class module:
 
     def msg(self, message_type, MsgVar=None, ErrorExit=False):
         messages = {
-                'pre.head'         : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-                'task.name'        : f'{nstate.s_note} Starting Task: {MsgVar}',
-                'proc.input'       : f'{nstate.s_note} Task file ok',
-                'error.input'      : f'{nstate.s_fail} Task file failed!',
-                'post.done'        : f'{nstate.s_ok} Task DONE!',
-                'step.pre'         : f'{nstate.s_note} Executing step {MsgVar}',
+                'pre.head'         : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+                'task.name'        : f'{s_note} Starting Task: {MsgVar}',
+                'proc.input'       : f'{s_note} Task file ok',
+                'error.input'      : f'{s_fail} Task file failed!',
+                'post.done'        : f'{s_ok} Task DONE!',
+                'step.pre'         : f'{s_note} Executing step {MsgVar}',
                 'nl'               : f'\n'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))

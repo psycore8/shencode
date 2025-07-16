@@ -1,11 +1,12 @@
 ########################################################
 ### Download Module
-### Status: migrated 084
+### Status: migrated 085
 ###
 ########################################################
 
 import requests
-from utils.helper import nstate, GetFileInfo
+from utils.helper import GetFileInfo
+from utils.style import *
 from tqdm import tqdm
 
 CATEGORY    = 'core'
@@ -24,7 +25,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.1'
+    Version = '0.1.2'
     DisplayName = 'D0WNL04D3R'
     data_size = int
     hash = ''
@@ -40,12 +41,12 @@ class module:
 
     def msg(self, message_type, MsgVar=None, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.out'       : f'{nstate.s_ok} File created in {self.output}\n{nstate.s_info} Hash: {self.hash}',
-            'mok'            : f'{nstate.s_ok} {MsgVar}',
-            'mnote'          : f'{nstate.s_note} {MsgVar}',
-            'merror'         : f'{nstate.s_fail} {MsgVar}'
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'post.done'      : f'{s_ok} DONE!',
+            'proc.out'       : f'{s_ok} File created in {self.output}\n{s_info} Hash: {self.hash}',
+            'mok'            : f'{s_ok} {MsgVar}',
+            'mnote'          : f'{s_note} {MsgVar}',
+            'merror'         : f'{s_fail} {MsgVar}'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:

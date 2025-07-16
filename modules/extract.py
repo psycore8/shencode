@@ -1,10 +1,11 @@
 ########################################################
 ### Extract Module
-### Status: migrated 084
+### Status: migrated 085
 ###
 ########################################################
 
-from utils.helper import nstate
+#from utils.helper import nstate
+from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from os import path as os_path
 import struct
@@ -35,7 +36,7 @@ def register_arguments(parser):
 
 class module:
     Author =      'psycore8'
-    Version =     '2.2.0'
+    Version =     '2.2.1'
     DisplayName = 'BYTE-XTRACT0R'
     hash = ''
     data_size = 0
@@ -52,16 +53,16 @@ class module:
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'   : f'{nstate.s_fail} File {self.output} not found or cannot be opened.',
-            'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.input_ok'  : f'{nstate.s_ok} File {self.input} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
-            'proc.output_ok' : f'{nstate.s_ok} File {self.output} created\n{nstate.s_ok} Size {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input}',
-            'proc.output_try': f'{nstate.s_note} Writing to file...',
-            #'proc.try'       : f'{nstate.s_note} Try to extract bytes from 0x{self.start_offset} to 0x{self.end_offset}',
-            'proc.try2'       : f'{nstate.s_note} Try to extract bytes from {self.extract_range[0]} to {self.extract_range[1]}',
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
+            'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
+            'post.done'      : f'{s_ok} DONE!',
+            'proc.input_ok'  : f'{s_ok} File {self.input} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
+            'proc.output_ok' : f'{s_ok} File {self.output} created\n{s_ok} Size {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
+            'proc.input_try' : f'{s_note} Try to open file {self.input}',
+            'proc.output_try': f'{s_note} Writing to file...',
+            #'proc.try'       : f'{s_note} Try to extract bytes from 0x{self.start_offset} to 0x{self.end_offset}',
+            'proc.try2'       : f'{s_note} Try to extract bytes from {self.extract_range[0]} to {self.extract_range[1]}',
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:

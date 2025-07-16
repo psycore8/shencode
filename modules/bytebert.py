@@ -1,6 +1,6 @@
 ########################################################
 ### ByteBert Module
-### Status: migrated 084
+### Status: migrated 085
 ### 
 ########################################################
 
@@ -12,7 +12,8 @@
 
 import random
 from utils.asm import variable_instruction_set
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
+from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from utils.binary import get_coff_section
 from os import path as osp
@@ -42,7 +43,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.4.2'
+    Version = '0.4.3'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -66,30 +67,30 @@ class module:
 
     def msg(self, message_type, ErrorExit=False, MsgVar=any):
         messages = {
-            'pre.head'      : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'post.done'     : f'{nstate.s_ok} DONE!',
-            'proc.ssize'    : f'{nstate.s_note} ASM script generated with a size of {self.stub_size} bytes',
-            'proc.rkey'     : f'{nstate.s_note} Random key: {self.key} ({hex(self.key)})',
-            'error.input'   : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'  : f'{nstate.s_fail} File {MsgVar} not found or cannot be opened.',
-            'proc.psize'    : f'{nstate.s_note} Payload size: {self.Shellcode_Length}',
-            'proc.xor_ok'   : f'{nstate.s_ok} Encoded payload appended!',
-            'proc.out'      : f'{nstate.s_ok} File created in {MsgVar}\n{nstate.s_note} Hash: {self.hash}',
-            'proc.comp_try' : f'{nstate.s_note} Try to compile object file',
-            'proc.input_ok' : f'{nstate.s_ok} File {self.input} loaded\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
-            'proc.compile'  : f'{nstate.s_ok} File {MsgVar} created\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
-            'proc.ext'      : f'{nstate.s_info} Extract .text section from object file',
-            'proc.fsize'    : f'{nstate.s_info} Final shellcode size: {MsgVar} bytes',
-            'error.xor_ok'  : f"{nstate.s_fail} XOR encoded Shellcode error, aborting script execution",
-            'error.nasm1'   : f'{nstate.s_fail} nasm.exe not found! Download and place it into the shencode directory: {nstate.f_link}https://nasm.us/{nstate.f_end}',
-            'key.try'       : f'{nstate.s_info} Bruteforcing XOR key',
-            'error.key'     : f'{nstate.s_fail} \\x00 detected! Proceeding with random key',
-            'error.nasm2'   : f'{nstate.s_info} You can compile it by hand: nasm.exe -f win64 {MsgVar}',
+            'pre.head'      : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'post.done'     : f'{s_ok} DONE!',
+            'proc.ssize'    : f'{s_note} ASM script generated with a size of {self.stub_size} bytes',
+            'proc.rkey'     : f'{s_note} Random key: {self.key} ({hex(self.key)})',
+            'error.input'   : f'{s_fail} File {self.input} not found or cannot be opened.',
+            'error.output'  : f'{s_fail} File {MsgVar} not found or cannot be opened.',
+            'proc.psize'    : f'{s_note} Payload size: {self.Shellcode_Length}',
+            'proc.xor_ok'   : f'{s_ok} Encoded payload appended!',
+            'proc.out'      : f'{s_ok} File created in {MsgVar}\n{s_note} Hash: {self.hash}',
+            'proc.comp_try' : f'{s_note} Try to compile object file',
+            'proc.input_ok' : f'{s_ok} File {self.input} loaded\n{s_note} Size of shellcode {self.data_size} bytes\n{s_note} Hash: {self.hash}',
+            'proc.compile'  : f'{s_ok} File {MsgVar} created\n{s_note} Size of shellcode {self.data_size} bytes\n{s_note} Hash: {self.hash}',
+            'proc.ext'      : f'{s_info} Extract .text section from object file',
+            'proc.fsize'    : f'{s_info} Final shellcode size: {MsgVar} bytes',
+            'error.xor_ok'  : f"{s_fail} XOR encoded Shellcode error, aborting script execution",
+            'error.nasm1'   : f'{s_fail} nasm.exe not found! Download and place it into the shencode directory: {f_link}https://nasm.us/{f_end}',
+            'key.try'       : f'{s_info} Bruteforcing XOR key',
+            'error.key'     : f'{s_fail} \\x00 detected! Proceeding with random key',
+            'error.nasm2'   : f'{s_info} You can compile it by hand: nasm.exe -f win64 {MsgVar}',
             # Verbose
-            'v.registers'   : f'{nstate.s_info} Selected registers: {MsgVar}',
-            'v.inst'        : f'{nstate.s_info} {MsgVar}',
-            'v.size'        : f'{nstate.s_info} Size instruction: {MsgVar}',
-            'v.padding'     : f'{nstate.s_info} Added NOP at line {MsgVar}'
+            'v.registers'   : f'{s_info} Selected registers: {MsgVar}',
+            'v.inst'        : f'{s_info} {MsgVar}',
+            'v.size'        : f'{s_info} Size instruction: {MsgVar}',
+            'v.padding'     : f'{s_info} Added NOP at line {MsgVar}'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:

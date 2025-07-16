@@ -1,6 +1,6 @@
 ########################################################
 ### Start Subprocess Module
-### Status: cleaned, 083
+### Status: migrated 085
 ###
 ########################################################
 
@@ -10,15 +10,20 @@ import subprocess
 CATEGORY    = 'core'
 DESCRIPTION = 'Execute a subprocess'
 
+arglist = {
+    'command_line':         { 'value': [], 'desc': 'Command line to execute' }
+}
+
 def register_arguments(parser):
-    parser.add_argument('-c', '--command-line', default=[], help='Command line to execute')
+    parser.add_argument('-c', '--command-line', default=[], help=arglist['command_line']['desc'])
 
 class module:
     Author =      'psycore8'
-    Version =     '0.1.0'
+    Version =     '0.1.1'
     DisplayName = 'SUBPR0CESS'
     hash = ''
     data_size = 0
+    shell_path = '::core::subproc'
 
     def __init__(self, command_line):
         self.command_line = command_line

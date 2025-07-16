@@ -1,10 +1,11 @@
 ########################################################
 ### UUID Module
-### Status: migrated 084
+### Status: migrated 085
 ### 
 ########################################################
 
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
+from utils.style import *
 from utils.helper import GetFileInfo
 
 CATEGORY    = 'obfuscate'
@@ -19,7 +20,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.2.4'
+    Version = '2.2.5'
     DisplayName = 'UUID-OBF'
     UUID_string = ''
     hash = ''
@@ -35,13 +36,13 @@ class module:
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{nstate.s_fail} File {self.input_file} not found or cannot be opened.',
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.input'    : f'{s_fail} File {self.input_file} not found or cannot be opened.',
             'post.out'       : f'{self.UUID_string}',
-            'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.input_ok'  : f'{nstate.s_ok} File {self.input_file} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input_file}',
-            'proc.try'       : f'{nstate.s_note} Try generate UUIDs'
+            'post.done'      : f'{s_ok} DONE!',
+            'proc.input_ok'  : f'{s_ok} File {self.input_file} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
+            'proc.input_try' : f'{s_note} Try to open file {self.input_file}',
+            'proc.try'       : f'{s_note} Try generate UUIDs'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:

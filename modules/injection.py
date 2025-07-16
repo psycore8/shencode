@@ -1,13 +1,14 @@
 ########################################################
 ### Injection Module
-### Status: migrated 084
+### Status: migrated 085
 ### 
 ########################################################
 
 import os
 from utils.windef import *
 from utils.winconst import *
-from utils.helper import nstate
+#from utils.helper import nstate
+from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 
 CATEGORY    = 'inject'
@@ -38,7 +39,7 @@ class module:
     import threading
 
     Author = 'cpu0x00, psycore8'
-    Version = '2.1.7'
+    Version = '2.1.8'
     DisplayName = 'INJECTION'
     delay = 5
     data_size = 0
@@ -58,23 +59,23 @@ class module:
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',    
-            'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.input_ok'  : f'{nstate.s_ok} File {self.input} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input}',
-            'proc.try'       : f'{nstate.s_note} Try to execute shellcode',
-            'inj.run'        : f'{nstate.s_note} starting {self.target_process}',
-            'inj.pid'        : f'{nstate.s_note} {self.target_process} process id: {self.pid}',
-            'inj.handle'     : f'{nstate.s_note} Opened a Handle to the process',
-            'inj.alloc'      : f'{nstate.s_note} Allocated Memory in the process',
-            'inj.write'      : f'{nstate.s_ok} Wrote The shellcode to memory',
-            'inj.nacc'       : f'{nstate.s_note} VirtualProtectEx: PAGE_NO_ACCESS',
-            'inj.susp'       : f'{nstate.s_note} CreateRemoteThread: START_SUSPENDED',
-            'inj.inj_ok'     : f'{nstate.s_ok} Injected the shellcode into the process',
-            'inj.rwe'        : f'{nstate.s_note} VirtualProtectEx: PAGE_READWRITE_EXECUTE',
-            'inj.rest'       : f'{nstate.s_note} ResumeThread',
-            'inj.resume'     : f'{nstate.s_ok} Process resumed'
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',    
+            'post.done'      : f'{s_ok} DONE!',
+            'proc.input_ok'  : f'{s_ok} File {self.input} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
+            'proc.input_try' : f'{s_note} Try to open file {self.input}',
+            'proc.try'       : f'{s_note} Try to execute shellcode',
+            'inj.run'        : f'{s_note} starting {self.target_process}',
+            'inj.pid'        : f'{s_note} {self.target_process} process id: {self.pid}',
+            'inj.handle'     : f'{s_note} Opened a Handle to the process',
+            'inj.alloc'      : f'{s_note} Allocated Memory in the process',
+            'inj.write'      : f'{s_ok} Wrote The shellcode to memory',
+            'inj.nacc'       : f'{s_note} VirtualProtectEx: PAGE_NO_ACCESS',
+            'inj.susp'       : f'{s_note} CreateRemoteThread: START_SUSPENDED',
+            'inj.inj_ok'     : f'{s_ok} Injected the shellcode into the process',
+            'inj.rwe'        : f'{s_note} VirtualProtectEx: PAGE_READWRITE_EXECUTE',
+            'inj.rest'       : f'{s_note} ResumeThread',
+            'inj.resume'     : f'{s_ok} Process resumed'
 
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))

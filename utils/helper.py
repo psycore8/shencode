@@ -50,21 +50,24 @@ class nstate:
     clGRAY = '\033[90m'
     clLIGHTMAGENTA = '\033[95m'
 
-    def FormatModuleHeader(ModHeadText, ModVersion):
+    def __init__(self):
+        pass
+
+    def FormatModuleHeader(self, ModHeadText, ModVersion):
         f = f'{nstate.f_bold}{nstate.clGRAY}[{nstate.clRED}{ModHeadText}{nstate.clGRAY}]-[{nstate.clRED}{ModVersion}{nstate.clGRAY}]{nstate.f_end}'
         return f
 
-    def TextBlue(TextToFormat:str) -> str:
+    def TextBlue(self, TextToFormat:str) -> str:
         return f'\033[94m{TextToFormat}\033[0m'
     
-    def TextLink(TextToFormat:str) -> str:
+    def TextLink(self, TextToFormat:str) -> str:
         return f'\033[94m\033[4m{TextToFormat}\033[0m'
     
-    def remove_ansi_escape_sequences(text):
+    def remove_ansi_escape_sequences(self, text):
         ansi_escape = re.compile(r'\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])')
         return ansi_escape.sub('', text)
     
-    def m(mtype):
+    def m(self, mtype):
         messages = {
             'done': '\033[92m[+]\033[0m DONE!'
         }
@@ -72,7 +75,7 @@ class nstate:
 
 class FileCheck:
 
-    def CheckWrittenFile(file, module_message):
+    def CheckWrittenFile(self, file, module_message):
         cf = path.isfile(file)
         if cf:
             hash = sha1.calculate_sha1(file)
@@ -88,7 +91,7 @@ class FileCheck:
                  f'{nstate.INFO} {nstate.clGRAY}[{module_message}]{nstate.ENDC} Hash: {nstate.BOLD}{nstate.clLIGHTBLUE}-{nstate.ENDC}' ]
         return cf, s
     
-    def CheckSourceFile(file, module_message):
+    def CheckSourceFile(self, file, module_message):
         cf = path.isfile(file)
         if cf:
             hash = sha1.calculate_sha1(file)
@@ -104,20 +107,20 @@ class FileCheck:
         return cf, s
     
 class FirstRun:
-    def CheckFirstRunState():
+    def CheckFirstRunState(self):
         file = 'os.done'
         if not path.exists(file):
             if name == 'nt':
-                FirstRun.WinOnlyModules(True)
+                FirstRun.WinOnlyModules(self, True)
                 with open(file, 'w') as file:
                     file.write(f'Operating System: {name}')
             else:
-                FirstRun.WinOnlyModules(False)
+                FirstRun.WinOnlyModules(self, False)
                 with open(file, 'w') as file:
                     file.write(f'Operating System: {name}')
             print(f'{nstate.OKGREEN} OS Check passed!')
 
-    def WinOnlyModules(ActivationState:bool):
+    def WinOnlyModules(self, ActivationState:bool):
         Mod_Dir = 'modules'
         FileList = [ 'injection', 'dll', 'meterpreter', 'ntinjection', 'psoverwrite', 'rolhash', 'sliver' ]
         if ActivationState:

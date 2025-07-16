@@ -1,6 +1,6 @@
 ########################################################
 ### Alphanum Module
-### Status: migrated 084
+### Status: migrated 085
 ### 
 ########################################################
 
@@ -8,7 +8,8 @@ import os
 import random
 import tqdm
 from utils.asm import variable_instruction_set
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
+from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from utils.const import *
 from utils.binary import get_coff_section
@@ -36,7 +37,7 @@ def register_arguments(parser):
 
 class module:
     Author          = 'psycore8'
-    Version         = '0.1.8'
+    Version         = '0.1.9'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
@@ -54,16 +55,16 @@ class module:
 
     def msg(self, message_type, ErrorExit=False, MsgVar=str):
         messages = {
-            'pre.head'      : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'proc.input_ok'  : f'{nstate.s_ok} {MsgVar}',
-            'proc.output_ok' : f'{nstate.s_ok} {MsgVar}',
-            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input}',
-            'proc.output_try': f'{nstate.s_note} Writing to file {self.output}',
-            'error.input'    : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'   : f'{nstate.s_fail} File {self.output} not found or cannot be opened.',
-            'note'           : f'{nstate.s_note} {MsgVar}',
-            'ok'             : f'{nstate.s_ok} {MsgVar}',
-            'post.done'      : f'{nstate.s_ok} DONE!'
+            'pre.head'      : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'proc.input_ok'  : f'{s_ok} {MsgVar}',
+            'proc.output_ok' : f'{s_ok} {MsgVar}',
+            'proc.input_try' : f'{s_note} Try to open file {self.input}',
+            'proc.output_try': f'{s_note} Writing to file {self.output}',
+            'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
+            'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
+            'note'           : f'{s_note} {MsgVar}',
+            'ok'             : f'{s_ok} {MsgVar}',
+            'post.done'      : f'{s_ok} DONE!'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
@@ -193,7 +194,7 @@ class module:
                 self.msg('proc.input_try')
                 with open(self.input, 'rb') as file:
                     size, hash = GetFileInfo(self.input)
-                    self.msg('proc.input_ok', False, f'File {self.input} loaded\n{nstate.s_ok} Size of shellcode {size} bytes\n{nstate.s_ok} Hash: {hash}')
+                    self.msg('proc.input_ok', False, f'File {self.input} loaded\n{s_ok} Size of shellcode {size} bytes\n{s_ok} Hash: {hash}')
                     shellcode_bytes = file.read()
             except FileNotFoundError:
                 self.msg('error.input', True)
@@ -233,7 +234,7 @@ class module:
                     f.write(sc)
             if CheckFile(self.output):
                 size, hash = GetFileInfo(self.output)
-                m('proc.output_ok', False, f'File {self.output} created\n{nstate.s_ok} Size {size} bytes\n{nstate.s_ok} Hash: {hash}')
+                m('proc.output_ok', False, f'File {self.output} created\n{s_ok} Size {size} bytes\n{s_ok} Hash: {hash}')
             else:
                 m('error.output', True)
 

@@ -1,12 +1,13 @@
 ########################################################
 ### Output Module
-### Status: migrated 084
+### Status: migrated 085
 ### 
 ########################################################
 
 from keystone import *
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileHash
+from utils.style import *
 
 CATEGORY    = 'core'
 DESCRIPTION = 'Output and inspect binaries in different formats'
@@ -41,9 +42,9 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     DisplayName = 'MODOUT'
-    Version = '0.2.4'
+    Version = '0.2.6'
     file_bytes = bytes
-    offset_color = nstate.clLIGHTMAGENTA
+    offset_color = clLIGHTMAGENTA
     cFile = False
     shell_path = '::core::output'
 
@@ -77,15 +78,15 @@ class module:
 
     def msg(self, message_type, ErrorExit=False, MsgVar=None):
         messages = {
-            'pre.head'      : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'pre.input'     : f'{nstate.s_note} Input File: {self.input}',
-            'pre.hash'      : f'{nstate.f_out} File Hash: {MsgVar}',
-            'process'       : f'{nstate.s_note} processing shellcode format... NoLineBreak: {self.no_line_break}\n',
-            'post.output'   : f'{nstate.s_ok} Output file: {self.output}',
-            'post.summary'  : f'{nstate.s_info} Total length: {MsgVar} bytes',
-            'post.done'     : f'{nstate.s_ok} DONE!',
-            'error.input'   : f'{nstate.s_fail} Input file not found' ,
-            'error.output'  : f'{nstate.s_fail} Output file not found'
+            'pre.head'      : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'pre.input'     : f'{s_note} Input File: {self.input}',
+            'pre.hash'      : f'{f_out} File Hash: {MsgVar}',
+            'process'       : f'{s_note} processing shellcode format... NoLineBreak: {self.no_line_break}\n',
+            'post.output'   : f'{s_ok} Output file: {self.output}',
+            'post.summary'  : f'{s_info} Total length: {MsgVar} bytes',
+            'post.done'     : f'{s_ok} DONE!',
+            'error.input'   : f'{s_fail} Input file not found' ,
+            'error.output'  : f'{s_fail} Output file not found'
         }
         print(messages.get(message_type, 'Unknown message type'))
         if ErrorExit:
@@ -102,14 +103,14 @@ class module:
                 self.file_bytes = file.read(y - x)
 
     def SaveOutputFile(self, data):
-        nstate.remove_ansi_escape_sequences(data)
+        remove_ansi_escape_sequences(data)
         with open(self.output, 'w') as file:
             file.write(
-                nstate.remove_ansi_escape_sequences( data )
+                remove_ansi_escape_sequences( data )
                 )
 
     def highlight_word(self, text, word, colorclass):
-        highlighted_text = text.replace(word, f"{colorclass}{word}{nstate.ENDC}")  # Rote Markierung
+        highlighted_text = text.replace(word, f"{colorclass}{word}{ENDC}")  # Rote Markierung
         return highlighted_text
 
     def GenerateOutput(self):
@@ -121,14 +122,14 @@ class module:
             if self.lines:
                 offset = self.GenerateOffset(i)
             chunk = self.file_bytes[i:i+self.bytes_per_row]
-            formatted_row = ''.join(f'{s['byte_sep']}{byte:02x}' for byte in chunk)
-            formatted_row = self.highlight_word(formatted_row, '00', nstate.clRED)
+            formatted_row = ''.join(f'{s["byte_sep"]}{byte:02x}' for byte in chunk)
+            formatted_row = self.highlight_word(formatted_row, '00', clRED)
             if self.highlight != None:
-                formatted_row = self.highlight_word(formatted_row, self.highlight, nstate.clLIGHTBLUE)
-            formatted_bytes += f'{offset}{s['row_prefix']}{formatted_row[s['row_cut']:]}{s['row_suffix']}'
+                formatted_row = self.highlight_word(formatted_row, self.highlight, clLIGHTBLUE)
+            formatted_bytes += f'{offset}{s["row_prefix"]}{formatted_row[s["row_cut"]:]}{s["row_suffix"]}'
         if self.no_line_break:
             formatted_bytes = formatted_bytes.replace('\n', '')
-        return f'{formatted_bytes[:s['code_cut']]}{s["code_add"]}', size
+        return f'{formatted_bytes[:s["code_cut"]]}{s["code_add"]}', size
 
     def GenerateHeader(self):
         if not self.syntax == 'inspect':
@@ -137,18 +138,18 @@ class module:
             c = self.offset_color
             if self.decimal:
                 row_numbers = ' '.join(f'{i:02d}' for i in range(self.bytes_per_row))
-                head = f'{c}Offset(d) {row_numbers}{nstate.ENDC}\n'
+                head = f'{c}Offset(d) {row_numbers}{ENDC}\n'
             else:
                 row_numbers = ' '.join(f'{i:02X}' for i in range(self.bytes_per_row))
-                head = f'{c}Offset(h) {row_numbers}{nstate.ENDC}\n'
+                head = f'{c}Offset(h) {row_numbers}{ENDC}\n'
         return head
     
     def GenerateOffset(self, counter=int):
         c = self.offset_color
         if self.decimal:
-            offset = f'{c}{counter:08d}:{nstate.ENDC}'
+            offset = f'{c}{counter:08d}:{ENDC}'
         else:
-            offset = f'{c}{counter:08X}:{nstate.ENDC}'
+            offset = f'{c}{counter:08X}:{ENDC}'
         return offset
 
     def PostProcess(self):
