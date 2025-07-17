@@ -30,20 +30,20 @@ DESCRIPTION = 'ByteBert - Advanced polymorphic Encoder Stub'
 arglist = {
     'input':                    { 'value': None, 'desc': 'Input file to use with bytebert' },
     'output':                   { 'value': None, 'desc': 'Outputfile for bytebert' },
-    'variable_padding':         { 'value': False, 'desc': 'Inserts a random NOP to differ the padding' },
+    'variable_padding':         { 'value': False, 'desc': 'Inserts random NOPs to differ the padding' },
     'verbose':                  { 'value': False, 'desc': 'Verbose mode' }
 }
 
 def register_arguments(parser):
             parser.add_argument('-i', '--input', help=arglist['input']['desc'])
             parser.add_argument('-o', '--output', help=arglist['output']['desc'])
-            parser.add_argument('-v', '--variable-padding', action='store_true', help=arglist['variable_padding']['desc'])
+            parser.add_argument('-v', '--variable-padding', type=int, help=arglist['variable_padding']['desc'])
             add = parser.add_argument_group('Additional')
             add.add_argument('--verbose', action='store_true', help=arglist['verbose']['desc'])
 
 class module:
     Author = 'psycore8'
-    Version = '0.4.3'
+    Version = '0.4.4'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -58,7 +58,7 @@ class module:
     relay_output = False
     shell_path = '::encoder::ByteBert'
 
-    def __init__(self, input, output, variable_padding=bool, verbose=bool):
+    def __init__(self, input, output, variable_padding=0, verbose=bool):
         self.input = input
         self.output = output
         self.variable_padding = variable_padding
@@ -312,16 +312,19 @@ class module:
                         call decoder             ; JMP-CALL-POP: 2. CALL
                   """
         
-        if self.variable_padding:
-            nop = vi.nop_instruction()
-            paddy = stub64.split('\n')
-            spacer = ' ' * 24
-            noppy = f'{spacer}{nop}'
-            random_noppy_index = random.randint(6, len(paddy)-2)
-            paddy.insert(random_noppy_index, noppy)
-            stub64_paddy = '\n'.join(paddy)
-            if self.verbose:
-                self.msg('v.padding', False, f'{random_noppy_index}')
+        if self.variable_padding != 0:
+            i = 0
+            while i in range(0, self.variable_padding):
+                nop = vi.nop_instruction()
+                paddy = stub64.split('\n')
+                spacer = ' ' * 24
+                noppy = f'{spacer}{nop}'
+                random_noppy_index = random.randint(6, len(paddy)-2)
+                paddy.insert(random_noppy_index, noppy)
+                stub64_paddy = '\n'.join(paddy)
+                if self.verbose:
+                    self.msg('v.padding', False, f'{random_noppy_index}')
+                i += 1
             return stub64_paddy
         else:
             return stub64

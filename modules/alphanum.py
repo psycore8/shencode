@@ -23,7 +23,7 @@ arglist = {
     'output':               { 'value': None,    'desc': 'Output file to use' },
     'decode':               { 'value': False,   'desc': 'Decode the input to bytes' },
     'compile':              { 'value': False,   'desc': 'Compile object file and extract shellcode' },
-    'variable_padding':     { 'value': False,   'desc': 'Inserts a random NOP to differ the padding' },
+    'variable_padding':     { 'value': False,   'desc': 'Inserts random NOPs to differ the padding' },
 }
 
 def register_arguments(parser):
@@ -33,11 +33,11 @@ def register_arguments(parser):
             add = parser.add_argument_group('Additional')
             add.add_argument('-c', '--compile', default=False, action='store_true' ,help=arglist['compile']['desc'])
             add.add_argument('-d', '--decode', default=False, action='store_true' ,help=arglist['decode']['desc'])
-            add.add_argument('-v', '--variable-padding', action='store_true', help=arglist['variable_padding']['desc'])
+            add.add_argument('-v', '--variable-padding', type=int, help=arglist['variable_padding']['desc'])
 
 class module:
     Author          = 'psycore8'
-    Version         = '0.1.9'
+    Version         = '0.2.0'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
@@ -45,7 +45,7 @@ class module:
     relay_output    = False
     shell_path      = '::encoder::alphanum'
 
-    def __init__(self, input, output, decode=False, compile=False, variable_padding=False):
+    def __init__(self, input, output, decode=False, compile=False, variable_padding=0):
             self.input = input
             self.output = output
             self.decode = decode
@@ -173,15 +173,18 @@ class module:
                         call decoder
                         encoded_shellcode: db '{self.encoded_data}'
             """
-        if self.variable_padding:
-            nop = vi.nop_instruction()
-            paddy = stub.split('\n')
-            spacer = ' ' * 24
-            noppy = f'{spacer}{nop}'
-            random_noppy_index = random.randint(4, len(paddy)-4)
-            paddy.insert(random_noppy_index, noppy)
-            stub64_paddy = '\n'.join(paddy)
-            self.msg('note', False, f'NOP inserted at line {random_noppy_index}: {nop}')
+        if self.variable_padding != 0:
+            i = 0
+            while i in range(0,self.variable_padding):
+                nop = vi.nop_instruction()
+                paddy = stub.split('\n')
+                spacer = ' ' * 24
+                noppy = f'{spacer}{nop}'
+                random_noppy_index = random.randint(4, len(paddy)-4)
+                paddy.insert(random_noppy_index, noppy)
+                stub64_paddy = '\n'.join(paddy)
+                self.msg('note', False, f'NOP inserted at line {random_noppy_index}: {nop}')
+                i += 1
             return stub64_paddy
         else:
             return stub

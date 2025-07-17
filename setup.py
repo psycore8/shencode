@@ -3,15 +3,16 @@ from utils.helper import FirstRun
 
 extras = []
 import sys
+fr = FirstRun()
 if sys.platform == 'win32':
     extras.append(
         ['pywin32==310',
         'WMI==1.5.1']
         )
-    FirstRun.WinOnlyModules(True)
+    fr.WinOnlyModules(True)
 elif sys.platform == 'linux':
     #extras.append('linux-only-package')
-    FirstRun.WinOnlyModules(False)
+    fr.WinOnlyModules(False)
 elif sys.platform == 'darwin':
     pass
     #extras.append('macos-only-package')

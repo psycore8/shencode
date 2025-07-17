@@ -74,7 +74,7 @@ class variable_instruction_set:
             'mov edi, edi',
             'mov ebx, ebx',
             'nop',
-            '66 nop',
+            #'66 nop',
             'rex nop'
             #'nop dword ptr [ecx]',
             #'nop dword ptr [eax+eax*1+01]'

@@ -10,7 +10,7 @@
                     "output": "tests\\0-sc.an",
                     "decode": false,
                     "compile": true,
-                    "variable_padding": true
+                    "variable_padding": 5
                 },
                 "input_buffer": false,
                 "return_buffer": false
@@ -19,7 +19,7 @@
                 "args": {
                     "input": "tests\\calc.raw",
                     "output": "tests\\0-sc.bb",
-                    "variable_padding": true,
+                    "variable_padding": 5,
                     "verbose": true
                 },
                 "input_buffer": false,

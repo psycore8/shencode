@@ -19,8 +19,6 @@ ShenCode is a framework for developing, analyzing and testing shellcodes. It com
 
 #### General usage
 
-> Help docs are currently not up to date. I am working on a new publishing system. This will be done in a few days.
-
 Check out [ShenCode Docs](https://heckhausen.it/shencode/wiki/) and [the starter tutorial](https://heckhausen.it/shencode/wiki/getting-started) for more information.
 
 | Category    | Module        | Description                                    | Docs                                                                 | Refs                                                                                                      |

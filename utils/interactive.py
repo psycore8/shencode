@@ -1,31 +1,34 @@
 import ast
 import importlib
 import json
+#import minidump
 import shlex
+import subprocess
 from keystone import *
 from utils.crypt import aes_worker
 from utils.const import *
-from utils.helper import nstate
+from utils.style import *
+#from utils.helper import nstate
 from os import path, get_terminal_size, listdir
 
 from prompt_toolkit import prompt, styles
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.formatted_text import HTML
 
-n = nstate
-print(f'{n.clRED}Interactive mode is still experimental{n.ENDC}')
-print(f'For error reporting use: {n.f_link}https://github.com/psycore8/shencode{n.ENDC}')
+print(f'{clRED}Interactive mode is still experimental{ENDC}')
+print(f'For error reporting use: {f_link}https://github.com/psycore8/shencode{ENDC}')
 
 cmd = ''
 
 help_list = {
     'aeskey':       { 'desc': 'Generate an AES key, iv and salt: aeskey password' },
     'asm':          { 'desc': 'Assemble shellcode instructions: asm "nop; mov ecx, 1"' },
-    'config':       { 'desc': 'Save or restore module configuration (overwrites old configs): config save/restore' },
+    'config':       { 'desc': 'Save, restore or print module configuration (overwrites old configs): config print/save/restore' },
     'exit':         { 'desc': 'Exit ShenCode' },
     'help':         { 'desc': 'List available commands' },
     'list':         { 'desc': 'List available modules' },
     'load':         { 'desc': 'Load a module' },
+    #'minidump':     { 'desc': 'Experimental minidump' },
     'options':      { 'desc': 'List module options' },
     'run':          { 'desc': 'Run module' },
     'set':          { 'desc': 'Set module options' }
@@ -34,9 +37,9 @@ help_list = {
 auto_complete = []
 
 imods = {
-    'core':         [ 'download', 'extract', 'multicoder', 'output' ],
+    'core':         [ 'download', 'extract', 'minidump', 'multicoder', 'output', 'subproc' ],
     'encoder':      [ 'alphanum', 'bytebert' ],
-    'inject':       [ 'dll', 'inject', 'psoverwrite' ],
+    'inject':       [ 'dll', 'injection', 'psoverwrite' ],
     'obfuscate':    [ 'feed', 'qrcode', 'rolhash', 'uuid' ],
     'payload':      [ 'msfvenom', 'winexec' ],
     'stager':       [ 'meterpreter', 'sliver' ]
@@ -52,6 +55,7 @@ left_just = 25
 shell_prefix = 'shencode'
 shell_infix = ''
 shell_suffix = '$ '
+#tf = nstate()
 
 style = styles.Style.from_dict({
     # 'token': 'fg:bg bold italic underline'
@@ -68,7 +72,7 @@ def command_parser(command):
     if split_cmd[0] == 'help':
         print('\n')
         for help in help_list:
-            print(f'{help}'.ljust(left_just) + f'{help_list[help].get('desc')}')
+            print(f'{help}'.ljust(left_just) + f'{help_list[help].get("desc")}')
         print('\n')
 
     elif split_cmd[0] == 'asm':
@@ -99,6 +103,8 @@ def command_parser(command):
                     print(f'ERROR: {e}')
             else:
                 print('No module loaded. Use the load command before.')
+        elif split_cmd[1] == 'print':
+            print_config()
         else:
             print('The given argument was not recognized, use save or restore.')
 
@@ -116,13 +122,16 @@ def command_parser(command):
         load_mod(split_cmd[1])
         loaded_module_name = split_cmd[1]
 
+    # elif split_cmd[0] == 'minidump':
+    #     subprocess.call(['python.exe','utils\\minidump.py'])
+
     elif split_cmd[0] == 'options':
         size = get_terminal_size()
         print('\n')
         print('Option'.ljust(left_just) + 'Value'.ljust(left_just) + 'Help')
         print('-'*size.columns)
         for arg in arg_list:
-            print(f'{arg}'.ljust(left_just) + f'{arg_list[arg]['value']}'.ljust(left_just) + f'{arg_list.get(arg)['desc']}')
+            print(f'{arg}'.ljust(left_just) + f'{arg_list[arg]["value"]}'.ljust(left_just) + f'{arg_list.get(arg)["desc"]}')
         print('\n')
 
     elif split_cmd[0] == 'run':
@@ -198,4 +207,21 @@ def interactive_mode():
     command_parser(cmd)
     interactive_mode()
 
-
+def print_config():
+    values = ''
+    for item in arg_list:
+        # if isinstance({arg_list[item]["value"]}, str):
+        #     value = f'"{arg_list[item]["value"]}"'
+        # else: 
+        #     value = f'{arg_list[item]["value"]}'
+        values += ' '*18 + f'"{item}": "{arg_list[item]["value"]}"\n'
+    json = f"""
+            "{loaded_module_name}": {{
+                "args": {{
+{values}
+                }},
+                "input_buffer": false,
+                "return_buffer": false
+            }},
+"""
+    print(json)
