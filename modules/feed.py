@@ -11,6 +11,7 @@ import urllib.parse
 from datetime import timedelta
 from utils.const import *
 from lxml import etree
+from tqdm import tqdm
 #from utils.helper import nstate as nstate
 from utils.style import *
 from utils.helper import GetFileInfo, CheckFile
@@ -46,7 +47,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.2.4'
+    Version = '2.2.5'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0
@@ -87,8 +88,10 @@ class module:
             self.shellcode = self.input_file
         else:
             try:
-                for b in open(self.input_file, 'rb').read():
-                    self.shellcode += b.to_bytes(1, 'big').hex()
+                #for b in open(self.input_file, 'rb').read():
+                #    self.shellcode += b.to_bytes(1, 'big').hex()
+                with open(self.input_file, 'rb') as f:
+                    self.shellcode = f.read()
                 return True
             except FileNotFoundError:
                 return False
@@ -119,7 +122,7 @@ class module:
         return random_date
 
     def convert_bytes_to_fake_id(self, block_size=16):
-        s = self.shellcode.encode('utf-8')
+        s = self.shellcode#.encode('utf-8')
         self.feed_fake_ids.extend([s[i:i + block_size] for i in range(0, len(s), block_size)])
 
     def generate_additional_attributes(self):
@@ -159,7 +162,8 @@ class module:
 
         # Entries
         i = 1
-        for id in self.feed_fake_ids:
+        #for id in self.feed_fake_ids:
+        for id in tqdm(self.feed_fake_ids, desc='IDs'):
             title = self.generate_fake_title()
             date = self.generate_fake_date()
             h = random.randint(0, 23)
@@ -175,7 +179,10 @@ class module:
             entry_updated = etree.SubElement(entry, 'updated')
             entry_updated.text = f'{date} {time}'
             entry_id = etree.SubElement(entry, 'id')
-            entry_id.text = f'{self.feed_uri}{id.decode("utf-8")}' # 16 bytes part of shellcode
+            #entry_id.text = f'{self.feed_uri}{id.decode("utf-8")}' # 16 bytes part of shellcode
+            #conv = id.to_bytes(1, 'big').hex()
+            conv = id.hex()
+            entry_id.text = f'{self.feed_uri}{conv}'
             i += 1
 
         xml_str = etree.tostring(root, pretty_print=True, xml_declaration=True, encoding="utf-8")
@@ -214,7 +221,9 @@ class module:
                 self.output_result()
             else:
                 self.msg('error.input', True)
-        if not self.relay_output:
+        if self.relay_output:
+            return self.shellcode
+        else:
             if CheckFile(self.output_file):
                 self.data_size, self.hash = GetFileInfo(self.output_file)
                 self.msg('proc.output_ok')

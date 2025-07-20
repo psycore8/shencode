@@ -45,7 +45,7 @@ imods = {
     'stager':       [ 'meterpreter', 'sliver' ]
 }
 
-append_keywords = [ 'save', 'restore' ]
+append_keywords = [ 'save', 'restore', 'print' ]
 
 arg_list = {}
 loaded_module = None
@@ -165,6 +165,8 @@ def command_parser(command):
 def eval_data_types(user_input):
     try:
         result = ast.literal_eval(user_input)
+        if isinstance(result, str):
+          result = ast.literal_eval(result)
     except Exception as e:
         #print(f'DEBUG: an error has occured, during type evaluation: {e}')
         result = user_input
@@ -214,7 +216,7 @@ def print_config():
         #     value = f'"{arg_list[item]["value"]}"'
         # else: 
         #     value = f'{arg_list[item]["value"]}'
-        values += ' '*18 + f'"{item}": "{arg_list[item]["value"]}"\n'
+        values += ' '*18 + f'"{item}": "{arg_list[item]["value"]},"\n'
     json = f"""
             "{loaded_module_name}": {{
                 "args": {{

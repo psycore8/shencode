@@ -4,7 +4,8 @@
 ###
 ########################################################
 
-from utils.helper import nstate
+#from utils.helper import nstate
+from utils.style import *
 import subprocess
 
 CATEGORY    = 'core'
@@ -30,10 +31,10 @@ class module:
 
     def msg(self, message_type, MsgVar=None, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.proc'     : f'{nstate.s_fail} Error during processing: {MsgVar} {self.command_line}',
-            'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.ok'        : f'{nstate.s_ok} Subprocess executed'
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.proc'     : f'{s_fail} Error during processing: {MsgVar} {self.command_line}',
+            'post.done'      : f'{s_ok} DONE!',
+            'proc.ok'        : f'{s_ok} Subprocess executed'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:

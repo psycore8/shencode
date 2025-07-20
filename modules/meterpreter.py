@@ -6,8 +6,10 @@
 
 #from utils.helper import nstate as nstate
 from utils.style import *
-from utils.windef import *
-from utils.winconst import *
+from os import name as osname
+if osname == 'nt':
+    from utils.windef import *
+    from utils.winconst import *
 from time import sleep
 import socket
 import struct
@@ -35,7 +37,7 @@ def register_arguments(parser):
 class module:
     
     Author          = 'raptor@0xdeadbeef.info, psycore8'
-    Version         = '1.2.6'
+    Version         = '1.2.7'
     DisplayName      = 'METERPRETER-STAGER'
     payload         = any
     payload_size    = int
