@@ -10,10 +10,10 @@ ShenCode is a framework for developing, analyzing and testing shellcodes. It sup
 
 - Argument mode
 	- `shencode core output -i file.raw -s inspect`
-- [[getting-started#Interactive|Interactive mode]]
+- [Interactive Mode](https://www.heckhausen.it/shencode/getting-started#interactive)
 	- `shencode$ load output`
 	- `shencode::core::output$`
-- [[task|Task mode]]
+- [Task Mode](https://www.heckhausen.it/shencode/core/task)
 	- Automate modules in different steps with `json`
 
 ### Version 0.8.5

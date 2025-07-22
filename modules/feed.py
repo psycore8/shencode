@@ -179,6 +179,7 @@ class module:
             entry_updated = etree.SubElement(entry, 'updated')
             entry_updated.text = f'{date} {time}'
             entry_id = etree.SubElement(entry, 'id')
+
             #entry_id.text = f'{self.feed_uri}{id.decode("utf-8")}' # 16 bytes part of shellcode
             #conv = id.to_bytes(1, 'big').hex()
             conv = id.hex()
