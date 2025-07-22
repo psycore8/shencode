@@ -9,17 +9,18 @@
 
 from utils.args import parse_arguments
 import utils.args
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
 from utils.const import *
+from utils.style import *
 import utils.header
 import utils.interactive
 #import utils.helper
 import importlib
 import json
 
-print(f"{nstate.HEADER}")
+print(f"{HEADER}")
 print(f'{utils.header.get_header(banner)}')
-print(f'Version {Version} by psycore8 -{nstate.ENDC} {nstate.TextLink("https://www.nosociety.de")}\n')
+print(f'Version {Version} by psycore8 -{ENDC} {TextLink("https://www.nosociety.de")}\n')
 arguments = parse_arguments()
 
 config = None

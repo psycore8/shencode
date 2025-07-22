@@ -1,10 +1,11 @@
 ########################################################
 ### AES Module
-### Status: cleaned, deprecated, 083
+### Status: migrated 085, deprecated
 ### 
 ########################################################
 
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
+from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
@@ -26,7 +27,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.1.5'
+    Version = '2.1.6'
     DisplayName = 'AES-ENCODER'
     data_size = int
     hash = ''
@@ -41,13 +42,13 @@ class module:
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
-            'error.enc'      : f'{nstate.s_fail} En-/Decrption error, aborting script execution',
-            'error.mode'     : f'{nstate.s_fail} Please provide a valid mode: encode / decode',
-            'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.input_ok'  : f'{nstate.s_ok} File {self.input} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
-            'proc.out'       : f'{nstate.s_ok} File created in {self.output}\n{nstate.s_ok} Hash: {self.hash}'
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
+            'error.enc'      : f'{s_fail} En-/Decrption error, aborting script execution',
+            'error.mode'     : f'{s_fail} Please provide a valid mode: encode / decode',
+            'post.done'      : f'{s_ok} DONE!',
+            'proc.input_ok'  : f'{s_ok} File {self.input} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
+            'proc.out'       : f'{s_ok} File created in {self.output}\n{s_ok} Hash: {self.hash}'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:

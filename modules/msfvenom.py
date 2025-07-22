@@ -1,10 +1,11 @@
 ########################################################
 ### MSFVenom Module
-### Status: migrated 084
+### Status: migrated 085
 ###
 ########################################################
 
-from utils.helper import nstate
+#from utils.helper import nstate
+from utils.style import *
 from utils.const import msfvenom_path
 import subprocess
 
@@ -20,7 +21,7 @@ def register_arguments(parser):
 
 class module:
   Author        = 'psycore8'
-  Version       = '2.1.4'
+  Version       = '2.1.5'
   DisplayName   = 'MSF-VENOM'
   Args          = []
   shell_path    = '::payload::msfvenom'
@@ -31,10 +32,10 @@ class module:
 
   def msg(self, message_type, ErrorExit=False):
       messages = {
-          'pre.head'      : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-          'pre.msg'       : f'{nstate.s_note} Creating payload...',
-          'process'       : f'{nstate.s_note}{self.Args}',
-          'post.done'     : f'{nstate.s_ok} DONE!',
+          'pre.head'      : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+          'pre.msg'       : f'{s_note} Creating payload...',
+          'process'       : f'{s_note}{self.Args}',
+          'post.done'     : f'{s_ok} DONE!',
       }
       print(messages.get(message_type, 'Unknown message type'))
       if ErrorExit:

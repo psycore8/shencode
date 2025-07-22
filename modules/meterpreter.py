@@ -1,12 +1,15 @@
 ########################################################
 ### Meterpreter Module
-### Status: migrated 084
+### Status: migrated 085
 ###
 ########################################################
 
-from utils.helper import nstate as nstate
-from utils.windef import *
-from utils.winconst import *
+#from utils.helper import nstate as nstate
+from utils.style import *
+from os import name as osname
+if osname == 'nt':
+    from utils.windef import *
+    from utils.winconst import *
 from time import sleep
 import socket
 import struct
@@ -34,7 +37,7 @@ def register_arguments(parser):
 class module:
     
     Author          = 'raptor@0xdeadbeef.info, psycore8'
-    Version         = '1.2.5'
+    Version         = '1.2.7'
     DisplayName      = 'METERPRETER-STAGER'
     payload         = any
     payload_size    = int
@@ -51,21 +54,21 @@ class module:
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
-            'pre.head'      : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'proc.sock'     : f'{nstate.s_note} Creating Socket...',
-            'proc.con'      : f'{nstate.s_ok} Connection established',
-            'proc.stage'    : f'{nstate.s_note} Download stage...',
-            'proc.size'     : f'{nstate.s_note} Payload size: {self.payload_size} bytes',
-            'proc.stage_ok' : f'{nstate.s_ok} Stage downloaded!',
-            'proc.exec'     : f'{nstate.s_note} Trying to execute Meterpreter stage...',
-            'inj.alloc'     : f'{nstate.s_ok} Memory allocated!',
-            'inj.sleep'     : f'{nstate.s_info} Let\'s take a nap for {self.sleeptime} seconds',
-            'inj.exec'      : f'{nstate.s_note} Execute payload...',
-            'inj.ok'        : f'{nstate.s_ok} Looks good!',
-            'inj.fail'      : f'{nstate.s_fail} Payload not executed',
-            'post.done'     : f'{nstate.s_ok} DONE!',
-            'error.con'     : f'{nstate.s_fail} Connection failed',
-            'error.stage_ok': f'{nstate.s_fail} Error during download'
+            'pre.head'      : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'proc.sock'     : f'{s_note} Creating Socket...',
+            'proc.con'      : f'{s_ok} Connection established',
+            'proc.stage'    : f'{s_note} Download stage...',
+            'proc.size'     : f'{s_note} Payload size: {self.payload_size} bytes',
+            'proc.stage_ok' : f'{s_ok} Stage downloaded!',
+            'proc.exec'     : f'{s_note} Trying to execute Meterpreter stage...',
+            'inj.alloc'     : f'{s_ok} Memory allocated!',
+            'inj.sleep'     : f'{s_info} Let\'s take a nap for {self.sleeptime} seconds',
+            'inj.exec'      : f'{s_note} Execute payload...',
+            'inj.ok'        : f'{s_ok} Looks good!',
+            'inj.fail'      : f'{s_fail} Payload not executed',
+            'post.done'     : f'{s_ok} DONE!',
+            'error.con'     : f'{s_fail} Connection failed',
+            'error.stage_ok': f'{s_fail} Error during download'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:

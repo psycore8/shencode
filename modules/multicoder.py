@@ -1,6 +1,6 @@
 ########################################################
 ### MultiCODER Module
-### Status: migrated 084
+### Status: migrated 085
 ### 
 ########################################################
 
@@ -8,7 +8,8 @@ import base64
 import os
 import pickle
 
-from utils.helper import nstate
+#from utils.helper import nstate
+from utils.style import *
 from utils.helper import GetFileInfo
 from utils.const import priv_key, pub_key
 
@@ -32,7 +33,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.1'
+    Version = '0.1.2'
     DisplayName = 'MultiC0DER'
     data_size = int
     hash = ''
@@ -50,14 +51,14 @@ class module:
 
     def msg(self, message_type, MsgVar=None, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.mode'     : f'{nstate.s_fail} Please provide a valid mode: encode / decode',
-            'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.input_ok'  : f'{nstate.s_ok} File {self.input} loaded\n{nstate.s_info} Size of encoded data: {self.data_size} bytes\n{nstate.s_info} Hash: {self.hash}',
-            'proc.out'       : f'{nstate.s_ok} File created in {self.output}\n{nstate.s_info} Hash: {self.hash}',
-            'mok'            : f'{nstate.s_ok} {MsgVar}',
-            'mnote'          : f'{nstate.s_note} {MsgVar}',
-            'merror'         : f'{nstate.s_fail} {MsgVar}'
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.mode'     : f'{s_fail} Please provide a valid mode: encode / decode',
+            'post.done'      : f'{s_ok} DONE!',
+            'proc.input_ok'  : f'{s_ok} File {self.input} loaded\n{s_info} Size of encoded data: {self.data_size} bytes\n{s_info} Hash: {self.hash}',
+            'proc.out'       : f'{s_ok} File created in {self.output}\n{s_info} Hash: {self.hash}',
+            'mok'            : f'{s_ok} {MsgVar}',
+            'mnote'          : f'{s_note} {MsgVar}',
+            'merror'         : f'{s_fail} {MsgVar}'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:

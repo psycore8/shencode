@@ -1,12 +1,13 @@
 ########################################################
 ### PSOverwrite Module
-### Status: migrated 084
+### Status: migrated 085
 ###
 ########################################################
 
 import ctypes
 import ctypes.wintypes
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
+from utils.style import *
 from utils.windef import *
 from utils.winconst import *
 
@@ -24,7 +25,7 @@ def register_arguments(parser):
 
 class module:
         Author = 'psycore8'
-        Version = '0.2.3'
+        Version = '0.2.4'
         DisplayName = 'PROCESS-OVERWRITE'
         pid = 0
         attr_list = any
@@ -38,16 +39,16 @@ class module:
         
         def msg(self, message_type, MsgVar=None, ErrorExit=False):
             messages = {
-                    'pre.head'         : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-                    'create.cfg'       : f'{nstate.f_out} CFGuard mitigation will be applied!',
-                    'arg.error'        : f'{nstate.s_fail} Given argument is not valid: {MsgVar}',
-                    'prot_img'         : f'{nstate.s_note} Set memory to PAGE_READWRITE',
-                    'sec.try'          : f'{nstate.s_note} Set section protections',
-                    'error'            : f'{nstate.s_fail} Error: {ctypes.get_last_error()}',
-                    'mok'              : f'{nstate.s_ok} {MsgVar}',
-                    'mnote'            : f'{nstate.s_note} {MsgVar}',
-                    'merror'           : f'{nstate.s_fail} {MsgVar}',
-                    'post.done'        : f'{nstate.s_ok} DONE!'
+                    'pre.head'         : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+                    'create.cfg'       : f'{f_out} CFGuard mitigation will be applied!',
+                    'arg.error'        : f'{s_fail} Given argument is not valid: {MsgVar}',
+                    'prot_img'         : f'{s_note} Set memory to PAGE_READWRITE',
+                    'sec.try'          : f'{s_note} Set section protections',
+                    'error'            : f'{s_fail} Error: {ctypes.get_last_error()}',
+                    'mok'              : f'{s_ok} {MsgVar}',
+                    'mnote'            : f'{s_note} {MsgVar}',
+                    'merror'           : f'{s_fail} {MsgVar}',
+                    'post.done'        : f'{s_ok} DONE!'
             }
             print(messages.get(message_type, f'{message_type} - this message type is unknown'))
             if ErrorExit:

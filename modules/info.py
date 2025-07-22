@@ -1,12 +1,13 @@
 ########################################################
 ### Info Module
-### Status: migrated 084
+### Status: migrated 085
 ###
 ########################################################
 
 from keystone import *
 from capstone import *
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
+from utils.style import *
 from utils.asm import variable_instruction_set
 from utils.hashes import FunctionHash
 from utils.const import *
@@ -36,7 +37,7 @@ class module:
     import utils.header as header
     from os import listdir, path
     Author = 'psycore8'
-    Version = '0.1.2'
+    Version = '0.1.3'
     DisplayName = 'SHENCODE-DEViNFO'
     mod_dir = module_dir
     mod_count = 0
@@ -55,20 +56,20 @@ class module:
 
     def msg(self, message_type, MsgVar=None, left_msg=None, right_msg=None, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'banner'         : f'{nstate.s_ok} Banners:'.ljust(self.s) + f'{len(self.header.headers)}',
-            'version'        : f'{nstate.s_ok} Version:'.ljust(self.s) + f'{Version}',
-            'mods'           : f'{nstate.s_ok} Modules:'.ljust(self.s) + f'{self.mod_count}',
-            'repo'           : f'{nstate.s_ok} Repository:'.ljust(self.s) + f'{nstate.f_link}https://github.com/psycore8/shencode{nstate.f_end}',
-            'docs'           : f'{nstate.s_ok} Docs:'.ljust(self.s) + f'{nstate.f_link}https://www.heckhausen.it/shencode/wiki{nstate.f_end}',
-            'msf'            : f'{nstate.s_ok} msfvenom:'.ljust(self.s) + f' {msfvenom_path}',
-            'template'       : f'{nstate.s_ok} template dir:'.ljust(self.s) + f'{tpl_path}',
-            'modules'        : f'{nstate.s_ok} module dir:'.ljust(self.s) + f'{module_dir}',
-            'out'            : f'{nstate.s_ok} {MsgVar}',
-            'fout'           : f'{nstate.s_ok} {left_msg}'.ljust(self.s) + f'{right_msg}',
-            'modlist.s'      : f'{nstate.s_ok} List modules',
-            'modlist'        : f'{nstate.s_note} Module {self.mod_count}:{self.mod_name.upper()}',
-            'post.done'      : f'{nstate.s_ok} DONE!'
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'banner'         : f'{s_ok} Banners:'.ljust(self.s) + f'{len(self.header.headers)}',
+            'version'        : f'{s_ok} Version:'.ljust(self.s) + f'{Version}',
+            'mods'           : f'{s_ok} Modules:'.ljust(self.s) + f'{self.mod_count}',
+            'repo'           : f'{s_ok} Repository:'.ljust(self.s) + f'{f_link}https://github.com/psycore8/shencode{f_end}',
+            'docs'           : f'{s_ok} Docs:'.ljust(self.s) + f'{f_link}https://www.heckhausen.it/shencode/wiki{f_end}',
+            'msf'            : f'{s_ok} msfvenom:'.ljust(self.s) + f' {msfvenom_path}',
+            'template'       : f'{s_ok} template dir:'.ljust(self.s) + f'{tpl_path}',
+            'modules'        : f'{s_ok} module dir:'.ljust(self.s) + f'{module_dir}',
+            'out'            : f'{s_ok} {MsgVar}',
+            'fout'           : f'{s_ok} {left_msg}'.ljust(self.s) + f'{right_msg}',
+            'modlist.s'      : f'{s_ok} List modules',
+            'modlist'        : f'{s_note} Module {self.mod_count}:{self.mod_name.upper()}',
+            'post.done'      : f'{s_ok} DONE!'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
@@ -86,7 +87,7 @@ class module:
     def interactive_module(self, module):
         mod = importlib.import_module(f'{module_dir}.{module}')
         shell_path = f'shencode{mod.module.shell_path}$ '
-        #c = input(f'{nstate.BOLD}{nstate.clGRAY}shencode::core::info${nstate.ENDC} ')
+        #c = input(f'{BOLD}{clGRAY}shencode::core::info${ENDC} ')
         c = input(shell_path)
         if c == 'options':
             for arg in mod.module.arglist:
@@ -98,7 +99,7 @@ class module:
     def interactive_mode(self):
         #self.msg('Interactive Mode')
         asm_mode = 'asm'
-        c = input(f'{nstate.BOLD}{nstate.clGRAY}shencode::core::info${nstate.ENDC} ')
+        c = input(f'{BOLD}{clGRAY}shencode::core::info${ENDC} ')
         cmd = c.split(' ')
         if c == 'exit':
             exit()

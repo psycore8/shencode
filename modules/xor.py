@@ -1,12 +1,13 @@
 ########################################################
 ### XOR Module
-### Status: cleaned, 083
+### Status: migrated 085
 ### 
 ########################################################
 
 import base64
 from itertools import cycle
-from utils.helper import nstate
+#from utils.helper import nstate
+from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from tqdm import tqdm
 
@@ -24,7 +25,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.1.4'
+    Version = '2.1.5'
     DisplayName = 'XOR-ENCODER'
     hash = ''
     data_size = 0
@@ -42,15 +43,15 @@ class module:
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'   : f'{nstate.s_fail} File {self.output} not found or cannot be opened.',
-            'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.input_ok'  : f'{nstate.s_ok} File {self.input} loaded\n{nstate.s_ok} Size of shellcode {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
-            'proc.output_ok' : f'{nstate.s_ok} File {self.output} created\n{nstate.s_ok} Size {self.data_size} bytes\n{nstate.s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input}',
-            'proc.output_try': f'{nstate.s_note} Try to write XORed shellcode to file',
-            'proc.try'       : f'{nstate.s_note} Try to generate XORed shellcode',
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
+            'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
+            'post.done'      : f'{s_ok} DONE!',
+            'proc.input_ok'  : f'{s_ok} File {self.input} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
+            'proc.output_ok' : f'{s_ok} File {self.output} created\n{s_ok} Size {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
+            'proc.input_try' : f'{s_note} Try to open file {self.input}',
+            'proc.output_try': f'{s_note} Try to write XORed shellcode to file',
+            'proc.try'       : f'{s_note} Try to generate XORed shellcode',
             'proc.verbose'   : f'\n{self.out}\n'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))

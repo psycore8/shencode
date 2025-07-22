@@ -1,10 +1,11 @@
 ########################################################
 ### AES Module
-### Status: cleaned, 083
+### Status: cleaned, 085
 ### 
 ########################################################
 
-from utils.helper import nstate as nstate
+#from utils.helper import nstate as nstate
+from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from utils.const import tpl_path
 from utils.binary import replace_bytes_at_offset
@@ -20,7 +21,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.1.4'
+    Version = '2.1.5'
     DisplayName = 'BYTESWAP-ENC'
     Shellcode = ''
     Shellcode_Length = 0
@@ -37,21 +38,21 @@ class module:
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.size'     : f'{nstate.s_fail} Shellcode exceeds max size of 255 bytes',
-            'error.input'    : f'{nstate.s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'   : f'{nstate.s_fail} File {self.output} not found or cannot be opened.',
-            'error.template' : f'{nstate.s_fail} File {self.template_file} not found or cannot be opened.',
-            'post.done'      : f'{nstate.s_ok} DONE!',
-            'proc.input_ok'  : f'{nstate.s_ok} File {self.input} loaded!\n{nstate.s_note} Size of shellcode {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
-            'proc.output_ok' : f'{nstate.s_ok} File {self.output} created!\n{nstate.s_note} Size {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
-            'proc.stub_ok'   : f'{nstate.s_ok} Stub {self.template_file} loaded!\n{nstate.s_note} Size {self.data_size} bytes\n{nstate.s_note} Hash: {self.hash}',
-            'proc.input_try' : f'{nstate.s_note} Try to open file {self.input}',
-            'proc.output_try': f'{nstate.s_note} Try to write XORPOLY shellcode to file',
-            'proc.stub'      : f'{nstate.s_note} Try to load stub from {self.template_file}',
-            'proc.try'       : f'{nstate.s_note} Try to append shellcode',
-            'proc.key'       : f'{nstate.s_note} Changing key to {self.xor_key} and patching length',
-            'proc.stats'     : f'{nstate.s_note} Shellcode size: {len(self.Shellcode)} bytes'
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.size'     : f'{s_fail} Shellcode exceeds max size of 255 bytes',
+            'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
+            'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
+            'error.template' : f'{s_fail} File {self.template_file} not found or cannot be opened.',
+            'post.done'      : f'{s_ok} DONE!',
+            'proc.input_ok'  : f'{s_ok} File {self.input} loaded!\n{s_note} Size of shellcode {self.data_size} bytes\n{s_note} Hash: {self.hash}',
+            'proc.output_ok' : f'{s_ok} File {self.output} created!\n{s_note} Size {self.data_size} bytes\n{s_note} Hash: {self.hash}',
+            'proc.stub_ok'   : f'{s_ok} Stub {self.template_file} loaded!\n{s_note} Size {self.data_size} bytes\n{s_note} Hash: {self.hash}',
+            'proc.input_try' : f'{s_note} Try to open file {self.input}',
+            'proc.output_try': f'{s_note} Try to write XORPOLY shellcode to file',
+            'proc.stub'      : f'{s_note} Try to load stub from {self.template_file}',
+            'proc.try'       : f'{s_note} Try to append shellcode',
+            'proc.key'       : f'{s_note} Changing key to {self.xor_key} and patching length',
+            'proc.stats'     : f'{s_note} Shellcode size: {len(self.Shellcode)} bytes'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
@@ -85,7 +86,7 @@ class module:
     def AppendShellcode(self):
         self.Modified_Shellcode += self.encrypt(self.Shellcode, int(self.xor_key))
         size = len(self.Modified_Shellcode)
-        print(f'{nstate.OKBLUE} XORed payload added, size of shellcode {size} bytes')
+        print(f'{OKBLUE} XORed payload added, size of shellcode {size} bytes')
 
     def WriteToFile(self):
       with open(self.output, 'wb') as file:

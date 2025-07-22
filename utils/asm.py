@@ -73,7 +73,9 @@ class variable_instruction_set:
             'lea edx, [edx]',
             'mov edi, edi',
             'mov ebx, ebx',
-            'nop'
+            'nop',
+            #'66 nop',
+            'rex nop'
             #'nop dword ptr [ecx]',
             #'nop dword ptr [eax+eax*1+01]'
         ]

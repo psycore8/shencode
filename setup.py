@@ -3,22 +3,23 @@ from utils.helper import FirstRun
 
 extras = []
 import sys
+fr = FirstRun()
 if sys.platform == 'win32':
     extras.append(
         ['pywin32==310',
         'WMI==1.5.1']
         )
-    FirstRun.WinOnlyModules(True)
+    fr.WinOnlyModules(True)
 elif sys.platform == 'linux':
     #extras.append('linux-only-package')
-    FirstRun.WinOnlyModules(False)
+    fr.WinOnlyModules(False)
 elif sys.platform == 'darwin':
     pass
     #extras.append('macos-only-package')
 
 setup(
     name='ShenCode',
-    version='0.8.4',
+    version='0.8.5',
     author='psycore8',
     description='A versatile tool for working with shellcodes',
     long_description=open('README.md').read(),
@@ -52,6 +53,7 @@ setup(
         'tqdm',
         'typing_extensions==4.14.1',
         'urllib3==2.5.0',
+        'yaspin'
         ] + extras,
         py_modules=['shencode'],
         # py_modules=[

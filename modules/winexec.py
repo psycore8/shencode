@@ -1,6 +1,6 @@
 ########################################################
 ### WinExec Shellcode Module
-### Status: migrated 084
+### Status: migrated 085
 ###
 ### DiceWare wordlist: https://github.com/ulif/diceware/blob/master/diceware/wordlists/wordlist_en_eff.txt
 ###
@@ -11,7 +11,8 @@ from utils.asm import variable_instruction_set
 from utils.binary import get_coff_section
 from utils.const import nasm
 from utils.hashes import FunctionHash
-from utils.helper import nstate, GetFileInfo
+from utils.helper import GetFileInfo
+from utils.style import *
 from subprocess import run
 import os
 
@@ -35,7 +36,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.5'
+    Version = '0.1.6'
     DisplayName = 'WinEXEC'
     opcode = ''
     size = 0
@@ -52,14 +53,14 @@ class module:
 
     def msg(self, message_type, MsgVar=str, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n', 
-            'proc.try'       : f'{nstate.s_note} Try to generate shellcode',
-            'proc.output_ok' : f'{nstate.s_ok} {MsgVar}',
-            'proc.output_try': f'{nstate.s_note} Writing to file {self.output}',
-            'm.note'         : f'{nstate.s_note} {MsgVar}',
-            'm.ok'           : f'{nstate.s_ok} {MsgVar}',
-            'error.output'   : f'{nstate.s_fail} File {self.output} not found or cannot be opened.',
-            'post.done'      : f'{nstate.s_ok} DONE!'
+            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n', 
+            'proc.try'       : f'{s_note} Try to generate shellcode',
+            'proc.output_ok' : f'{s_ok} {MsgVar}',
+            'proc.output_try': f'{s_note} Writing to file {self.output}',
+            'm.note'         : f'{s_note} {MsgVar}',
+            'm.ok'           : f'{s_ok} {MsgVar}',
+            'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
+            'post.done'      : f'{s_ok} DONE!'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
@@ -77,7 +78,7 @@ class module:
             m('proc.output_try')
             if self.write_outputfile(fn_nasm):
                 size, hash = GetFileInfo(fn_nasm)
-                m('proc.output_ok', f'File {fn_nasm} created\n{nstate.s_ok} Size {size} bytes\n{nstate.s_ok} Hash: {hash}')
+                m('proc.output_ok', f'File {fn_nasm} created\n{s_ok} Size {size} bytes\n{s_ok} Hash: {hash}')
             else:
                 m('error.output', '', True)
         else:
@@ -93,7 +94,7 @@ class module:
                 self.opcode = sc
                 if self.write_outputfile(self.output):
                     size, hash = GetFileInfo(self.output)
-                    m('proc.output_ok', f'File {self.output} created\n{nstate.s_ok} Size {size} bytes\n{nstate.s_ok} Hash: {hash}')
+                    m('proc.output_ok', f'File {self.output} created\n{s_ok} Size {size} bytes\n{s_ok} Hash: {hash}')
                 else:
                     m('error.output', None, True)
         m('post.done')

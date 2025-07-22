@@ -1,4 +1,4 @@
-from utils.helper import nstate as nstate
+from utils.style import *
 
 # defines a category
 CATEGORY    = 'example'
@@ -37,9 +37,9 @@ class module:
   # defines the console output
   def msg(self, message_type, ErrorExit=False):
     messages = {
-        'pre.head'       : f'{nstate.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-        'proc.calcs'     : f'{nstate.s_ok} The result equals {self.power}',
-        'proc.calcv'     : f'{nstate.s_ok} The base of {self.base} raised to the exponent of {self.exponent} results in the power value {self.power}'
+        'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+        'proc.calcs'     : f'{s_ok} The result equals {self.power}',
+        'proc.calcv'     : f'{s_ok} The base of {self.base} raised to the exponent of {self.exponent} results in the power value {self.power}'
     }
     print(messages.get(message_type, f'{message_type} - this message type is unknown'))
     if ErrorExit:
