@@ -54,7 +54,7 @@ To activate the virtual environment use the following command:
 ## Release Notes
 
 - `general` - fixed some fstring errors 
-- `core/minidump` - dump a process from memory to disk
+- `core/minidump` - dump a process from memory to disk with WinAPI
 - `inject/linject` - Linux based injection method
 - `inject/psoverwrite` - Fixed NoCFG setting
 - `obfuscate/feed` - open file optimizations
