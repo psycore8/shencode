@@ -43,7 +43,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.4.4'
+    Version = '0.4.5'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -61,6 +61,8 @@ class module:
     def __init__(self, input, output, variable_padding=0, verbose=bool):
         self.input = input
         self.output = output
+        if variable_padding == None:
+            variable_padding = 0
         self.variable_padding = variable_padding
         self.verbose = verbose
         self.compiler_cmd = nasm
