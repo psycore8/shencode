@@ -1,3 +1,10 @@
+---
+tags:
+  - Label/Repo
+title: ShenCode
+Version: 0.8.6
+Release:
+---
 # ShenCode
 
 > **A versatile tool for working with shellcodes.**
