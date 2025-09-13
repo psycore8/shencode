@@ -41,6 +41,7 @@ setup(
         'idna==3.10',
         'keystone-engine',
         'lxml==6.0.1',
+        'OpenCv-python',
         'pefile==2024.8.26',
         "prompt_toolkit",
         'psutil',
