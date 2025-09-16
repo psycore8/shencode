@@ -1,6 +1,6 @@
 ########################################################
 ### feed Module
-### Status: migrated 085
+### Status: 086
 ### 
 ########################################################
 
@@ -12,7 +12,6 @@ from datetime import timedelta
 from utils.const import *
 from lxml import etree
 from tqdm import tqdm
-#from utils.helper import nstate as nstate
 from utils.style import *
 from utils.helper import GetFileInfo, CheckFile
 
@@ -47,7 +46,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.2.5'
+    Version = '2.2.6'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0
@@ -88,8 +87,6 @@ class module:
             self.shellcode = self.input_file
         else:
             try:
-                #for b in open(self.input_file, 'rb').read():
-                #    self.shellcode += b.to_bytes(1, 'big').hex()
                 with open(self.input_file, 'rb') as f:
                     self.shellcode = f.read()
                 return True
@@ -162,7 +159,6 @@ class module:
 
         # Entries
         i = 1
-        #for id in self.feed_fake_ids:
         for id in tqdm(self.feed_fake_ids, desc='IDs'):
             title = self.generate_fake_title()
             date = self.generate_fake_date()
@@ -171,7 +167,6 @@ class module:
             time = f'{h:02}:{m:02}'
             entry = etree.SubElement(root, 'entry')
             entry_title = etree.SubElement(entry, 'title', attrib={'type': 'html'})
-            #entry_title.text = f'Title {i}'
             entry_title.text = title
             entry_link = etree.SubElement(entry, 'link', attrib={'href': f'{self.feed_uri}0{i}/{random.randint(1, 31)}/{urllib.parse.quote(title)}', 'rel': 'alternate', 'type': 'text/html', 'title': title})
             entry_published = etree.SubElement(entry, 'published')
@@ -180,8 +175,6 @@ class module:
             entry_updated.text = f'{date} {time}'
             entry_id = etree.SubElement(entry, 'id')
 
-            #entry_id.text = f'{self.feed_uri}{id.decode("utf-8")}' # 16 bytes part of shellcode
-            #conv = id.to_bytes(1, 'big').hex()
             conv = id.hex()
             entry_id.text = f'{self.feed_uri}{conv}'
             i += 1

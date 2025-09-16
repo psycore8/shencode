@@ -1,6 +1,6 @@
 ########################################################
 ### Minidump Module
-### Status: initial
+### Status: 086
 ###
 ########################################################
 
@@ -34,7 +34,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.0'
+    Version = '0.1.1'
     DisplayName = 'MINIDUMP'
     data_size = int
     hash = ''
@@ -82,11 +82,9 @@ class module:
         if not self.minidumptype:
             self.minidumptype = minidumptypes.MiniDumpWithFullMemory
         m('mnote', f'Getting PID from {self.processname}')
-        #result = self.process_lookup()
         result = self.get_proc_id()
         if not result:
             m('merror', f'Failed to get the PID of {self.processname}', True)
-        #self.pid = result
         m('mok', f'PID: {self.pid}')
         m('mnote', 'Try to receive a process handle')
         self.h_process = ctypes.windll.kernel32.OpenProcess( 0x001F0FFF, False, self.pid )
@@ -103,22 +101,11 @@ class module:
         if self.dbghelp == 0:
             m('merror', f'Error while loading dbghelp.dll: {ctypes.get_last_error()}', True)
         m('mok', 'dbghelp.dll loaded')
-        
-        # MiniDumpWriteDump = self.dbghelp.MiniDumpWriteDump
-        # MiniDumpWriteDump.argtypes = [
-        #     HANDLE, DWORD, HANDLE, DWORD, ctypes.c_void_p, ctypes.c_void_p, ctypes.c_void_p
-        # ]
-        # MiniDumpWriteDump.restype = BOOL
-
-        #success = MiniDumpWriteDump( self.h_process, self.pid, self.h_file, self.minidumptype, None, None, None )
         thread = threading.Thread(target=self.write_minidump)
         thread.start()
-        #spinner = tqdm(total=None, desc='Writing minidump', bar_format='{desc} {elapsed} {postfix}')
         with yaspin(text=" Writing minidump", color="cyan") as spinner:
             while thread.is_alive():
-                #spinner.set_postfix(spinner="/") 
                 time.sleep(0.1)
-                #spinner.update(0)
             spinner.ok('✔')
         ctypes.windll.kernel32.CloseHandle(self.h_file)
         ctypes.windll.kernel32.CloseHandle(self.h_process)
@@ -127,7 +114,6 @@ class module:
         if success:
             self.data_size, self.hash = GetFileInfo(self.output)
             m('proc.out')
-            #m('mok', f'Dump written to {self.output}')
         else:
             m('merror', f'Error writing dump: {ctypes.get_last_error()}', True)
         m('post.done')

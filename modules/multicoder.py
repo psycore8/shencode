@@ -8,7 +8,6 @@ import base64
 import os
 import pickle
 
-#from utils.helper import nstate
 from utils.style import *
 from utils.helper import GetFileInfo
 from utils.const import priv_key, pub_key

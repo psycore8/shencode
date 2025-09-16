@@ -21,25 +21,27 @@ print(f'For error reporting use: {f_link}https://github.com/psycore8/shencode{EN
 cmd = ''
 
 help_list = {
-    'aeskey':       { 'desc': 'Generate an AES key, iv and salt: aeskey password' },
-    'asm':          { 'desc': 'Assemble shellcode instructions: asm "nop; mov ecx, 1"' },
-    'config':       { 'desc': 'Save, restore or print module configuration (overwrites old configs): config print/save/restore' },
-    'exit':         { 'desc': 'Exit ShenCode' },
-    'help':         { 'desc': 'List available commands' },
-    'list':         { 'desc': 'List available modules' },
-    'load':         { 'desc': 'Load a module' },
+    'aeskey':           { 'desc': 'Generate an AES key, iv and salt: aeskey password' },
+    'asm':              { 'desc': 'Assemble shellcode instructions: asm "nop; mov ecx, 1"' },
+    'config_print':     { 'desc': 'Print module config' },
+    'config_restore':   { 'desc': 'Restore module config' },
+    'config_save':      { 'desc': 'Save module config' },
+    'exit':             { 'desc': 'Exit ShenCode' },
+    'help':             { 'desc': 'List available commands' },
+    'list':             { 'desc': 'List available modules' },
+    'load':             { 'desc': 'Load a module' },
     #'minidump':     { 'desc': 'Experimental minidump' },
-    'options':      { 'desc': 'List module options' },
-    'run':          { 'desc': 'Run module' },
-    'set':          { 'desc': 'Set module options' }
+    'options':          { 'desc': 'List module options' },
+    'run':              { 'desc': 'Run module' },
+    'set':              { 'desc': 'Set module options' }
 }
 
 auto_complete = []
 
 imods = {
-    'core':         [ 'download', 'extract', 'minidump', 'multicoder', 'output', 'subproc' ],
-    'encoder':      [ 'alphanum', 'bytebert' ],
-    'inject':       [ 'dll', 'injection', 'psoverwrite' ],
+    'core':         [ 'download', 'extract', 'minidump', 'output', 'subproc' ],
+    'encoder':      [ 'alphanum', 'bytebert', 'multicoder', 'xor', 'xorchain' ],
+    'inject':       [ 'dll', 'injection', 'linject', 'psoverwrite' ],
     'obfuscate':    [ 'feed', 'qrcode', 'rolhash', 'uuid' ],
     'payload':      [ 'msfvenom', 'winexec' ],
     'stager':       [ 'meterpreter', 'sliver' ]
@@ -85,28 +87,27 @@ def command_parser(command):
         except KsError as e:
             print("ERROR: %s" %e)
 
-    elif split_cmd[0] == 'config':
-        if split_cmd[1] == 'save':
-            if loaded_module != None:
-                fn = f'{json_dir}{loaded_module_name}.json'
-                with open(fn, 'w') as f:
-                    json.dump(arg_list, f, ensure_ascii=False, indent=4)
-            else:
-                print('No module loaded. Use the load command before.')
-        elif split_cmd[1] == 'restore':
-            if loaded_module != None:
-                fn = f'{json_dir}{loaded_module_name}.json'
-                try:
-                    with open(fn, 'r') as f:
-                        arg_list = json.load(f)
-                except FileNotFoundError as e:
-                    print(f'ERROR: {e}')
-            else:
-                print('No module loaded. Use the load command before.')
-        elif split_cmd[1] == 'print':
-            print_config()
+    elif split_cmd[0] == 'config_save':
+        if loaded_module != None:
+            fn = f'{json_dir}{loaded_module_name}.json'
+            with open(fn, 'w') as f:
+                json.dump(arg_list, f, ensure_ascii=False, indent=4)
         else:
-            print('The given argument was not recognized, use save or restore.')
+            print('No module loaded. Use the load command before.')
+    elif split_cmd[0] == 'config_restore':
+        if loaded_module != None:
+            fn = f'{json_dir}{loaded_module_name}.json'
+            try:
+                with open(fn, 'r') as f:
+                    arg_list = json.load(f)
+            except FileNotFoundError as e:
+                print(f'ERROR: {e}')
+        else:
+            print('No module loaded. Use the load command before.')
+    elif split_cmd[0] == 'config_print':
+            print_config()
+    # else:
+    #         print('The given argument was not recognized, use save or restore.')
 
     elif split_cmd[0] == 'exit':
         exit()

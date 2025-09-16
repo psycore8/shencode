@@ -17,8 +17,6 @@ arglist = {
     'input':                { 'value': None, 'desc': 'Input file for extract module'},
     'output':               { 'value': None, 'desc': 'Output file with extracted bytes'},
     'extract_range':        { 'value': [0,0], 'desc': 'Defines the range to extract, takes 2 arguments: -e 100 150'},
-    #'start_offset':         { 'value': None, 'desc': 'Begin extraction from this offset'},
-    #'end_offset':           { 'value': None, 'desc': 'Extract until here'},
     'extract_section':      { 'value': None, 'desc': 'Extract a section from exe, dll, obj'}
 }
 
@@ -30,25 +28,18 @@ def register_arguments(parser):
     exd.add_argument('-e', '--extract-range', nargs=2, default=[0, 0], help=arglist['extract_range']['desc'])
     exd.add_argument('-s', '--extract-section', help=arglist['extract_section']['desc'])
 
-    #dpc = parser.add_argument_group('Deprecated, will be removed in a future release')
-    #dpc.add_argument('-so', '--start-offset', help='')
-    #dpc.add_argument('-eo', '--end-offset', help='')
-
 class module:
     Author =      'psycore8'
-    Version =     '2.2.1'
+    Version =     '2.2.2'
     DisplayName = 'BYTE-XTRACT0R'
     hash = ''
     data_size = 0
     shell_path = '::core::extract'
 
-    #def __init__(self, input, output, extract_range, start_offset, end_offset, extract_section=None):
     def __init__(self, input, output, extract_range=[0, 0], extract_section=None):
         self.input = input
         self.output = output
         self.extract_range = extract_range
-        #self.start_offset = start_offset
-        #self.end_offset = end_offset
         self.extract_section = extract_section
 
     def msg(self, message_type, ErrorExit=False):
@@ -61,7 +52,6 @@ class module:
             'proc.output_ok' : f'{s_ok} File {self.output} created\n{s_ok} Size {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
             'proc.input_try' : f'{s_note} Try to open file {self.input}',
             'proc.output_try': f'{s_note} Writing to file...',
-            #'proc.try'       : f'{s_note} Try to extract bytes from 0x{self.start_offset} to 0x{self.end_offset}',
             'proc.try2'       : f'{s_note} Try to extract bytes from {self.extract_range[0]} to {self.extract_range[1]}',
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
@@ -104,9 +94,6 @@ class module:
         except FileNotFoundError:
             self.msg('error.input', True)
         if self.extract_section == None:
-            #if self.start_offset != None and self.end_offset != None:
-                #self.msg('proc.try')
-                #shellcode_new = shellcode[int(self.start_offset):int(self.end_offset)]
             if isinstance(self.extract_range, str): pass
             bytes_from = self.extract_range[0]
             bytes_until = self.extract_range[1]
