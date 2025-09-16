@@ -44,7 +44,7 @@ setup(
         'pefile==2024.8.26',
         "prompt_toolkit",
         'psutil',
-        'pycparser==2.22',
+        'pycparser==2.23',
         'pypng==0.20220715.0',
         'qrcode==8.2',
         'requests==2.32.5',
