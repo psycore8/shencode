@@ -9,6 +9,7 @@ import random
 import tqdm
 from utils.asm import variable_instruction_set
 #from utils.helper import nstate as nstate
+from os import path as osp
 from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from utils.const import *
@@ -37,7 +38,7 @@ def register_arguments(parser):
 
 class module:
     Author          = 'psycore8'
-    Version         = '0.2.0'
+    Version         = '0.2.1'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
@@ -51,6 +52,8 @@ class module:
             self.decode = decode
             self.compile = compile
             self.compiler_cmd = nasm
+            if variable_padding == None:
+                variable_padding = 0
             self.variable_padding = variable_padding
 
     def msg(self, message_type, ErrorExit=False, MsgVar=str):
@@ -62,6 +65,7 @@ class module:
             'proc.output_try': f'{s_note} Writing to file {self.output}',
             'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
             'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
+            'merror'         : f'{s_fail} {MsgVar}',
             'note'           : f'{s_note} {MsgVar}',
             'ok'             : f'{s_ok} {MsgVar}',
             'post.done'      : f'{s_ok} DONE!'
@@ -69,6 +73,12 @@ class module:
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
             exit()
+
+    def CheckNasm(self)->bool:
+        if osp.exists(self.compiler_cmd):
+            return True
+        else:
+            return False
 
     def to_alphanum(self, encoded_shellcode):
         self.msg('note', False, 'Encoder running...')
@@ -217,7 +227,7 @@ class module:
             format_sc = ''.join(f'\\x{byte:02x}' for byte in self.shellcode)
             sc = self.to_alphanum(format_sc)
         self.encoded_data = sc
-        if self.compile:
+        if self.compile and self.CheckNasm():
             sc = self.gen_x64_stub()
             with open(fn_asm, 'wb') as f:
                 if isinstance(sc, str):
@@ -226,6 +236,8 @@ class module:
                     f.write(sc)
             run([self.compiler_cmd, '-f', 'win64', fn_asm, '-o', fn_obj])
             sc = get_coff_section(fn_obj, '.text')
+        else:
+            self.msg('merror', True, f'nasm.exe not found! Download and place it into the shencode directory: {f_link}https://nasm.us/{f_end}')
         if self.relay_output:
             return sc
         else:

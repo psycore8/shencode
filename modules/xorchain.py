@@ -23,8 +23,8 @@ CATEGORY    = 'encoder'
 DESCRIPTION = 'XORChain - Encrypt each byte with the previous one'
 
 arglist = {
-    'input':                    { 'value': None, 'desc': 'Input file to use with bytebert' },
-    'output':                   { 'value': None, 'desc': 'Outputfile for bytebert' },
+    'input':                    { 'value': None, 'desc': 'Input file to use with xorchain' },
+    'output':                   { 'value': None, 'desc': 'Outputfile for xorchain' },
     'variable_padding':         { 'value': False, 'desc': 'Inserts random NOPs to differ the padding' },
     'compile':                  { 'value': False, 'desc': 'Compile with nasm' },
     'verbose':                  { 'value': False, 'desc': 'Verbose mode' }

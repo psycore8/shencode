@@ -56,7 +56,7 @@ setup(
         'urllib3==2.5.0',
         'yaspin'
         ] + extras,
-        py_modules=['shencode'],
+        # py_modules=['shencode'],
         # py_modules=[
         #     'shencode',
         #     'modules',
