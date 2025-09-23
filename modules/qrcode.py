@@ -7,8 +7,10 @@
 from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from qrcode.image.pure import PyPNGImage
+from pyzbar.pyzbar import decode
 import cv2
-import numpy as np
+import base64
+#import numpy as np
 import qrcode
 import qrcode.constants
 
@@ -28,7 +30,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.2.0'
+    Version = '2.2.2'
     DisplayName = 'QRCODE-OBF'
     hash = ''
     data_size = 0
@@ -50,7 +52,7 @@ class module:
             'proc.input_ok'  : f'{s_ok} File {self.input_file} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
             'proc.output_ok' : f'{s_ok} File {self.output_file} created\n{s_ok} Size {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
             'proc.input_try' : f'{s_note} Try to open file {self.input_file}',
-            'proc.try'       : f'{s_note} Try to generate generate QR-Code',
+            'proc.try'       : f'{s_note} Try to generate QR-Code',
             'mnote'          : f'{s_note} {MsgVar}',
             'mok'            : f'{s_ok} {MsgVar}',
             'merror'         : f'{s_fail} {MsgVar}'
@@ -61,7 +63,7 @@ class module:
 
     def open_file(self):
         if self.reverse:
-            self.shellcode = cv2.imread(self.input_file)
+            #self.shellcode = cv2.imread(self.input_file)
             return True
         if self.relay_input:
             self.shellcode = self.input_file
@@ -79,16 +81,37 @@ class module:
             cv2.line(im, tuple(bbox[j][0]), tuple(bbox[ (j+1) % n][0]), (255,0,0), 3)
         cv2.imshow("Results", im)
 
+    def bytes_to_base64_str(self, input_bytes=bytes) -> str:
+        try:
+            data = base64.b64encode(input_bytes).decode('ascii')
+            return data
+        except:
+            self.msg('merror', True, 'Base64 encoding error!')
+
+    def base64_str_to_bytes(self, input_string=str) -> bytes:
+        try:
+            data = base64.b64decode(input_string.encode('ascii'))
+            return data
+        except:
+            self.msg('merror', True, 'Base64 decoding error!')
+
     def decode_qr_code(self):
-        qrDecoder = cv2.QRCodeDetector()
-        data,bbox,rectifiedImage = qrDecoder.detectAndDecode(self.shellcode)
-        if len(data)>0:
-            print(data.encode('latin-1'))
+        data = cv2.imread(self.input_file)
+        #qrDecoder = cv2.QRCodeDetector()
+        #qrDecoder.detectAndDecodeBytes
+        #dec_data,bbox,rectifiedImage = qrDecoder.detectAndDecode(data)
+        dec_data = decode(data)
+        #print(dec_data[0].data.decode('utf-8'))
+        out_bytes = self.base64_str_to_bytes(dec_data[0].data.decode('utf-8'))
+        if len(dec_data)>0:
+            #print(dec_data.encode('latin-1'))
+
             with open(self.output_file, 'wb') as f:
-                f.write(data.encode('latin-1'))
+                f.write(out_bytes)
+                #f.write(dec_data.encode('latin-1'))
         else:
             print("QR Code not detected")
-            cv2.imshow("Results", self.shellcode)
+            cv2.imshow("Results", dec_data)
         
         cv2.waitKey(0)
         cv2.destroyAllWindows()
@@ -111,6 +134,7 @@ class module:
         self.msg('pre.head')
         self.msg('proc.input_try')
         self.open_file()
+        #print(self.shellcode[0:10])
         if CheckFile(self.input_file):
             self.data_size, self.hash = GetFileInfo(self.input_file)
             self.msg('proc.input_ok')
@@ -126,12 +150,18 @@ class module:
                     self.msg('mnote', False, 'File size check passed')
                 else:
                     self.msg('merror', True, 'File size exceeds 1852 bytes!')
-                    self.msg('proc.try')
-                qr = qrcode.QRCode(version=None, error_correction=qrcode.constants.ERROR_CORRECT_Q, image_factory=PyPNGImage)
-                payload_bytes = self.shellcode
+                self.msg('proc.try')
+                qr = qrcode.QRCode(image_factory=PyPNGImage, error_correction=qrcode.constants.ERROR_CORRECT_Q)
+                #qr = qrcode.QRCode()
+                #qr = qrcode.QRCode(version=40, error_correction=qrcode.constants.ERROR_CORRECT_Q)
+                #payload_bytes = self.shellcode
+                payload_bytes = self.bytes_to_base64_str(self.shellcode)
+                print(payload_bytes)
                 qr.add_data(payload_bytes)
                 qr.make(fit=True)
+                #type(img)
                 img = qr.make_image(fill_color='white', back_color='black')
+                #img = qr.make()
                 img.save(self.output_file)
                 if CheckFile(self.output_file):
                     self.data_size, self.hash = GetFileInfo(self.output_file)

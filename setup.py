@@ -27,6 +27,7 @@ setup(
     url='https://github.com/psycore8/shencode',
     #packages=find_packages(),
     packages=[
+        'shencode',
         'modules',
         'utils'
     ],
@@ -47,6 +48,7 @@ setup(
         'psutil',
         'pycparser==2.23',
         'pypng==0.20220715.0',
+        'pyzbar',
         'qrcode==8.2',
         'requests==2.32.5',
         'setuptools==80.9.0',
