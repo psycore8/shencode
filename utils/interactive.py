@@ -1,14 +1,12 @@
 import ast
 import importlib
 import json
-#import minidump
 import shlex
-import subprocess
+#import subprocess
 from keystone import *
 from utils.crypt import aes_worker
 from utils.const import *
 from utils.style import *
-#from utils.helper import nstate
 from os import path, get_terminal_size, listdir
 
 from prompt_toolkit import prompt, styles
@@ -21,25 +19,26 @@ print(f'For error reporting use: {f_link}https://github.com/psycore8/shencode{EN
 cmd = ''
 
 help_list = {
-    'aeskey':       { 'desc': 'Generate an AES key, iv and salt: aeskey password' },
-    'asm':          { 'desc': 'Assemble shellcode instructions: asm "nop; mov ecx, 1"' },
-    'config':       { 'desc': 'Save, restore or print module configuration (overwrites old configs): config print/save/restore' },
-    'exit':         { 'desc': 'Exit ShenCode' },
-    'help':         { 'desc': 'List available commands' },
-    'list':         { 'desc': 'List available modules' },
-    'load':         { 'desc': 'Load a module' },
-    #'minidump':     { 'desc': 'Experimental minidump' },
-    'options':      { 'desc': 'List module options' },
-    'run':          { 'desc': 'Run module' },
-    'set':          { 'desc': 'Set module options' }
+    'aeskey':           { 'desc': 'Generate an AES key, iv and salt: aeskey password' },
+    'asm':              { 'desc': 'Assemble shellcode instructions: asm "nop; mov ecx, 1"' },
+    'config_print':     { 'desc': 'Print module config' },
+    'config_restore':   { 'desc': 'Restore module config' },
+    'config_save':      { 'desc': 'Save module config' },
+    'exit':             { 'desc': 'Exit ShenCode' },
+    'help':             { 'desc': 'List available commands' },
+    'list':             { 'desc': 'List available modules' },
+    'load':             { 'desc': 'Load a module' },
+    'options':          { 'desc': 'List module options' },
+    'run':              { 'desc': 'Run module' },
+    'set':              { 'desc': 'Set module options' }
 }
 
 auto_complete = []
 
 imods = {
-    'core':         [ 'download', 'extract', 'minidump', 'multicoder', 'output', 'subproc' ],
-    'encoder':      [ 'alphanum', 'bytebert' ],
-    'inject':       [ 'dll', 'injection', 'psoverwrite' ],
+    'core':         [ 'download', 'extract', 'minidump', 'output', 'subproc' ],
+    'encoder':      [ 'alphanum', 'bytebert', 'multicoder', 'xor', 'xorchain' ],
+    'inject':       [ 'dll', 'injection', 'linject', 'psoverwrite' ],
     'obfuscate':    [ 'feed', 'qrcode', 'rolhash', 'uuid' ],
     'payload':      [ 'msfvenom', 'winexec' ],
     'stager':       [ 'meterpreter', 'sliver' ]
@@ -55,20 +54,15 @@ left_just = 25
 shell_prefix = 'shencode'
 shell_infix = ''
 shell_suffix = '$ '
-#tf = nstate()
 
 style = styles.Style.from_dict({
     # 'token': 'fg:bg bold italic underline'
-    'prompt': 'bold fg:magenta',  # grün und fett
+    'prompt': 'bold fg:magenta',
 })
 
 def command_parser(command):
     global arg_list, loaded_module_name
-    #print(f'DEBUG: {arg_list}')
-    #split_cmd = command.split(' ')
-    #lex = shlex.shlex(command, posix=False)
     split_cmd = shlex.split(command, posix=False)
-    #print(f'DEBUG: {split_cmd}')
     if split_cmd[0] == 'help':
         print('\n')
         for help in help_list:
@@ -76,7 +70,6 @@ def command_parser(command):
         print('\n')
 
     elif split_cmd[0] == 'asm':
-        #asm = ' '.join(split_cmd).replace('asm ', '')
         asm = shlex.join(split_cmd).replace('asm ', '')
         try:
             ks = Ks(KS_ARCH_X86, KS_MODE_64)
@@ -85,28 +78,25 @@ def command_parser(command):
         except KsError as e:
             print("ERROR: %s" %e)
 
-    elif split_cmd[0] == 'config':
-        if split_cmd[1] == 'save':
-            if loaded_module != None:
-                fn = f'{json_dir}{loaded_module_name}.json'
-                with open(fn, 'w') as f:
-                    json.dump(arg_list, f, ensure_ascii=False, indent=4)
-            else:
-                print('No module loaded. Use the load command before.')
-        elif split_cmd[1] == 'restore':
-            if loaded_module != None:
-                fn = f'{json_dir}{loaded_module_name}.json'
-                try:
-                    with open(fn, 'r') as f:
-                        arg_list = json.load(f)
-                except FileNotFoundError as e:
-                    print(f'ERROR: {e}')
-            else:
-                print('No module loaded. Use the load command before.')
-        elif split_cmd[1] == 'print':
-            print_config()
+    elif split_cmd[0] == 'config_save':
+        if loaded_module != None:
+            fn = f'{json_dir}{loaded_module_name}.json'
+            with open(fn, 'w') as f:
+                json.dump(arg_list, f, ensure_ascii=False, indent=4)
         else:
-            print('The given argument was not recognized, use save or restore.')
+            print('No module loaded. Use the load command before.')
+    elif split_cmd[0] == 'config_restore':
+        if loaded_module != None:
+            fn = f'{json_dir}{loaded_module_name}.json'
+            try:
+                with open(fn, 'r') as f:
+                    arg_list = json.load(f)
+            except FileNotFoundError as e:
+                print(f'ERROR: {e}')
+        else:
+            print('No module loaded. Use the load command before.')
+    elif split_cmd[0] == 'config_print':
+            print_config()
 
     elif split_cmd[0] == 'exit':
         exit()
@@ -121,9 +111,6 @@ def command_parser(command):
     elif split_cmd[0] == 'load':
         load_mod(split_cmd[1])
         loaded_module_name = split_cmd[1]
-
-    # elif split_cmd[0] == 'minidump':
-    #     subprocess.call(['python.exe','utils\\minidump.py'])
 
     elif split_cmd[0] == 'options':
         size = get_terminal_size()
@@ -142,7 +129,6 @@ def command_parser(command):
         mod.process()
 
     elif split_cmd[0] == 'set':
-        #cmd = ' '.join(split_cmd).replace(f'set {split_cmd[1]} ', '')
         cmd = shlex.join(split_cmd).replace(f'set {split_cmd[1]} ', '')
         try:
             evaluated_data = eval_data_types(cmd)
@@ -168,7 +154,6 @@ def eval_data_types(user_input):
         if isinstance(result, str):
           result = ast.literal_eval(result)
     except Exception as e:
-        #print(f'DEBUG: an error has occured, during type evaluation: {e}')
         result = user_input
     return result
         
@@ -212,10 +197,6 @@ def interactive_mode():
 def print_config():
     values = ''
     for item in arg_list:
-        # if isinstance({arg_list[item]["value"]}, str):
-        #     value = f'"{arg_list[item]["value"]}"'
-        # else: 
-        #     value = f'{arg_list[item]["value"]}'
         values += ' '*18 + f'"{item}": "{arg_list[item]["value"]},"\n'
     json = f"""
             "{loaded_module_name}": {{

@@ -4,7 +4,6 @@
 ###
 ########################################################
 
-#from utils.helper import nstate as nstate
 from utils.style import *
 from os import name as osname
 if osname == 'nt':

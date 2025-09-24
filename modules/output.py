@@ -5,7 +5,6 @@
 ########################################################
 
 from keystone import *
-#from utils.helper import nstate as nstate
 from utils.helper import CheckFile, GetFileHash
 from utils.style import *
 

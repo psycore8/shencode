@@ -3,7 +3,7 @@
 # ShenCode
 # Autor:      psycore8
 # Repo:       https://github.com/psycore8/shencode
-# Web:        https://www.nocoiety.de
+# Web:        https://www.heckhausen.it
 #
 ########################################################################
 
@@ -20,7 +20,7 @@ import json
 
 print(f"{HEADER}")
 print(f'{utils.header.get_header(banner)}')
-print(f'Version {Version} by psycore8 -{ENDC} {TextLink("https://www.nosociety.de")}\n')
+print(f'Version {Version} by psycore8 -{ENDC} {TextLink("https://github.com/psycore8/shencode")}\n')
 arguments = parse_arguments()
 
 config = None

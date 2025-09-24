@@ -1,12 +1,11 @@
 ########################################################
 ### Info Module
-### Status: migrated 085
+### Status: 086
 ###
 ########################################################
 
 from keystone import *
 from capstone import *
-#from utils.helper import nstate as nstate
 from utils.style import *
 from utils.asm import variable_instruction_set
 from utils.hashes import FunctionHash
@@ -21,7 +20,6 @@ arglist = {
     'modlist':              { 'value': False, 'desc': 'List modules' },
     'function_hash':        { 'value': '', 'desc': 'Returns Hash' },
     'prep_str':             { 'value': None, 'desc': 'Prepare a string for the stack' },
-    'interactive':          { 'value': False, 'desc': 'Interactive mode (experimental), internal use only, do not change this value !!!' }
 }
 
 def register_arguments(parser):
@@ -30,7 +28,6 @@ def register_arguments(parser):
     parser.add_argument('-fh', '--function-hash', help=arglist['function_hash']['desc'])
 
     opt = parser.add_argument_group('additional')
-    opt.add_argument('--interactive', action='store_true', help=arglist['interactive']['desc'])
     opt.add_argument('--prep-str', help=arglist['prep_str']['desc'])
 
 class module:
@@ -47,12 +44,11 @@ class module:
     s = 40
     shell_path = '::core::info'
 
-    def __init__(self, get, modlist=False, function_hash='', prep_str=any, interactive=bool):
+    def __init__(self, get, modlist=False, function_hash='', prep_str=any):
         self.get = get
         self.modlist = modlist
         self.function_hash = function_hash
-        self.prep_str = prep_str
-        self.interactive = interactive    
+        self.prep_str = prep_str 
 
     def msg(self, message_type, MsgVar=None, left_msg=None, right_msg=None, ErrorExit=False):
         messages = {
@@ -84,58 +80,12 @@ class module:
                 mod_name = file[:-3] 
                 return mod_name
             
-    def interactive_module(self, module):
-        mod = importlib.import_module(f'{module_dir}.{module}')
-        shell_path = f'shencode{mod.module.shell_path}$ '
-        #c = input(f'{BOLD}{clGRAY}shencode::core::info${ENDC} ')
-        c = input(shell_path)
-        if c == 'options':
-            for arg in mod.module.arglist:
-                print(f'{arg}: {mod.module.arglist.get(arg)}')
-        elif c == 'exit':
-            exit()
-        self.interactive_module(module)
-            
-    def interactive_mode(self):
-        #self.msg('Interactive Mode')
-        asm_mode = 'asm'
-        c = input(f'{BOLD}{clGRAY}shencode::core::info${ENDC} ')
-        cmd = c.split(' ')
-        if c == 'exit':
-            exit()
-        elif cmd[0] == 'set':
-            asm_mode = cmd[1]
-            print(f'ASM mode set to: {asm_mode}')
-        elif cmd[0] == 'load':
-            mod_loader = cmd[1]
-            self.interactive_module(mod_loader)
-        else:
-            if asm_mode == 'asm':
-                try:
-                    ks = Ks(KS_ARCH_X86, KS_MODE_64)
-                    code, count = ks.asm(c)
-                    print("".join("\\x{:02x}".format(b) for b in code))
-                except KsError as e:
-                    print("ERROR: %s" %e)
-            elif asm_mode == 'dism':
-                try:
-                    c = b'\x55\x48\x8b\x05\xb8\x13\x00\x00'
-                    cs = Cs(CS_ARCH_X86, CS_MODE_64)
-                    for i in cs.disasm(c, 0x1000):
-                        print("0x{0:x}:\t{1}\t{2}".format(i.address, i.mnemonic, i.op_str))
-                except CsError as e:
-                    print('ERROR: %s' %e)
-        self.interactive_mode()
-
     def process(self):
         vi = variable_instruction_set()
         m = self.msg
         self.msg('pre.head')
         self.msg('version')
         self.msg('banner')
-        if self.interactive:
-            print('Input Assembler instructions or type "exit"')
-            self.interactive_mode()
         if self.function_hash != None:
             print(f"[DEBUG] Eingabewert: {self.function_hash}")
             fh = FunctionHash()

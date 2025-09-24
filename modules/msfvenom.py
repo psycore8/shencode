@@ -4,7 +4,6 @@
 ###
 ########################################################
 
-#from utils.helper import nstate
 from utils.style import *
 from utils.const import msfvenom_path
 import subprocess

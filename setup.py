@@ -19,7 +19,7 @@ elif sys.platform == 'darwin':
 
 setup(
     name='ShenCode',
-    version='0.8.5',
+    version='0.8.6',
     author='psycore8',
     description='A versatile tool for working with shellcodes',
     long_description=open('README.md').read(),
@@ -27,6 +27,7 @@ setup(
     url='https://github.com/psycore8/shencode',
     #packages=find_packages(),
     packages=[
+        'shencode',
         'modules',
         'utils'
     ],
@@ -41,11 +42,13 @@ setup(
         'idna==3.10',
         'keystone-engine',
         'lxml==6.0.1',
+        'OpenCv-python',
         'pefile==2024.8.26',
         "prompt_toolkit",
         'psutil',
         'pycparser==2.23',
         'pypng==0.20220715.0',
+        'pyzbar',
         'qrcode==8.2',
         'requests==2.32.5',
         'setuptools==80.9.0',
@@ -55,7 +58,7 @@ setup(
         'urllib3==2.5.0',
         'yaspin'
         ] + extras,
-        py_modules=['shencode'],
+        # py_modules=['shencode'],
         # py_modules=[
         #     'shencode',
         #     'modules',
