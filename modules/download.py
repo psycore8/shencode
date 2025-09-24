@@ -30,7 +30,6 @@ class module:
     data_size = int
     hash = ''
     data_bytes = bytes
-    #relay_input = False
     relay_output = False
     shell_path = '::core::download'
 

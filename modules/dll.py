@@ -5,8 +5,6 @@
 ########################################################
 
 import os
-
-#from utils.helper import nstate as nstate
 from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from utils.windef import *

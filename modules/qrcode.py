@@ -10,7 +10,6 @@ from qrcode.image.pure import PyPNGImage
 from pyzbar.pyzbar import decode
 import cv2
 import base64
-#import numpy as np
 import qrcode
 import qrcode.constants
 
@@ -63,7 +62,6 @@ class module:
 
     def open_file(self):
         if self.reverse:
-            #self.shellcode = cv2.imread(self.input_file)
             return True
         if self.relay_input:
             self.shellcode = self.input_file
@@ -97,18 +95,11 @@ class module:
 
     def decode_qr_code(self):
         data = cv2.imread(self.input_file)
-        #qrDecoder = cv2.QRCodeDetector()
-        #qrDecoder.detectAndDecodeBytes
-        #dec_data,bbox,rectifiedImage = qrDecoder.detectAndDecode(data)
         dec_data = decode(data)
-        #print(dec_data[0].data.decode('utf-8'))
         out_bytes = self.base64_str_to_bytes(dec_data[0].data.decode('utf-8'))
         if len(dec_data)>0:
-            #print(dec_data.encode('latin-1'))
-
             with open(self.output_file, 'wb') as f:
                 f.write(out_bytes)
-                #f.write(dec_data.encode('latin-1'))
         else:
             print("QR Code not detected")
             cv2.imshow("Results", dec_data)
@@ -134,7 +125,6 @@ class module:
         self.msg('pre.head')
         self.msg('proc.input_try')
         self.open_file()
-        #print(self.shellcode[0:10])
         if CheckFile(self.input_file):
             self.data_size, self.hash = GetFileInfo(self.input_file)
             self.msg('proc.input_ok')
@@ -152,16 +142,10 @@ class module:
                     self.msg('merror', True, 'File size exceeds 1852 bytes!')
                 self.msg('proc.try')
                 qr = qrcode.QRCode(image_factory=PyPNGImage, error_correction=qrcode.constants.ERROR_CORRECT_Q)
-                #qr = qrcode.QRCode()
-                #qr = qrcode.QRCode(version=40, error_correction=qrcode.constants.ERROR_CORRECT_Q)
-                #payload_bytes = self.shellcode
                 payload_bytes = self.bytes_to_base64_str(self.shellcode)
-                print(payload_bytes)
                 qr.add_data(payload_bytes)
                 qr.make(fit=True)
-                #type(img)
                 img = qr.make_image(fill_color='white', back_color='black')
-                #img = qr.make()
                 img.save(self.output_file)
                 if CheckFile(self.output_file):
                     self.data_size, self.hash = GetFileInfo(self.output_file)

@@ -6,7 +6,6 @@
 
 import base64
 from itertools import cycle
-#from utils.helper import nstate
 from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from tqdm import tqdm

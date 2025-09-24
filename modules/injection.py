@@ -7,7 +7,6 @@
 import os
 from utils.windef import *
 from utils.winconst import *
-#from utils.helper import nstate
 from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 
@@ -49,7 +48,6 @@ class module:
     shell_path = '::inject::injection'
 
     def __init__(self, input, process, start_process, shellcode=None, resume_thread=None, virtual_protect=None):
-    #def __init__(self, **arglist):
         self.input = input
         self.process_start = start_process
         self.target_process = process
@@ -73,7 +71,6 @@ class module:
             exit()
 
     def Start_Process(self):
-        #self.msg('inj.run')
         self.msg('mnote', f'starting {self.target_process}')
         os.system(self.target_process)
 

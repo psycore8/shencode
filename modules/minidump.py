@@ -4,7 +4,6 @@
 ###
 ########################################################
 
-#from tqdm import tqdm
 from utils.helper import GetFileInfo
 from os import path
 from utils.style import *

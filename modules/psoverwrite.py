@@ -5,8 +5,7 @@
 ########################################################
 
 import ctypes
-import ctypes.wintypes
-#from utils.helper import nstate as nstate
+#import ctypes.wintypes
 from utils.style import *
 from utils.windef import *
 from utils.winconst import *

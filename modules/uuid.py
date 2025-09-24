@@ -4,7 +4,6 @@
 ### 
 ########################################################
 
-#from utils.helper import nstate as nstate
 from utils.style import *
 from utils.helper import GetFileInfo
 

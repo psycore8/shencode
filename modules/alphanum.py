@@ -8,7 +8,6 @@ import os
 import random
 import tqdm
 from utils.asm import variable_instruction_set
-#from utils.helper import nstate as nstate
 from os import path as osp
 from utils.style import *
 from utils.helper import CheckFile, GetFileInfo

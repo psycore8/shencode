@@ -4,10 +4,9 @@
 ###
 ########################################################
 
-#from utils.helper import nstate
 from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
-from os import path as os_path
+#from os import path as os_path
 import struct
 
 CATEGORY    = 'core'

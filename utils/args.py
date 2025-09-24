@@ -40,11 +40,8 @@ def load_modules():
 def create_parser():
     require_pos_args = False
     parser = argparse.ArgumentParser(description='dynamic module parser', formatter_class=FixedWidthHelpFormatter)
-    #group = parser.add_mutually_exclusive_group()
     parser.add_argument('--config', help='load a json config file')
     parser.add_argument('--interactive', action='store_true', help='Interactive mode (experimental)')
-    #args, unknown = parser.parse_known_args()
-    #if args.interactive: require_pos_args = False
     subparsers = parser.add_subparsers(dest='module', required=require_pos_args, help='Available modules')
     modules_by_category = load_modules()
 
@@ -52,10 +49,7 @@ def create_parser():
     for category, modules in modules_by_category.items():
         category_parser = subparsers.add_parser(category, help=f"{category} group", formatter_class=FixedWidthHelpFormatter)
         category_subparsers = category_parser.add_subparsers(dest='command', required=require_pos_args)
-
-        #for mod_name, mod_desc, mod in modules.items():
         for mod_name, mod_info in modules.items():
-            #mod_parser = category_subparsers.add_parser(mod_name, help=f"Arguments for {mod_name} {mod_desc}", formatter_class=FixedWidthHelpFormatter)
             mod = mod_info['module']
             description = mod_info['description']
             mod_parser = category_subparsers.add_parser(mod_name, help=f'{description}', description=description, formatter_class=FixedWidthHelpFormatter)

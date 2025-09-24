@@ -1,14 +1,12 @@
 import ast
 import importlib
 import json
-#import minidump
 import shlex
-import subprocess
+#import subprocess
 from keystone import *
 from utils.crypt import aes_worker
 from utils.const import *
 from utils.style import *
-#from utils.helper import nstate
 from os import path, get_terminal_size, listdir
 
 from prompt_toolkit import prompt, styles
@@ -30,7 +28,6 @@ help_list = {
     'help':             { 'desc': 'List available commands' },
     'list':             { 'desc': 'List available modules' },
     'load':             { 'desc': 'Load a module' },
-    #'minidump':     { 'desc': 'Experimental minidump' },
     'options':          { 'desc': 'List module options' },
     'run':              { 'desc': 'Run module' },
     'set':              { 'desc': 'Set module options' }
@@ -57,20 +54,15 @@ left_just = 25
 shell_prefix = 'shencode'
 shell_infix = ''
 shell_suffix = '$ '
-#tf = nstate()
 
 style = styles.Style.from_dict({
     # 'token': 'fg:bg bold italic underline'
-    'prompt': 'bold fg:magenta',  # grün und fett
+    'prompt': 'bold fg:magenta',
 })
 
 def command_parser(command):
     global arg_list, loaded_module_name
-    #print(f'DEBUG: {arg_list}')
-    #split_cmd = command.split(' ')
-    #lex = shlex.shlex(command, posix=False)
     split_cmd = shlex.split(command, posix=False)
-    #print(f'DEBUG: {split_cmd}')
     if split_cmd[0] == 'help':
         print('\n')
         for help in help_list:
@@ -78,7 +70,6 @@ def command_parser(command):
         print('\n')
 
     elif split_cmd[0] == 'asm':
-        #asm = ' '.join(split_cmd).replace('asm ', '')
         asm = shlex.join(split_cmd).replace('asm ', '')
         try:
             ks = Ks(KS_ARCH_X86, KS_MODE_64)
@@ -106,8 +97,6 @@ def command_parser(command):
             print('No module loaded. Use the load command before.')
     elif split_cmd[0] == 'config_print':
             print_config()
-    # else:
-    #         print('The given argument was not recognized, use save or restore.')
 
     elif split_cmd[0] == 'exit':
         exit()
@@ -122,9 +111,6 @@ def command_parser(command):
     elif split_cmd[0] == 'load':
         load_mod(split_cmd[1])
         loaded_module_name = split_cmd[1]
-
-    # elif split_cmd[0] == 'minidump':
-    #     subprocess.call(['python.exe','utils\\minidump.py'])
 
     elif split_cmd[0] == 'options':
         size = get_terminal_size()
@@ -143,7 +129,6 @@ def command_parser(command):
         mod.process()
 
     elif split_cmd[0] == 'set':
-        #cmd = ' '.join(split_cmd).replace(f'set {split_cmd[1]} ', '')
         cmd = shlex.join(split_cmd).replace(f'set {split_cmd[1]} ', '')
         try:
             evaluated_data = eval_data_types(cmd)
@@ -169,7 +154,6 @@ def eval_data_types(user_input):
         if isinstance(result, str):
           result = ast.literal_eval(result)
     except Exception as e:
-        #print(f'DEBUG: an error has occured, during type evaluation: {e}')
         result = user_input
     return result
         
@@ -213,10 +197,6 @@ def interactive_mode():
 def print_config():
     values = ''
     for item in arg_list:
-        # if isinstance({arg_list[item]["value"]}, str):
-        #     value = f'"{arg_list[item]["value"]}"'
-        # else: 
-        #     value = f'{arg_list[item]["value"]}'
         values += ' '*18 + f'"{item}": "{arg_list[item]["value"]},"\n'
     json = f"""
             "{loaded_module_name}": {{

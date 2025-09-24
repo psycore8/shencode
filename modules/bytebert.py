@@ -12,7 +12,6 @@
 
 import random
 from utils.asm import variable_instruction_set
-#from utils.helper import nstate as nstate
 from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from utils.binary import get_coff_section
@@ -20,7 +19,6 @@ from os import path as osp
 from os import name as os_name
 from os import urandom as urandom
 from subprocess import run
-#import struct
 from tqdm import tqdm
 from utils.const import *
 
@@ -104,28 +102,6 @@ class module:
         else:
             return False
         
-    # def find_valid_xor_key(self, shellcode):
-    #     for key in range(1, 255):
-    #         #print(key)
-    #         if all((b ^ key) != 0 for b in shellcode): 
-    #             return key
-    #     return 0 
-    
-    # def find_valid_xor_key2(self, shellcode):
-    #     #widgets = ['Loading: ', progressbar.AnimatedMarker()]
-    #     #bar = progressbar.ProgressBar(widgets=widgets).start()        
-    #     #for i in tqdm (range (255), colour='magenta', leave=True):
-    #     # with tqdm(desc="Processing: ", dynamic_ncols=True) as pbar:
-    #     #     while True:
-    #     #         key = urandom(1)[0]  # Zufälliges Byte als Schlüssel
-    #     #         pbar.update(1)
-    #     #         #print(f'Checking {key}')
-    #     #         if all((b ^ key) != 0 for b in shellcode):  # Prüfen, ob XOR keine Null-Bytes erzeugt
-    #     #             return key
-    #     for i in range(255):
-    #         print(i)
-    #         self.encrypt(i)
-
     def encrypt(self, data: bytes, xor_key: int) -> bytes:
         transformed = bytearray()
         prev_enc_byte = 0
