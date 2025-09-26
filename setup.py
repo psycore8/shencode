@@ -19,13 +19,12 @@ elif sys.platform == 'darwin':
 
 setup(
     name='ShenCode',
-    version='0.8.6',
+    version='0.9.0',
     author='psycore8',
     description='A versatile tool for working with shellcodes',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/psycore8/shencode',
-    #packages=find_packages(),
     packages=[
         'shencode',
         'modules',
@@ -58,12 +57,6 @@ setup(
         'urllib3==2.5.0',
         'yaspin'
         ] + extras,
-        # py_modules=['shencode'],
-        # py_modules=[
-        #     'shencode',
-        #     'modules',
-        #     'utils'
-        # ],
         entry_points={
             'console_scripts': [
                 'shencode=shencode:main'

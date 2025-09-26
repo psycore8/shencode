@@ -1,6 +1,6 @@
 ########################################################
 ### Task Module
-### Status: dev
+### Status: cleaned, 085
 ### 
 ########################################################
 
@@ -8,7 +8,7 @@ from utils.style import *
 from utils.helper import CheckFile, GetFileHash
 
 CATEGORY    = 'core'
-DESCRIPTION = 'Create tasks to automate ShenCode (V2 scheme)'
+DESCRIPTION = '(DEPRECATED) Create tasks to automate ShenCode (V1 scheme)'
 
 def register_arguments(parser):
       parser.add_argument('-i', '--input', help='Input task file')
@@ -17,8 +17,8 @@ class module:
     import json
     import importlib
     Author = 'psycore8'
-    DisplayName = 'TASKS-V2'
-    Version = '0.2.0'
+    DisplayName = 'TASKS-V1'
+    Version = '0.1.2'
     result = any
 
     def __init__(self, input):
@@ -49,43 +49,28 @@ class module:
             m('proc.input')
             self.result = None
             tasks = self.load_config(self.input)
-            m('task.name', tasks['name'])
+            m('task.name', tasks['task']['name'])
             m('nl')
-            single_step = tasks['single_step']
-            #task = tasks['tasks']['modules']
-            #mod_count = len(task)
+            single_step = tasks['task']['single_step']
+            task = tasks['task']['modules']
+            mod_count = len(task)
             if single_step == None:
-                for task in tasks["tasks"]:
-                    m('step.pre', f'Task {task["id"]}: {task["module"]}')
+                for index, step in enumerate(task, start=1):
+                    if step == 'task' or step == 'bypass':
+                        continue
+                    m('step.pre', f'{step} // {index} of {mod_count}')
                     m('nl')
-                    mod = self.importlib.import_module(f'modules.{task["module"]}')
-                    if task["input_buffer"]:
-                        task["args"]["input"] = self.result
+                    mod = self.importlib.import_module(f'modules.{step}')
+                    if task[step]['input_buffer']:
+                        task[step]['args']['input'] = self.result
                         mod.module.relay = True
                         mod.module.relay_input = True
-                    if task["return_buffer"]:
-                        task["args"]["output"] = self.result
+                    if task[step]['return_buffer']:
                         mod.module.relay = True
                         mod.module.relay_output = True
-                    modclass = mod.module(**task["args"])
+                    modclass = mod.module(**task[step]['args'])
                     self.result = modclass.process()
                     m('nl')
-                # for index, step in enumerate(task, start=1):
-                #     if step == 'task' or step == 'bypass':
-                #         continue
-                #     m('step.pre', f'{step} // {index} of {mod_count}')
-                #     m('nl')
-                #     mod = self.importlib.import_module(f'modules.{step}')
-                #     if task[step]['input_buffer']:
-                #         task[step]['args']['input'] = self.result
-                #         mod.module.relay = True
-                #         mod.module.relay_input = True
-                #     if task[step]['return_buffer']:
-                #         mod.module.relay = True
-                #         mod.module.relay_output = True
-                #     modclass = mod.module(**task[step]['args'])
-                #     self.result = modclass.process()
-                #     m('nl')
             else:
                 mod = self.importlib.import_module(f'modules.{single_step}')
                 modclass = mod.module(**task[single_step]['args'])

