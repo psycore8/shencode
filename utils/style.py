@@ -1,5 +1,21 @@
 import re
 
+#from rich import Console
+
+class ConsoleStyles:
+
+    def __init__(self):
+        pass
+
+    state_ok        = '[bold white][[green]+[/green]][/bold white]'
+    state_note      = '[bold white][[purple]+[/purple]][/bold white]'
+    state_fail      = '[bold white][[red]+[/red]][/bold white]'
+    state_info      = '[bold white][[yellow]+[/yellow]][/bold white]'
+
+    def FormatModuleHeader(self, ModHeadText, ModVersion):
+        f = f'[bold][grey][[red]{ModHeadText}[/red]]-[[red]{ModVersion}[/red]][/grey][/bold]'
+        return f
+
 s_ok    = '\033[90m[\033[92m+\033[90m]\033[0m'
 s_note  = '\033[90m[\033[94m*\033[90m]\033[0m'
 s_fail  = '\033[90m[\033[91m-\033[90m]\033[0m'
