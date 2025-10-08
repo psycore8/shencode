@@ -1,6 +1,6 @@
 ########################################################
 ### UUID Module
-### Status: migrated 085
+### Status: migrated 090
 ### 
 ########################################################
 
@@ -8,7 +8,8 @@ from utils.style import *
 from utils.helper import GetFileInfo, CheckFile
 
 from rich.console import Console
-
+import re
+cs = ConsoleStyles()
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Obfuscate shellcodes as UUID strings'
 
@@ -21,11 +22,11 @@ arglist = {
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help=arglist['input']['desc'])
     parser.add_argument('-o', '--output', help=arglist['output']['desc'])
-    parser.add_argument('-r', '--reverse', help=arglist['reverse']['desc'])
+    parser.add_argument('-r', '--reverse', action='store_true', help=arglist['reverse']['desc'])
 
 class module:
     out = Console()
-    cs = ConsoleStyles()
+    
     Author = 'psycore8'
     Version = '2.2.7'
     DisplayName = 'UUID-OBF'
@@ -45,16 +46,16 @@ class module:
 
     def msg(self, message_type, ErrorExit=False):
         messages = {
-            'pre.head'       : f'{self.cs.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{s_fail} File {self.input_file} not found or cannot be opened.',
+            'pre.head'       : f'{cs.FormatModuleHeader(self.DisplayName, self.Version)}\n',
+            'error.input'    : f'{cs.state_fail} File {self.input_file} not found or cannot be opened.',
             'post.out'       : f'{self.UUID_string}',
-            'post.done'      : f'{s_ok} DONE!',
-            'proc.input_ok'  : f'{s_ok} File {self.input_file} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-            'proc.output_ok' : f'{s_ok} File {self.output} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{s_note} Try to open file {self.input_file}',
-            'proc.try'       : f'{s_note} Try generate UUIDs'
+            'post.done'      : f'{cs.state_ok} DONE!',
+            'proc.input_ok'  : f'{cs.state_ok} File {self.input_file} loaded\n{cs.state_ok} Size of shellcode [cyan]{self.data_size}[/cyan] bytes\n{cs.state_ok} Hash: [cyan]{self.hash}[/cyan]',
+            'proc.output_ok' : f'{cs.state_ok} File {self.output} loaded\n{cs.state_ok} Size of shellcode [cyan]{self.data_size}[/cyan] bytes\n{cs.state_ok} Hash: [cyan]{self.hash}[/cyan]',
+            'proc.input_try' : f'{cs.state_note} Try to open file {self.input_file}',
+            'proc.try'       : f'{cs.state_note} Try generate output'
         }
-        self.out.print(messages.get(message_type, f'{message_type} - this message type is unknown'))
+        self.out.print(messages.get(message_type, f'{message_type} - this message type is unknown'), highlight=True)
         if ErrorExit:
             exit()
 
@@ -62,9 +63,19 @@ class module:
         formatted_string = f"{string_value[:8]}-{string_value[8:12]}-{string_value[12:16]}-{string_value[16:20]}-{string_value[20:]}"
         return formatted_string
     
+    def uuid_to_bytes(self, uuid_string):
+        cut_off_chars = len(uuid_string) - 3
+        bytes_only = re.sub('[\n,"-]', '', uuid_string[33:cut_off_chars])
+        binary_data = bytes.fromhex(bytes_only)
+        return binary_data
+    
     def open_file(self, filename):
         try:
-            with open(filename, 'rb') as f:
+            if self.reverse:
+                file_access_mode = 'r'
+            else:
+                file_access_mode = 'rb'
+            with open(filename, file_access_mode) as f:
                 self.shellcode = f.read()
             return True
         except FileNotFoundError:
@@ -72,7 +83,11 @@ class module:
         
     def save_file(self, data):
         try:
-            with open(self.output, 'w') as f:
+            if isinstance(data, str):
+                file_access_mode = 'w'
+            else:
+                file_access_mode = 'wb'
+            with open(self.output, file_access_mode) as f:
                 written = f.write(data)
                 return written
         except:
@@ -103,8 +118,13 @@ class module:
         else:
             self.msg('error.input', True)
         self.msg('proc.try')
-        self.UUID_string = self.CreateVar()
-        self.save_file(self.UUID_string)
+        if self.reverse:
+            data = self.uuid_to_bytes(self.shellcode)
+            self.save_file(data)
+        else:
+            self.UUID_string = self.CreateVar()
+            print(self.UUID_string)
+            self.save_file(self.UUID_string)
         if CheckFile(self.output):
             self.data_size, self.hash = GetFileInfo(self.output)
             self.msg('proc.output_ok')

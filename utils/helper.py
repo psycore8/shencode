@@ -15,11 +15,11 @@ def GetFSize(file):
     
 def GetFileHash(file):
     hash = sha1.calculate_sha1(file)
-    return f'{nstate.f_bold}{nstate.clLIGHTBLUE}{hash}{nstate.f_end}'
+    return f'{hash}'
 
 def GetFileInfo(file):
     size = GetFSize(file)
-    hash = f'{nstate.f_bold}{nstate.clLIGHTBLUE}{sha1.calculate_sha1(file)}{nstate.f_end}'
+    hash = f'{sha1.calculate_sha1(file)}'
     return size, hash
 
 
