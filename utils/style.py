@@ -1,20 +1,85 @@
 import re
 
-#from rich import Console
+from utils.helper import CheckFile, GetFileInfo
+
+from rich.console import Console
+from rich.table import Table
+
+cs = Console()
 
 class ConsoleStyles:
 
     def __init__(self):
         pass
 
-    state_ok        = '[bold white][[green]+[/green]][/bold white]'
-    state_note      = '[bold white][[purple]+[/purple]][/bold white]'
-    state_fail      = '[bold white][[red]+[/red]][/bold white]'
-    state_info      = '[bold white][[yellow]+[/yellow]][/bold white]'
+    state_ok        = '[bold grey42][[green]+[/green]][/]'
+    state_note      = '[bold grey42][[purple]*[/purple]][/]'
+    state_fail      = '[bold grey42][[red]-[/red]][/]'
+    state_info      = '[bold grey42][[blue]#[/blue]][/]'
 
-    def FormatModuleHeader(self, ModHeadText, ModVersion):
-        f = f'[bold][grey][[red]{ModHeadText}[/red]]-[[red]{ModVersion}[/red]][/grey][/bold]'
-        return f
+    def module_header(self, ModHeadText, ModVersion):
+        f = f'[bold][grey42][[red]{ModHeadText}[/red]]-[[red]{ModVersion}[/red]][/grey42][/bold]'
+        cs.print(f)
+        #return f
+    
+    #class actions:
+    def action_open_file(self, filename):
+        size, hash = GetFileInfo(filename)
+        cs.print(f'{self.state_ok} [cyan][u]{filename}[/u][/cyan] - loaded')
+        cs.print(f'{self.state_info} File size: [cyan]{size}[/cyan] bytes')
+        cs.print(f'{self.state_info} File hash: [cyan]{hash}[/cyan]')
+
+    def action_open_file2(sekf, filename):
+        size, hash = GetFileInfo(filename)
+        table = Table(border_style='grey42')
+        table.add_column('[red]Key[/]', style='red')
+        table.add_column('Value')
+        #table.add_column('Hash')
+        #table.add_row(filename, str(size), hash)
+        table.add_row('File', filename)
+        table.add_row('Size', str(size))
+        table.add_row('Hash', hash)
+        cs.print(table)
+        
+    def action_save_file(self, filename):
+        if CheckFile(filename):
+            size, hash = GetFileInfo(filename)
+            cs.print(f'{self.state_ok} [cyan][u]{filename}[/u][/cyan] - saved')
+            cs.print(f'{self.state_info} File size: [cyan]{size}[/cyan] bytes')
+            cs.print(f'{self.state_info} File hash: [cyan]{hash}[/cyan]')
+        else:
+            cs.print(f'{self.state_fail} {filename } not found!')
+            return False
+        
+    def action_save_file2(self, filename):
+        if CheckFile(filename):
+            size, hash = GetFileInfo(filename)
+            table = Table(border_style='grey42')
+            table.add_column('[red]Key[/]', style='red')
+            table.add_column('Value')
+            #table.add_column('Hash')
+            #table.add_row(filename, str(size), hash)
+            table.add_row('File', filename)
+            table.add_row('Size', str(size))
+            table.add_row('Hash', hash)
+            cs.print(table)
+        else:
+            cs.print(f'{self.state_fail} {filename } not found!')
+            return False
+        
+    def print(self, text:str, state:str=None, rules:bool=False):
+        if state == None: state = ''
+        message = f'{state} {text}'
+        if rules:
+            cs.rule('')
+            cs.print(message)
+            cs.rule('')
+        else:
+            cs.print(message)
+
+    def log(self, message):
+        cs.log(message)
+
 
 s_ok    = '\033[90m[\033[92m+\033[90m]\033[0m'
 s_note  = '\033[90m[\033[94m*\033[90m]\033[0m'

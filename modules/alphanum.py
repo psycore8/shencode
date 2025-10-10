@@ -1,6 +1,6 @@
 ########################################################
 ### Alphanum Module
-### Status: migrated 085
+### Status: migrated 090 - code cleanup
 ### 
 ########################################################
 
@@ -9,6 +9,7 @@ import random
 import tqdm
 from utils.asm import variable_instruction_set
 from os import path as osp
+from rich.console import Console
 from utils.style import *
 from utils.helper import CheckFile, GetFileInfo
 from utils.const import *
@@ -17,6 +18,8 @@ from subprocess import run
 
 CATEGORY    = 'encoder'
 DESCRIPTION = 'Encode bytes to alphanumeric output'
+
+cs = ConsoleStyles()
 
 arglist = {
     'input':                { 'value': None,    'desc': 'Input file to use' },
@@ -36,8 +39,9 @@ def register_arguments(parser):
             add.add_argument('-v', '--variable-padding', type=int, help=arglist['variable_padding']['desc'])
 
 class module:
+    out = Console()
     Author          = 'psycore8'
-    Version         = '0.2.1'
+    Version         = '0.3.0'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
@@ -55,23 +59,23 @@ class module:
                 variable_padding = 0
             self.variable_padding = variable_padding
 
-    def msg(self, message_type, ErrorExit=False, MsgVar=str):
-        messages = {
-            'pre.head'      : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'proc.input_ok'  : f'{s_ok} {MsgVar}',
-            'proc.output_ok' : f'{s_ok} {MsgVar}',
-            'proc.input_try' : f'{s_note} Try to open file {self.input}',
-            'proc.output_try': f'{s_note} Writing to file {self.output}',
-            'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
-            'merror'         : f'{s_fail} {MsgVar}',
-            'note'           : f'{s_note} {MsgVar}',
-            'ok'             : f'{s_ok} {MsgVar}',
-            'post.done'      : f'{s_ok} DONE!'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
+    # def msg(self, message_type, ErrorExit=False, MsgVar=str):
+    #     messages = {
+    #         #'pre.head'      : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
+    #         #'proc.input_ok'  : f'{s_ok} {MsgVar}',
+    #         #'proc.output_ok' : f'{s_ok} {MsgVar}',
+    #         #'proc.input_try' : f'{s_note} Try to open file {self.input}',
+    #         #'proc.output_try': f'{s_note} Writing to file {self.output}',
+    #         'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
+    #         #'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
+    #         'merror'         : f'{s_fail} {MsgVar}',
+    #         'note'           : f'{s_note} {MsgVar}',
+    #         'ok'             : f'{s_ok} {MsgVar}',
+    #         'post.done'      : f'{s_ok} DONE!'
+    #     }
+    #     print(messages.get(message_type, f'{message_type} - this message type is unknown'))
+    #     if ErrorExit:
+    #         exit()
 
     def CheckNasm(self)->bool:
         if osp.exists(self.compiler_cmd):
@@ -80,7 +84,8 @@ class module:
             return False
 
     def to_alphanum(self, encoded_shellcode):
-        self.msg('note', False, 'Encoder running...')
+        #self.msg('note', False, 'Encoder running...')
+        cs.print('Encoder running...', cs.state_note)
         alphanum_shellcode = ''
         for hex_byte in tqdm.tqdm (encoded_shellcode.split('\\x')[1:], colour='magenta'):
             num = int(hex_byte, 16)
@@ -90,7 +95,8 @@ class module:
         return alphanum_shellcode
     
     def from_alphanum(self, alphanum_shellcode):
-        self.msg('note', False, 'Decoder running...')
+        cs.print('Decoder running...', cs.state_note)
+        #self.msg('note', False, 'Decoder running...')
         if len(alphanum_shellcode) % 2 != 0:
             raise ValueError('Alphanumeric chars not valid!')
 
@@ -203,18 +209,23 @@ class module:
             shellcode_bytes = self.input
         else:
             try:
-                self.msg('proc.input_try')
+                #self.msg('proc.input_try')
+                cs.print(f'Try to open file {self.input}', cs.state_note)
                 with open(self.input, 'rb') as file:
-                    size, hash = GetFileInfo(self.input)
-                    self.msg('proc.input_ok', False, f'File {self.input} loaded\n{s_ok} Size of shellcode {size} bytes\n{s_ok} Hash: {hash}')
+                    #size, hash = GetFileInfo(self.input)
+                    #self.msg('proc.input_ok', False, f'File {self.input} loaded\n{s_ok} Size of shellcode {size} bytes\n{s_ok} Hash: {hash}')
                     shellcode_bytes = file.read()
+                    cs.action_open_file(self.input)
             except FileNotFoundError:
-                self.msg('error.input', True)
+                cs.print(f'File {self.input} not found or cannot be opened.', cs.state_fail)
+                exit()
+                #self.msg('error.input', True)
         self.shellcode = shellcode_bytes
 
     def process(self):
-        m = self.msg
-        m('pre.head')
+        #m = self.msg
+        #m('pre.head')
+        cs.module_header(self.DisplayName, self.Version)
         fn_root, fn_extension = os.path.splitext(self.output)
         fn_obj = f'{fn_root}.obj'
         fn_asm = f'{fn_root}.nasm'
@@ -236,20 +247,23 @@ class module:
             run([self.compiler_cmd, '-f', 'win64', fn_asm, '-o', fn_obj])
             sc = get_coff_section(fn_obj, '.text')
         else:
-            self.msg('merror', True, f'nasm.exe not found! Download and place it into the shencode directory: {f_link}https://nasm.us/{f_end}')
+            cs.print(f'nasm.exe not found! Download and place it into the shencode directory: {f_link}https://nasm.us/{f_end}', cs.state_fail)
+            #self.msg('merror', True, f'nasm.exe not found! Download and place it into the shencode directory: {f_link}https://nasm.us/{f_end}')
         if self.relay_output:
             return sc
         else:
-            m('proc.output_try')
+            #m('proc.output_try')#
+            cs.print(f'Writing to file {self.output}', cs.state_note)
             with open(self.output, 'wb') as f:
                 if isinstance(sc, str):
                     f.write(sc.encode('utf-8'))
                 else:
                     f.write(sc)
-            if CheckFile(self.output):
-                size, hash = GetFileInfo(self.output)
-                m('proc.output_ok', False, f'File {self.output} created\n{s_ok} Size {size} bytes\n{s_ok} Hash: {hash}')
-            else:
-                m('error.output', True)
-
-        m('post.done')  
+            cs.action_save_file(self.output)
+            # if CheckFile(self.output):
+            #     size, hash = GetFileInfo(self.output)
+            #     m('proc.output_ok', False, f'File {self.output} created\n{s_ok} Size {size} bytes\n{s_ok} Hash: {hash}')
+            # else:
+            #     m('error.output', True)
+        cs.print('Done!', cs.state_ok)
+        #m('post.done')  

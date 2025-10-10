@@ -1,15 +1,11 @@
-########################################################
-### MSFVenom Module
-### Status: migrated 085
-###
-########################################################
-
 from utils.style import *
 from utils.const import msfvenom_path
 import subprocess
 
 CATEGORY    = 'payload'
 DESCRIPTION = 'Generate payloads with msfvenom'
+
+cs = ConsoleStyles()
 
 arglist = {
    'command_line':      { 'value': None, 'desc': 'Msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"' }
@@ -20,7 +16,7 @@ def register_arguments(parser):
 
 class module:
   Author        = 'psycore8'
-  Version       = '2.1.5'
+  Version       = '0.9.0'
   DisplayName   = 'MSF-VENOM'
   Args          = []
   shell_path    = '::payload::msfvenom'
@@ -41,13 +37,16 @@ class module:
           exit()
   
   def CreateShellcodeEx(self):
-    self.msg('pre.head')
+    #self.msg('pre.head')
+    cs.module_header(self.DisplayName, self.Version)
     msf_args = self.command_line.split()
     msf_args.insert(0, self.msfvenom_path)
     self.Args = msf_args
-    self.msg('process')
+    #self.msg('process')
+    cs.print(f'{self.Args}', cs.state_note)
     subprocess.run(msf_args)
-    self.msg('post.done')
+    #self.msg('post.done')
+    cs.print('DONE!', cs.state_ok)
     return True
   
   def process(self):
