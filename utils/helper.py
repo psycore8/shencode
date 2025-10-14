@@ -22,6 +22,14 @@ def GetFileInfo(file):
     hash = f'{sha1.calculate_sha1(file)}'
     return size, hash
 
+# Source: https://stackoverflow.com/questions/1094841/get-a-human-readable-version-of-a-file-size
+def sizeof_fmt(num, suffix="B"):
+    for unit in ("", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"):
+        if abs(num) < 1024.0:
+            return f"[cyan]{num:3.1f}[/] {unit}{suffix}"
+        num /= 1024.0
+    return f"{num:.1f}Yi{suffix}"
+
 
 class nstate:
     ### [STATUS]-[MODNAME] : Message Extra

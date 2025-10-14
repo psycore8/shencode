@@ -1,16 +1,11 @@
-########################################################
-### Extract Module
-### Status: migrated 085
-###
-########################################################
-
 from utils.style import *
-from utils.helper import CheckFile, GetFileInfo
-#from os import path as os_path
+from utils.helper import GetFileInfo
 import struct
 
 CATEGORY    = 'core'
 DESCRIPTION = 'Extract bytes or sections from PE files'
+
+cs = ConsoleStyles()
 
 arglist = {
     'input':                { 'value': None, 'desc': 'Input file for extract module'},
@@ -29,7 +24,7 @@ def register_arguments(parser):
 
 class module:
     Author =      'psycore8'
-    Version =     '2.2.2'
+    Version =     '0.9.0'
     DisplayName = 'BYTE-XTRACT0R'
     hash = ''
     data_size = 0
@@ -40,22 +35,6 @@ class module:
         self.output = output
         self.extract_range = extract_range
         self.extract_section = extract_section
-
-    def msg(self, message_type, ErrorExit=False):
-        messages = {
-            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
-            'post.done'      : f'{s_ok} DONE!',
-            'proc.input_ok'  : f'{s_ok} File {self.input} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-            'proc.output_ok' : f'{s_ok} File {self.output} created\n{s_ok} Size {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{s_note} Try to open file {self.input}',
-            'proc.output_try': f'{s_note} Writing to file...',
-            'proc.try2'       : f'{s_note} Try to extract bytes from {self.extract_range[0]} to {self.extract_range[1]}',
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
 
     def extract_section_from_file(self, file_name, section_name, optional_header=False):
         with open(file_name, "rb") as f:
@@ -79,34 +58,30 @@ class module:
                 section_buffer = data[raw_data_offset : raw_data_offset + raw_data_size]
                 return section_buffer
 
-        print(f'{section_name} section not found!')
+        cs.print(f'{section_name} section not found!', cs.state_fail)
         return None
 
     def process(self):
-        self.msg('pre.head')
-        self.msg('proc.input_try')
+        cs.module_header(self.DisplayName, self.Version)
+        cs.print('Try to open file', cs.state_note)
         try:
             with open(self.input, "rb") as file:
                 shellcode = file.read()
                 self.data_size, self.hash = GetFileInfo(self.input)
-                self.msg('proc.input_ok')
+                cs.action_open_file2(self.input)
         except FileNotFoundError:
             self.msg('error.input', True)
         if self.extract_section == None:
             if isinstance(self.extract_range, str): pass
-            bytes_from = self.extract_range[0]
-            bytes_until = self.extract_range[1]
+            bytes_from = int(self.extract_range[0])
+            bytes_until = int(self.extract_range[1])
             if bytes_from > -1 and bytes_until > 0:
-                self.msg('proc.try2')
+                cs.print(f'Try to extract bytes from {self.extract_range[0]} to {self.extract_range[1]}', cs.state_note)
                 shellcode_new = shellcode[bytes_from:bytes_until]
         else:
             shellcode_new = self.extract_section_from_file(self.input, self.extract_section)
-        self.msg('proc.output_try')
+        cs.print('Writing to file...', cs.state_note)
         with open(self.output, 'wb') as file:
             file.write(shellcode_new)
-        if CheckFile(self.output):
-            self.data_size, self.hash = GetFileInfo(self.output)
-            self.msg('proc.output_ok')
-        else:
-            self.msg('error.output', True)
-        self.msg('post.done')
+        cs.action_save_file2(self.output)
+        cs.print('DONE!', cs.state_ok)

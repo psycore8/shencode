@@ -1,6 +1,6 @@
 import re
 
-from utils.helper import CheckFile, GetFileInfo
+from utils.helper import CheckFile, GetFileInfo, sizeof_fmt
 
 from rich.console import Console
 from rich.table import Table
@@ -37,7 +37,7 @@ class ConsoleStyles:
         #table.add_column('Hash')
         #table.add_row(filename, str(size), hash)
         table.add_row('File', filename)
-        table.add_row('Size', str(size))
+        table.add_row('Size', str(sizeof_fmt(size)))
         table.add_row('Hash', hash)
         cs.print(table)
         
@@ -60,7 +60,7 @@ class ConsoleStyles:
             #table.add_column('Hash')
             #table.add_row(filename, str(size), hash)
             table.add_row('File', filename)
-            table.add_row('Size', str(size))
+            table.add_row('Size', str(sizeof_fmt(size)))
             table.add_row('Hash', hash)
             cs.print(table)
         else:

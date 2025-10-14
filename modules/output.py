@@ -132,11 +132,12 @@ class module:
         return head
     
     def GenerateOffset(self, counter=int):
-        c = self.offset_color
+        #c = self.offset_color
+        c = '[magenta]'
         if self.decimal:
-            offset = f'{c}{counter:08d}:{ENDC}'
+            offset = f'{c}{counter:08d}:[/]'
         else:
-            offset = f'{c}{counter:08X}:{ENDC}'
+            offset = f'{c}{counter:08X}:[/]'
         return offset
 
     def PostProcess(self):
