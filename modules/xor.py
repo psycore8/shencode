@@ -1,17 +1,13 @@
-########################################################
-### XOR Module
-### Status: migrated 085
-### 
-########################################################
-
 import base64
 from itertools import cycle
 from utils.style import *
-from utils.helper import CheckFile, GetFileInfo
+from utils.helper import CheckFile
 from tqdm import tqdm
 
 CATEGORY    = 'encoder'
 DESCRIPTION = 'XOR encoder for payloads'
+
+cs = ConsoleStyles()
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for XOR encoding')
@@ -24,7 +20,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.1.5'
+    Version = '0.9.0'
     DisplayName = 'XOR-ENCODER'
     hash = ''
     data_size = 0
@@ -39,23 +35,6 @@ class module:
         self.xor_key = key
         self.verbose = verbose
         self.mode = mode
-
-    def msg(self, message_type, ErrorExit=False):
-        messages = {
-            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
-            'post.done'      : f'{s_ok} DONE!',
-            'proc.input_ok'  : f'{s_ok} File {self.input} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-            'proc.output_ok' : f'{s_ok} File {self.output} created\n{s_ok} Size {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{s_note} Try to open file {self.input}',
-            'proc.output_try': f'{s_note} Try to write XORed shellcode to file',
-            'proc.try'       : f'{s_note} Try to generate XORed shellcode',
-            'proc.verbose'   : f'\n{self.out}\n'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
 
     def xor_crypt_string(data, key, encode = False, decode = False):
         if decode:
@@ -88,13 +67,13 @@ class module:
             file.write(self.mod_shellcode)
     
     def process(self):
-        self.msg('pre.head')
-        self.msg('proc.input_try')
+        cs.module_header(self.DisplayName, self.Version)
+        cs.print('Try to open file', cs.state_note)
         if CheckFile(self.input):
             self.open_file()
-            self.data_size, self.hash = GetFileInfo(self.input)
-            self.msg('proc.input_ok')
-            self.msg('proc.try')
+
+            cs.action_open_file2(self.input)
+            cs.print('Try to generate XORed shellcode', cs.state_note)
             if self.mode == 'encode':
                 for i in tqdm (range (100), colour='magenta', leave=False):
                     self.mod_shellcode = self.xor_crypt_bytes(self.shellcode, self.xor_key)
@@ -102,23 +81,21 @@ class module:
                 for i in tqdm (range (100), colour='magenta', leave=False):
                     self.mod_shellcode = self.xor_decrypt_bytes(self.shellcode, self.xor_key)
             if self.verbose:
-                self.msg('proc.verbose')
+                cs.print(f'\n{self.out}\n', cs.state_note)
             if not self.relay:
                 CheckFile(self.output)
-                self.msg('proc.output_try')
                 self.write_to_file()
-                self.data_size, self.hash = GetFileInfo(self.output)
-                self.msg('proc.output_ok')
+                cs.print('Try to write XORed shellcode to file', cs.state_note)
+                cs.action_save_file2(self.output)
             elif self.relay:
-                self.msg('post.done')
-                print('\n')
+                cs.print('DONE!', cs.state_ok)
+                cs.print('\n')
                 return self.mod_shellcode
                 exit()
-            else:
-                self.msg('error.output', True)
         else:
-            self.msg('error.input', True)
-        self.msg('post.done')
+            cs.print(f'File {self.input} not found or cannot be opened!', cs.state_fail)
+            return
+        cs.print('DONE!', cs.state_ok)
 
 
 

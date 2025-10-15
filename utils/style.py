@@ -80,6 +80,9 @@ class ConsoleStyles:
     def log(self, message):
         cs.log(message)
 
+    def rule(self, title=''):
+        cs.rule(title=title)
+
 
 s_ok    = '\033[90m[\033[92m+\033[90m]\033[0m'
 s_note  = '\033[90m[\033[94m*\033[90m]\033[0m'

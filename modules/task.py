@@ -1,14 +1,10 @@
-########################################################
-### Task Module
-### Status: dev
-### 
-########################################################
-
 from utils.style import *
-from utils.helper import CheckFile, GetFileHash
+from utils.helper import CheckFile
 
 CATEGORY    = 'core'
 DESCRIPTION = 'Create tasks to automate ShenCode (V2 scheme)'
+
+cs = ConsoleStyles()
 
 def register_arguments(parser):
       parser.add_argument('-i', '--input', help='Input task file')
@@ -18,46 +14,28 @@ class module:
     import importlib
     Author = 'psycore8'
     DisplayName = 'TASKS-V2'
-    Version = '0.2.0'
+    Version = '0.9.0'
     result = any
 
     def __init__(self, input):
         self.input = input
-
-    def msg(self, message_type, MsgVar=None, ErrorExit=False):
-        messages = {
-                'pre.head'         : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-                'task.name'        : f'{s_note} Starting Task: {MsgVar}',
-                'proc.input'       : f'{s_note} Task file ok',
-                'error.input'      : f'{s_fail} Task file failed!',
-                'post.done'        : f'{s_ok} Task DONE!',
-                'step.pre'         : f'{s_note} Executing step {MsgVar}',
-                'nl'               : f'\n'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
 
     def load_config(self, file):
         with open(file, "r") as f:
             return self.json.load(f)
 
     def process(self):
-        m = self.msg
-        m('pre.head')
+        cs.module_header(self.DisplayName, self.Version)
         if CheckFile(self.input):
-            m('proc.input')
+            cs.print('Task file ok', cs.state_ok)
             self.result = None
             tasks = self.load_config(self.input)
-            m('task.name', tasks['name'])
-            m('nl')
+            cs.print(f'Starting Task: {tasks['name']}\n', cs.state_note)
             single_step = tasks['single_step']
-            #task = tasks['tasks']['modules']
-            #mod_count = len(task)
             if single_step == None:
                 for task in tasks["tasks"]:
-                    m('step.pre', f'Task {task["id"]}: {task["module"]}')
-                    m('nl')
+                    cs.print(f'Executing step #{task["id"]}', cs.state_note)
+                    cs.rule(f'[bold red]{task["module"]}[/]')
                     mod = self.importlib.import_module(f'modules.{task["module"]}')
                     if task["input_buffer"]:
                         task["args"]["input"] = self.result
@@ -69,27 +47,12 @@ class module:
                         mod.module.relay_output = True
                     modclass = mod.module(**task["args"])
                     self.result = modclass.process()
-                    m('nl')
-                # for index, step in enumerate(task, start=1):
-                #     if step == 'task' or step == 'bypass':
-                #         continue
-                #     m('step.pre', f'{step} // {index} of {mod_count}')
-                #     m('nl')
-                #     mod = self.importlib.import_module(f'modules.{step}')
-                #     if task[step]['input_buffer']:
-                #         task[step]['args']['input'] = self.result
-                #         mod.module.relay = True
-                #         mod.module.relay_input = True
-                #     if task[step]['return_buffer']:
-                #         mod.module.relay = True
-                #         mod.module.relay_output = True
-                #     modclass = mod.module(**task[step]['args'])
-                #     self.result = modclass.process()
-                #     m('nl')
+                    cs.print('\n')
             else:
                 mod = self.importlib.import_module(f'modules.{single_step}')
                 modclass = mod.module(**task[single_step]['args'])
                 modclass.process()
-            m('post.done')
+            cs.print('Task DONE!', cs.state_ok)
         else:
-            m('error.input', None, True)
+            cs.print('Task file failed!', cs.state_fail)
+            return
