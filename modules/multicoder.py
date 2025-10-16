@@ -1,9 +1,3 @@
-########################################################
-### MultiCODER Module
-### Status: migrated 085
-### 
-########################################################
-
 import base64
 import os
 import pickle
@@ -14,6 +8,8 @@ from utils.const import priv_key, pub_key
 
 CATEGORY    = 'encoder'
 DESCRIPTION = 'En- / Decoder for different algorithms. Supports: AES, Base32, Base64, RSA'
+
+cs = ConsoleStyles()
 
 arglist = {
     'algorithm':     { 'value': None, 'desc': 'Choose an algorithm: base32, base64, aes, rsa' },
@@ -32,7 +28,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.2'
+    Version = '0.9.0'
     DisplayName = 'MultiC0DER'
     data_size = int
     hash = ''
@@ -48,47 +44,32 @@ class module:
         self.key = key
         self.output = output
 
-    def msg(self, message_type, MsgVar=None, ErrorExit=False):
-        messages = {
-            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.mode'     : f'{s_fail} Please provide a valid mode: encode / decode',
-            'post.done'      : f'{s_ok} DONE!',
-            'proc.input_ok'  : f'{s_ok} File {self.input} loaded\n{s_info} Size of encoded data: {self.data_size} bytes\n{s_info} Hash: {self.hash}',
-            'proc.out'       : f'{s_ok} File created in {self.output}\n{s_info} Hash: {self.hash}',
-            'mok'            : f'{s_ok} {MsgVar}',
-            'mnote'          : f'{s_note} {MsgVar}',
-            'merror'         : f'{s_fail} {MsgVar}'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
-
     def process(self):
-        m = self.msg
-        m('pre.head')
-        m('mnote', MsgVar=f'Load input file')
+        cs.module_header(self.DisplayName, self.Version)
+        cs.console_print.note('Load input file...')
         if self.load_file():
             if not self.relay_input:
                 self.data_size, self.hash = GetFileInfo(self.input)
-                m('proc.input_ok')
+                cs.action_open_file2(self.input)
         else:
-            m('merror', f'Error loading {self.input}', True)
-        m('mnote', f'Process input with {self.algorithm.upper()}')
+            cs.console_print.error(f'Error loading file {self.input}')
+            return
+        cs.console_print.note(f'Process input with {self.algorithm.upper()}')
         if hasattr(self, self.algorithm):
             processed_data = getattr(self, self.algorithm)()
         else:
-            m('merror', f'Algorithm {self.algorithm} is not valid!', True)
+            cs.console_print.error(f'Algorithm {self.algorithm} is not valid')
+            return
         if processed_data == None:
-            m('merror', 'Error while processing data', ErrorExit=True)
+            cs.console_print.error('Error while processing data')
+            return
         if self.relay_output:
             return processed_data
         else:
-            if self.save_file(processed_data):
-                self.data_size, self.hash = GetFileInfo(self.output)
-                m('proc.out')
-            else:
-                m('merror', f'Output {self.output} not created!', True)
-        m('post.done')
+            self.save_file(processed_data)
+            cs.action_save_file2(self.output)
+        cs.console_print.ok('DONE!')
+
 
     def load_file(self):
         try:
@@ -126,7 +107,7 @@ class module:
 
     def rsa(self):
         if not os.path.exists(priv_key) or not os.path.exists(pub_key):
-            self.msg('mnote', 'Private and/or public key not found, set generate flag...', False)
+            cs.console_print.note('Private and/or public key not found, set generate flag!')
             gen_keys = True
         else:
             gen_keys = False
@@ -154,7 +135,8 @@ class module:
             processed_data = self.aes()
             return processed_data
         else:
-            self.msg('merror', 'Mode not valid, try encode / decode', True)
+            cs.console_print.error('Mode not valid, try encode/decode')
+            return
     
     def aes(self):
         from utils.crypt import aes_worker

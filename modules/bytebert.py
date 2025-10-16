@@ -1,9 +1,3 @@
-########################################################
-### ByteBert Module
-### Status: migrated 085
-### 
-########################################################
-
 ### DEFINITIONS
 # reg1 = save / read encryptedbyte(odd)
 # reg2 = shellcode indexer
@@ -13,7 +7,7 @@
 import random
 from utils.asm import variable_instruction_set
 from utils.style import *
-from utils.helper import CheckFile, GetFileInfo
+from utils.helper import CheckFile
 from utils.binary import get_coff_section
 from os import path as osp
 from os import name as os_name
@@ -24,6 +18,8 @@ from utils.const import *
 
 CATEGORY    = 'encoder'
 DESCRIPTION = 'ByteBert - Advanced polymorphic Encoder Stub'
+
+cs = ConsoleStyles()
 
 arglist = {
     'input':                    { 'value': None, 'desc': 'Input file to use with bytebert' },
@@ -41,7 +37,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.4.5'
+    Version = '0.9.0'
     DisplayName = 'ByteBERT-ENC'
     Shellcode = ''
     Shellcode_Bin = b''
@@ -64,37 +60,6 @@ class module:
         self.variable_padding = variable_padding
         self.verbose = verbose
         self.compiler_cmd = nasm
-
-    def msg(self, message_type, ErrorExit=False, MsgVar=any):
-        messages = {
-            'pre.head'      : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'post.done'     : f'{s_ok} DONE!',
-            'proc.ssize'    : f'{s_note} ASM script generated with a size of {self.stub_size} bytes',
-            'proc.rkey'     : f'{s_note} Random key: {self.key} ({hex(self.key)})',
-            'error.input'   : f'{s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'  : f'{s_fail} File {MsgVar} not found or cannot be opened.',
-            'proc.psize'    : f'{s_note} Payload size: {self.Shellcode_Length}',
-            'proc.xor_ok'   : f'{s_ok} Encoded payload appended!',
-            'proc.out'      : f'{s_ok} File created in {MsgVar}\n{s_note} Hash: {self.hash}',
-            'proc.comp_try' : f'{s_note} Try to compile object file',
-            'proc.input_ok' : f'{s_ok} File {self.input} loaded\n{s_note} Size of shellcode {self.data_size} bytes\n{s_note} Hash: {self.hash}',
-            'proc.compile'  : f'{s_ok} File {MsgVar} created\n{s_note} Size of shellcode {self.data_size} bytes\n{s_note} Hash: {self.hash}',
-            'proc.ext'      : f'{s_info} Extract .text section from object file',
-            'proc.fsize'    : f'{s_info} Final shellcode size: {MsgVar} bytes',
-            'error.xor_ok'  : f"{s_fail} XOR encoded Shellcode error, aborting script execution",
-            'error.nasm1'   : f'{s_fail} nasm.exe not found! Download and place it into the shencode directory: {f_link}https://nasm.us/{f_end}',
-            'key.try'       : f'{s_info} Bruteforcing XOR key',
-            'error.key'     : f'{s_fail} \\x00 detected! Proceeding with random key',
-            'error.nasm2'   : f'{s_info} You can compile it by hand: nasm.exe -f win64 {MsgVar}',
-            # Verbose
-            'v.registers'   : f'{s_info} Selected registers: {MsgVar}',
-            'v.inst'        : f'{s_info} {MsgVar}',
-            'v.size'        : f'{s_info} Size instruction: {MsgVar}',
-            'v.padding'     : f'{s_info} Added NOP at line {MsgVar}'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
 
     def CheckNasm(self)->bool:
         if osp.exists(self.compiler_cmd):
@@ -119,7 +84,8 @@ class module:
     def LoadHeader(self):
         self.Modified_Shellcode = self.generate_win64_stub()
         self.stub_size = len(self.Modified_Shellcode)
-        self.msg('proc.ssize')
+        #cs.print(f'ASM script generated with a size of {self.stub_size} bytes', cs.state_note)
+        cs.console_print.note(f'ASM script generated with a size of {self.stub_size} bytes')
 
     def LoadShellcode(self):
         self.key = random.randint(1, 255)
@@ -130,15 +96,15 @@ class module:
                 with open(self.input, 'rb') as file:
                     shellcode_bytes = file.read()
             except FileNotFoundError:
-                self.msg('error.input', True)
-        self.msg('proc.rkey')
+                cs.console_print.error('File not found')
+        cs.console_print.info(f'Random key: {self.key} ({hex(self.key)})')
 
         for i in tqdm (range (100), colour='magenta', leave=False):
             self.Shellcode_Bin = self.encrypt(shellcode_bytes, self.key)
         size = len(self.Shellcode_Bin)
         self.Shellcode_Length = str(size)
         self.end_offset = str( 404 )
-        self.msg('proc.psize')
+        cs.console_print.note(f'Payload size: {self.Shellcode_Length}')
 
     def ConvertShellCodeToStr(self):
         self.Shellcode = [f"0x{byte:02X}" for byte in self.Shellcode_Bin]
@@ -146,7 +112,7 @@ class module:
 
     def AppendShellcode(self):
         self.Modified_Shellcode += self.Shellcode
-        self.msg('proc.xor_ok')
+        cs.console_print.ok('Encoded payload appended!')
 
     def WriteToFile(self, data, filename):
       if isinstance(data, bytes):
@@ -160,47 +126,42 @@ class module:
         run([self.compiler_cmd, '-f', 'win64', nasm_file, '-o', obj_file])
         
     def process(self):
-        self.msg('pre.head')
-
+        cs.module_header(self.DisplayName, self.Version)
         fn_Root, output_file_extension = osp.splitext(self.output)
         fn_nasm = f'{fn_Root}.nasm'
         fn_obj = f'{fn_Root}.obj'
 
         if not self.relay_input and CheckFile(self.input):
             self.LoadShellcode()
-            self.data_size, self.hash = GetFileInfo(self.input)
-            self.msg('proc.input_ok')
+            cs.action_open_file2(self.input)
         elif self.relay_input:
             self.LoadShellcode()
         else:
-            self.msg('error.input', True)
+            cs.console_print.error(f'File {self.input} not found or cannot be opened')
         self.LoadHeader()
         self.ConvertShellCodeToStr()
         self.AppendShellcode()
         self.WriteToFile(self.Modified_Shellcode, fn_nasm)
-        if CheckFile(fn_nasm):
-            self.data_size, self.hash = GetFileInfo(fn_nasm)
-            self.msg('proc.out', False, f'{fn_nasm}')
-        else:
-            self.msg('error.output', True, f'{fn_nasm}')
+        if self.verbose: cs.action_save_file2(fn_nasm)
         if self.CheckNasm():
-            self.msg('proc.comp_try')
+            cs.console_print.note('Try to compile object file')
             self.CompileObjectFile(fn_nasm, fn_obj)
             if CheckFile(fn_obj):
-                self.data_size, self.hash = GetFileInfo(fn_obj)
-                self.msg('proc.compile', False, f'{fn_obj}')
-                self.msg('proc.ext')
+                if self.verbose: cs.action_save_file2(fn_obj)
+                cs.console_print.info('Extract .text section from object file')
                 final_shellcode = get_coff_section(fn_obj, '.text')
-                self.msg('proc.fsize', False, len(final_shellcode))
+                shellcode_size = str(len(final_shellcode))
+                cs.console_print.info(f'Final shellcode size: {shellcode_size} bytes')
                 if self.relay_output:
-                    self.msg('post.done')
+                    cs.console_print.ok('DONE!')
                     return final_shellcode
                 else:
                     self.WriteToFile(final_shellcode, self.output)
-                    self.msg('post.done')
+                    cs.action_save_file2(self.output)
+                    cs.console_print.ok('DONE!')
         else:
-            self.msg('error.nasm1')
-            self.msg('error.nasm2', True, f'{fn_nasm} -o {fn_obj}')
+            cs.console_print.error(f'nasm.exe not found! Download and place it into the shencode directory: [cyan underline]https://nasm.us/[/]')
+            cs.console_print.info(f'You can compile it by hand: nasm.exe -f win64 {fn_nasm} -o {fn_obj}')
 
     def generate_win64_stub(self):
         vi = variable_instruction_set()
@@ -228,9 +189,9 @@ class module:
         asm_dec_reg     = random.choice(inst_asm_dec_reg)
 
         if self.verbose:
-            self.msg('v.registers', False, f'{reg1[0]}, {reg2[0]}, {reg3[0]}, {reg4[0]}')
-            self.msg('v.inst', False, f'Instruction set: {asm_jmp_cond} / {asm_jmp_ncond} / {asm_reg_zero}')
-            self.msg('v.inst', False, f'Increase, decrease: {asm_inc_reg} {asm_dec_reg}')
+            cs.console_print.info(f'Selected registers: {reg1[0]}, {reg2[0]}, {reg3[0]}, {reg4[0]}')
+            cs.console_print.info(f'Instruction set: {asm_jmp_cond} / {asm_jmp_ncond} / {asm_reg_zero}')
+            cs.console_print.info(f'Increase, decrease: {asm_inc_reg} {asm_dec_reg}')
 
         size = int(self.Shellcode_Length)
         
@@ -242,7 +203,7 @@ class module:
            sc_size = f'mov {reg3[1]}, {size}'
 
         if self.verbose:
-            self.msg('v.size', False, f'{sc_size}')
+           cs.console_print.info(f'Size instruction: {sc_size}')
         
         stub64 = f"""
             section .data
@@ -301,7 +262,7 @@ class module:
                 paddy.insert(random_noppy_index, noppy)
                 stub64_paddy = '\n'.join(paddy)
                 if self.verbose:
-                    self.msg('v.padding', False, f'{random_noppy_index}')
+                    cs.console_print.info(f'Added NOP at line {random_noppy_index}')
                 i += 1
             return stub64_paddy
         else:

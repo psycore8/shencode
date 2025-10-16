@@ -1,8 +1,4 @@
-########################################################
-### feed Module
-### Status: 086
-### 
-########################################################
+# shencode module
 
 import datetime
 import feedparser
@@ -17,6 +13,8 @@ from utils.helper import GetFileInfo, CheckFile
 
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Obfuscate shellcodes as XML Feed'
+
+cs = ConsoleStyles()
 
 arglist = {
     'input':            { 'value': None, 'desc': 'Input file for feed encoding' },
@@ -46,7 +44,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.2.6'
+    Version = '0.9.0'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0
@@ -64,23 +62,7 @@ class module:
         self.feed_author = feed_author
         self.feed_title = feed_title
         self.feed_subtitle = feed_subtitle
-        self.feed_uri = feed_uri
-
-    def msg(self, message_type, ErrorExit=False):
-        messages = {
-            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{s_fail} File {self.input_file} not found or cannot be opened.',
-            'error.output'   : f'{s_fail} File {self.output_file} not found or cannot be opened.',
-            'post.done'      : f'{s_ok} DONE!',
-            'proc.input_ok'  : f'{s_ok} File {self.input_file} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-            'proc.output_ok' : f'{s_ok} File {self.output_file} created\n{s_ok} Size {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{s_note} Try to open file {self.input_file}',
-            'proc.try'       : f'{s_note} Try to generate fake feed',
-            'proc.retry'     : f'{s_note} Try to reassemble shellcode'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()        
+        self.feed_uri = feed_uri      
 
     def open_file(self):
         if self.relay_input:
@@ -119,7 +101,7 @@ class module:
         return random_date
 
     def convert_bytes_to_fake_id(self, block_size=16):
-        s = self.shellcode#.encode('utf-8')
+        s = self.shellcode
         self.feed_fake_ids.extend([s[i:i + block_size] for i in range(0, len(s), block_size)])
 
     def generate_additional_attributes(self):
@@ -197,33 +179,29 @@ class module:
                 f.write(self.shellcode)
 
     def process(self):
-        self.msg('pre.head')
+        cs.module_header(self.DisplayName, self.Version)
         self.generate_additional_attributes()
         if self.reassemble:
-            self.msg('proc.retry')
+            cs.console_print.note('Try to reassemble shellcode')
             self.shellcode = self.reassemble_shellcode()
             self.output_result()
         else:
-            self.msg('proc.input_try')
+            cs.console_print.note('Try to open file')
             if CheckFile(self.input_file):
                 self.data_size, self.hash = GetFileInfo(self.input_file)
                 self.open_file()
-                self.msg('proc.input_ok')
+                cs.action_open_file2(self.input_file)
                 self.convert_bytes_to_fake_id()
-                self.msg('proc.try')
+                cs.console_print.note('Try to generate fake feed')
                 self.shellcode = self.generate_feed()
                 self.output_result()
             else:
-                self.msg('error.input', True)
+                cs.console_print.error(f'File {self.input_file} not found or cannot be opened')
         if self.relay_output:
             return self.shellcode
         else:
-            if CheckFile(self.output_file):
-                self.data_size, self.hash = GetFileInfo(self.output_file)
-                self.msg('proc.output_ok')
-            else:
-                self.msg('error.output', True)
-        self.msg('post.done')
+            cs.action_save_file2(self.output_file)
+        cs.console_print.ok('DONE!')
 
 
 

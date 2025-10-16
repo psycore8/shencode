@@ -32,7 +32,7 @@ class ConsoleStyles:
     def action_open_file2(sekf, filename):
         size, hash = GetFileInfo(filename)
         table = Table(border_style='grey42')
-        table.add_column('[red]Key[/]', style='red')
+        table.add_column('[bright_magenta]Key[/]', style='bright_magenta')
         table.add_column('Value')
         #table.add_column('Hash')
         #table.add_row(filename, str(size), hash)
@@ -55,7 +55,7 @@ class ConsoleStyles:
         if CheckFile(filename):
             size, hash = GetFileInfo(filename)
             table = Table(border_style='grey42')
-            table.add_column('[red]Key[/]', style='red')
+            table.add_column('[bright_magenta]Key[/]', style='bright_magenta')
             table.add_column('Value')
             #table.add_column('Hash')
             #table.add_row(filename, str(size), hash)
@@ -67,6 +67,20 @@ class ConsoleStyles:
             cs.print(f'{self.state_fail} {filename } not found!')
             return False
         
+    class console_print():
+        def info(text:str):
+            message = f'{ConsoleStyles.state_info} {text}'
+            cs.print(message)
+        def error(text:str):
+            message = f'{ConsoleStyles.state_error} {text}'
+            cs.print(message)
+        def ok(text:str):
+            message = f'{ConsoleStyles.state_ok} {text}'
+            cs.print(message)
+        def note(text:str):
+            message = f'{ConsoleStyles.state_note} {text}'
+            cs.print(message)
+
     def print(self, text:str, state:str=None, rules:bool=False):
         if state == None: state = ''
         message = f'{state} {text}'
@@ -76,6 +90,22 @@ class ConsoleStyles:
             cs.rule('')
         else:
             cs.print(message)
+
+    def print_error(self, text:str):
+        message = f'{self.state_fail} {text}'
+        cs.print(message)
+
+    def print_note(self, text:str):
+        message = f'{self.state_note} {text}'
+        cs.print(message)
+
+    def print_info(self, text:str):
+        message = f'{self.state_info} {text}'
+        cs.print(message)
+
+    def print_ok(self, text:str):
+        message = f'{self.state_ok} {text}'
+        cs.print(message)
 
     def log(self, message):
         cs.log(message)

@@ -198,7 +198,8 @@ class module:
                 random_noppy_index = random.randint(4, len(paddy)-4)
                 paddy.insert(random_noppy_index, noppy)
                 stub64_paddy = '\n'.join(paddy)
-                self.msg('note', False, f'NOP inserted at line {random_noppy_index}: {nop}')
+                #self.msg('note', False, f'NOP inserted at line {random_noppy_index}: {nop}')
+                cs.print(f'NOP inserted at line {random_noppy_index}: {nop}', cs.state_note)
                 i += 1
             return stub64_paddy
         else:
@@ -215,7 +216,7 @@ class module:
                     #size, hash = GetFileInfo(self.input)
                     #self.msg('proc.input_ok', False, f'File {self.input} loaded\n{s_ok} Size of shellcode {size} bytes\n{s_ok} Hash: {hash}')
                     shellcode_bytes = file.read()
-                    cs.action_open_file(self.input)
+                    cs.action_open_file2(self.input)
             except FileNotFoundError:
                 cs.print(f'File {self.input} not found or cannot be opened.', cs.state_fail)
                 exit()
@@ -259,7 +260,7 @@ class module:
                     f.write(sc.encode('utf-8'))
                 else:
                     f.write(sc)
-            cs.action_save_file(self.output)
+            cs.action_save_file2(self.output)
             # if CheckFile(self.output):
             #     size, hash = GetFileInfo(self.output)
             #     m('proc.output_ok', False, f'File {self.output} created\n{s_ok} Size {size} bytes\n{s_ok} Hash: {hash}')
