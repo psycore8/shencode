@@ -1,11 +1,13 @@
 ########################################################
-### QRCode Module
-### Status: 086
+### ShenCode Module
+###
+### Name: QRCode
+### Docs: https://heckhausen.it/shencode/README
 ### 
 ########################################################
 
 from utils.style import *
-from utils.helper import CheckFile, GetFileInfo
+from utils.helper import CheckFile
 from qrcode.image.pure import PyPNGImage
 from pyzbar.pyzbar import decode
 import cv2
@@ -15,6 +17,8 @@ import qrcode.constants
 
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Obfuscate shellcodes as QR-Codes'
+
+cs = ConsoleStyles()
 
 arglist = {
     'input':        { 'value': None, 'desc': 'Input file for QR-Code encoding' },
@@ -29,7 +33,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.2.2'
+    Version = '0.9.0'
     DisplayName = 'QRCODE-OBF'
     hash = ''
     data_size = 0
@@ -41,24 +45,6 @@ class module:
          self.input_file = input
          self.output_file = output
          self.reverse = reverse
-
-    def msg(self, message_type, ErrorExit=False, MsgVar=None):
-        messages = {
-            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{s_fail} File {self.input_file} not found or cannot be opened.',
-            'error.output'   : f'{s_fail} File {self.output_file} not found or cannot be opened.',
-            'post.done'      : f'{s_ok} DONE!',
-            'proc.input_ok'  : f'{s_ok} File {self.input_file} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-            'proc.output_ok' : f'{s_ok} File {self.output_file} created\n{s_ok} Size {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-            'proc.input_try' : f'{s_note} Try to open file {self.input_file}',
-            'proc.try'       : f'{s_note} Try to generate QR-Code',
-            'mnote'          : f'{s_note} {MsgVar}',
-            'mok'            : f'{s_ok} {MsgVar}',
-            'merror'         : f'{s_fail} {MsgVar}'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
 
     def open_file(self):
         if self.reverse:
@@ -84,14 +70,16 @@ class module:
             data = base64.b64encode(input_bytes).decode('ascii')
             return data
         except:
-            self.msg('merror', True, 'Base64 encoding error!')
+            cs.console_print.error('Base64 encoding error!')
+            return
 
     def base64_str_to_bytes(self, input_string=str) -> bytes:
         try:
             data = base64.b64decode(input_string.encode('ascii'))
             return data
         except:
-            self.msg('merror', True, 'Base64 decoding error!')
+            cs.console_print.error('Base64 decoding error!')
+            return
 
     def decode_qr_code(self):
         data = cv2.imread(self.input_file)
@@ -101,7 +89,7 @@ class module:
             with open(self.output_file, 'wb') as f:
                 f.write(out_bytes)
         else:
-            print("QR Code not detected")
+            cs.console_print.error('QR Code not detected')
             cv2.imshow("Results", dec_data)
         
         cv2.waitKey(0)
@@ -122,36 +110,31 @@ class module:
 
                         
     def process(self):
-        self.msg('pre.head')
-        self.msg('proc.input_try')
+        cs.module_header(self.DisplayName, self.Version)
+        cs.console_print.note('Try to open file')
         self.open_file()
         if CheckFile(self.input_file):
-            self.data_size, self.hash = GetFileInfo(self.input_file)
-            self.msg('proc.input_ok')
+            cs.action_open_file2(self.input_file)
             if self.reverse:
                 self.decode_qr_code()
-                if CheckFile(self.output_file):
-                    self.data_size, self.hash = GetFileInfo(self.output_file)
-                    self.msg('proc.output_ok')
-                self.msg('post.done')
+                cs.action_save_file2(self.output_file)
+                cs.console_print.ok('DONE!')
                 return True
             else:
                 if self.check_max_size(self.shellcode):
-                    self.msg('mnote', False, 'File size check passed')
+                    cs.console_print.note('File size check passed')
                 else:
-                    self.msg('merror', True, 'File size exceeds 1852 bytes!')
-                self.msg('proc.try')
+                    cs.console_print.error('File size exceeds 1852 bytes')
+                    return
+                cs.console_print.note('Try to generate QR Code')
                 qr = qrcode.QRCode(image_factory=PyPNGImage, error_correction=qrcode.constants.ERROR_CORRECT_Q)
                 payload_bytes = self.bytes_to_base64_str(self.shellcode)
                 qr.add_data(payload_bytes)
                 qr.make(fit=True)
                 img = qr.make_image(fill_color='white', back_color='black')
                 img.save(self.output_file)
-                if CheckFile(self.output_file):
-                    self.data_size, self.hash = GetFileInfo(self.output_file)
-                    self.msg('proc.output_ok')
-                else:
-                    self.msg('error.output', True)
+                cs.action_save_file2(self.output_file)
         else:
-            self.msg('error.input', True)
-        self.msg('post.done')
+            cs.console_print.error('File not found or cannot be opened')
+            return
+        cs.console_print.ok('DONE!')

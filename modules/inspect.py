@@ -1,3 +1,11 @@
+########################################################
+### ShenCode Module
+###
+### Name: Inspect
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 from utils.style import *
 from rich.table import Table
 from rich.console import Console
@@ -34,7 +42,6 @@ class module:
     cFile = False
     shell_path = '::core::inspect'
     table = Table()
-    #console = Console()
 
     def __init__(self, input=any, bytes_per_row=int, decimal=bool, highlight=None, range=[0, 0]):
         self.input = input
@@ -56,9 +63,12 @@ class module:
                 file.seek(x)
                 self.file_bytes = file.read(y - x)
 
-    def highlight_table_word(self, text, word, colorclass):
-        highlighted_text = text.replace(word, f"{colorclass}{word}[/]")
-        return highlighted_text
+    def highlight_table_word(self, list, word, colorclass):
+        delimiter = ' '
+        converted_string = delimiter.join(list)
+        highlighted_text = converted_string.replace(word, f"{colorclass}{word}[/]")
+        converted_list = highlighted_text.split()
+        return converted_list
     
     def generate_table_output(self):
         self.table.border_style = 'grey42'
@@ -75,6 +85,8 @@ class module:
                     ctag_open = ''
                     ctag_close = ''
                 row.append(f'{ctag_open}{byte:02x}{ctag_close}')
+            if self.highlight != None:
+                row = self.highlight_table_word(row, self.highlight, '[cyan]')
             self.table.add_row(*row)
             #console.log(f'Row added {row}')
             row = []
@@ -99,9 +111,9 @@ class module:
     
     def process(self):
         cs.module_header(self.DisplayName, self.Version)
-        cs.print('loading input file', cs.state_note)
+        cs.console_print.note('loading input file')
         self.load_input_file()
-        cs.print('generating output', cs.state_note)
+        cs.console_print.note('generating output')
         self.generate_table_output()
         console.print(self.table)
-        cs.print('Done!', cs.state_ok)
+        cs.console_print.ok('Done!')
