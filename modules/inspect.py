@@ -15,12 +15,13 @@ CATEGORY    = 'core'
 DESCRIPTION = 'Inspect binary files'
 
 cs = ConsoleStyles()
-console = Console()
+console = Console(record=True)
 
 arglist = {
     'input':            { 'value': None, 'desc': 'Input file or buffer for formatted output' },
     'bytes_per_row':    { 'value': 16, 'desc': 'Define how many bytes per row will be displayed' },
     'decimal':          { 'value': False, 'desc': 'Output decimal offsets instead of hex' },
+    'export':           { 'value': None, 'desc': 'Save table as html file' },
     'highlight':        { 'value': None, 'desc': 'Highlights bytes' },
     'range':            { 'value': [0,0], 'desc': 'Set a range of bytes to output: <start> <end>' }
 }
@@ -31,6 +32,7 @@ def register_arguments(parser):
       src = parser.add_argument_group('formatting')
       src.add_argument('-b', '--bytes-per-row', required=False, default=16, type=int, help=arglist['bytes_per_row']['desc'] , metavar='INT')
       src.add_argument('-hl', '--highlight', default=None, help=arglist['highlight']['desc'])
+      src.add_argument('-e', '--export', default=None, help=arglist['export']['desc'])
       src.add_argument('-r', '--range', nargs=2, default=[0, 0], type=int, help=arglist['range']['desc'])
       src.add_argument('-d', '--decimal', action='store_true', required=False, default=False, help=arglist['decimal']['desc'])
 
@@ -43,10 +45,11 @@ class module:
     shell_path = '::core::inspect'
     table = Table()
 
-    def __init__(self, input=any, bytes_per_row=int, decimal=bool, highlight=None, range=[0, 0]):
+    def __init__(self, input=any, bytes_per_row=int, decimal=bool, export=None, highlight=None, range=[0, 0]):
         self.input = input
         self.bytes_per_row = bytes_per_row
         self.decimal = decimal
+        self.export = export
         self.highlight = highlight
         if range != [0, 0]:
             self.range = [range[0], range[1]]
@@ -116,4 +119,9 @@ class module:
         cs.console_print.note('generating output')
         self.generate_table_output()
         console.print(self.table)
+        if self.export != None:
+            html_export = console.export_html()
+            with open(self.export, 'w', encoding='utf-8') as f:
+                f.write(html_export)
+            cs.action_save_file2(self.export)
         cs.console_print.ok('Done!')

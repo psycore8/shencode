@@ -72,7 +72,7 @@ class ConsoleStyles:
             message = f'{ConsoleStyles.state_info} {text}'
             cs.print(message)
         def error(text:str):
-            message = f'{ConsoleStyles.state_error} {text}'
+            message = f'{ConsoleStyles.state_fail} {text}'
             cs.print(message)
         def ok(text:str):
             message = f'{ConsoleStyles.state_ok} {text}'

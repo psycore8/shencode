@@ -1,3 +1,11 @@
+########################################################
+### ShenCode Module
+###
+### Name: Task
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 from utils.style import *
 from utils.helper import CheckFile
 
@@ -27,9 +35,15 @@ class module:
     def process(self):
         cs.module_header(self.DisplayName, self.Version)
         if CheckFile(self.input):
-            cs.print('Task file ok', cs.state_ok)
             self.result = None
             tasks = self.load_config(self.input)
+            try:
+                if tasks['scheme'] != 'V2':
+                    cs.console_print.error('Wrong task scheme! This module requires [bold red]V2[/] scheme!')
+            except KeyError:
+                cs.console_print.error('Wrong task scheme! This module requires [bold red]V2[/] scheme!')
+                return
+            cs.print('Task file ok', cs.state_ok)
             cs.print(f'Starting Task: {tasks['name']}\n', cs.state_note)
             single_step = tasks['single_step']
             if single_step == None:

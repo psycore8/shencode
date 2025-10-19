@@ -61,12 +61,13 @@ To activate the virtual environment use the following command:
 ## Release Notes
 
 - `general` - code cleanup
-- `dependencies` - updated
-- `encoder/alphanum` - padding and nasm fix
-- `encoder/bytebert` - padding fix
-- `encoder/xorchain` - new encoder module
-- `obfuscate/qrcode` - added `--reverse` option to convert the qr code back to raw binary
-- `utils/interactive` - changed the `config` command to `config_print`, `config_restore` and `config_save`
+- `general` - improved output with rich implementation
+- `general` - ShenCode as python module
+- `core/inspect `- seperated the file inspect function to a module, including html export
+- `core/output` - removed inspect
+- `core/task` - Improved JSON scheme for better iteration and multiple module usage in one file
+- `obfuscate/uuid` - file output and reverse function added
+- `stager/sliver` - fixed a datatype error and os.name implementation
 
 
 ## References
