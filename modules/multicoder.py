@@ -1,3 +1,11 @@
+########################################################
+### ShenCode Module
+###
+### Name: Multicoder Module
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 import base64
 import os
 import pickle

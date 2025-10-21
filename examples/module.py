@@ -1,8 +1,19 @@
+########################################################
+### ShenCode Module
+###
+### Name: Example Module
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 from utils.style import *
 
 # defines a category
 CATEGORY    = 'example'
 DESCRIPTION = 'An example module for ShenCode'
+
+# Console style definitions
+cs = ConsoleStyles()
 
 # the arglist defines argument defaults and descriptions
 arglist = {
@@ -20,7 +31,7 @@ def register_arguments(parser):
 class module:
   # general information
   Author =      'Name'
-  Version =     '1.0.0'
+  Version =     '0.9.0'
   DisplayName = 'CALC-POWER'
   # relay is used in tasked mode
   relay_input = False
@@ -34,25 +45,14 @@ class module:
     self.power          = power
     self.verbose        = verbose
 
-  # defines the console output
-  def msg(self, message_type, ErrorExit=False):
-    messages = {
-        'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-        'proc.calcs'     : f'{s_ok} The result equals {self.power}',
-        'proc.calcv'     : f'{s_ok} The base of {self.base} raised to the exponent of {self.exponent} results in the power value {self.power}'
-    }
-    print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-    if ErrorExit:
-        exit()
-
   def CalculatePower(self):
      # executes functions in process()
      self.power = pow(self.base,self.exponent)
 
   def process(self):
     # prints module header
-    # [CALC-POWER]-[1.0.0]
-    self.msg('pre.head')
+    # [CALC-POWER]-[0.9.0]
+    cs.module_header(self.DisplayName, self.Version)
 
     # executes function
     self.CalculatePower()
@@ -62,10 +62,10 @@ class module:
       # prints the result
       if self.verbose:
         # [+] The base of 8 raised to the exponent of 4 results in the power value 4096
-        self.msg('proc.calcv')
+        cs.console_print.ok('The base of 8 raised to the exponent of 4 results in the power value 4096')
       else:
         # [+] The result equals 4096
-        self.msg('proc.calcs')
+        cs.console_print.ok('The result equals 4096')
     else:
        # returns the values to task module for further processing
        value_list = [self.base, self.exponent, self.power]

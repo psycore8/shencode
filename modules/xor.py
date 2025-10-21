@@ -1,3 +1,11 @@
+########################################################
+### ShenCode Module
+###
+### Name: XOR Encoder
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 import base64
 from itertools import cycle
 from utils.style import *

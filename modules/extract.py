@@ -1,3 +1,11 @@
+########################################################
+### ShenCode Module
+###
+### Name: Extract Module
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 from utils.style import *
 from utils.helper import GetFileInfo
 import struct

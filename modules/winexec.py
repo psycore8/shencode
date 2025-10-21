@@ -1,3 +1,11 @@
+########################################################
+### ShenCode Module
+###
+### Name: Winexec Payload
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 from utils.asm import variable_instruction_set
 from utils.binary import get_coff_section
 from utils.const import nasm

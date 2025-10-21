@@ -1,7 +1,9 @@
 ########################################################
-### Info Module
-### Status: 086
+### ShenCode Module
 ###
+### Name: Info Module
+### Docs: https://heckhausen.it/shencode/README
+### 
 ########################################################
 
 from keystone import *
@@ -10,11 +12,11 @@ from utils.style import *
 from utils.asm import variable_instruction_set
 from utils.hashes import FunctionHash
 from utils.const import *
-import importlib
 
 CATEGORY    = 'core'
 DESCRIPTION = 'Developer Info Module'
 
+cs = ConsoleStyles()
 arglist = {
     'get':                  { 'value': False, 'desc': 'Get developer info' },
     'modlist':              { 'value': False, 'desc': 'List modules' },
@@ -34,7 +36,7 @@ class module:
     import utils.header as header
     from os import listdir, path
     Author = 'psycore8'
-    Version = '0.1.3'
+    Version = '0.9.0'
     DisplayName = 'SHENCODE-DEViNFO'
     mod_dir = module_dir
     mod_count = 0
@@ -50,27 +52,6 @@ class module:
         self.function_hash = function_hash
         self.prep_str = prep_str 
 
-    def msg(self, message_type, MsgVar=None, left_msg=None, right_msg=None, ErrorExit=False):
-        messages = {
-            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'banner'         : f'{s_ok} Banners:'.ljust(self.s) + f'{len(self.header.headers)}',
-            'version'        : f'{s_ok} Version:'.ljust(self.s) + f'{Version}',
-            'mods'           : f'{s_ok} Modules:'.ljust(self.s) + f'{self.mod_count}',
-            'repo'           : f'{s_ok} Repository:'.ljust(self.s) + f'{f_link}https://github.com/psycore8/shencode{f_end}',
-            'docs'           : f'{s_ok} Docs:'.ljust(self.s) + f'{f_link}https://www.heckhausen.it/shencode/wiki{f_end}',
-            'msf'            : f'{s_ok} msfvenom:'.ljust(self.s) + f' {msfvenom_path}',
-            'template'       : f'{s_ok} template dir:'.ljust(self.s) + f'{tpl_path}',
-            'modules'        : f'{s_ok} module dir:'.ljust(self.s) + f'{module_dir}',
-            'out'            : f'{s_ok} {MsgVar}',
-            'fout'           : f'{s_ok} {left_msg}'.ljust(self.s) + f'{right_msg}',
-            'modlist.s'      : f'{s_ok} List modules',
-            'modlist'        : f'{s_note} Module {self.mod_count}:{self.mod_name.upper()}',
-            'post.done'      : f'{s_ok} DONE!'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
-
     def get_mod_count(self):
         self.mod_count = len([f for f in self.listdir(self.mod_dir) if self.path.isfile(self.path.join(self.mod_dir, f))])
 
@@ -82,30 +63,30 @@ class module:
             
     def process(self):
         vi = variable_instruction_set()
-        m = self.msg
-        self.msg('pre.head')
-        self.msg('version')
-        self.msg('banner')
+        cs.module_header(self.DisplayName, self.Version)
+        cs.console_print.ok(f'Version:'.ljust(self.s) + f'{Version}')
+        cs.console_print.ok(f'Banners:'.ljust(self.s) + f'{len(self.header.headers)}')
         if self.function_hash != None:
-            print(f"[DEBUG] Eingabewert: {self.function_hash}")
+            cs.console_print.ok(f"[DEBUG] Eingabewert: {self.function_hash}")
             fh = FunctionHash()
             hash_r = fh.ror_hash(self.function_hash, 13)
-            print(f'[ROR13] {self.function_hash} : {hex(hash_r)}')
+            cs.console_print.ok(f'[ROR13] {self.function_hash} : {hex(hash_r)}')
             exit()
         if self.prep_str != None:
             stack_list = vi.prepare_str_to_stack(self.prep_str)
             for stack_string in stack_list:
-                print(stack_string)
+                cs.console_print.ok(stack_string)
             exit()
         self.get_mod_count()
-        self.msg('mods')
-        self.msg('modules')
-        m('fout', None, 'nasm:', f'{nasm}')
-        m('fout', None, 'Resource dir:', f'{resource_dir}')
-        self.msg('template')
-        self.msg('msf')
-        self.msg('repo')
-        self.msg('docs')
+        cs.console_print.note(f'Modules:'.ljust(self.s) + f'{self.mod_count}')
+        cs.console_print.note(f'Module dir:'.ljust(self.s) + f'{module_dir}')
+        cs.console_print.note(f'NASM:'.ljust(self.s) + f'{nasm}')
+        cs.console_print.note(f'Resource dir:'.ljust(self.s) + f'{resource_dir}')
+        cs.console_print.note(f'Template dir:'.ljust(self.s) + f'{tpl_path}')
+        cs.console_print.note(f'Msfvenom:'.ljust(self.s) + f'{msfvenom_path}')
+        cs.console_print.note(f'Repository:'.ljust(self.s) + f'[url]https://github.com/psycore8/shencode[/]')
+        cs.console_print.note(f'Docs:'.ljust(self.s) + f'[url]https://www.heckhausen.it/shencode/wiki[/]')
+
         if self.modlist:
             self.mod_count = 1
             for file in self.listdir(self.mod_dir):
@@ -115,7 +96,7 @@ class module:
                     else:
                         spacer = ' '*8
                     self.mod_name = spacer + file[:-3]
-                    self.msg('modlist')
+                    cs.console_print.note(f'Module {self.mod_count}:{self.mod_name.upper()}')
                     self.mod_count += 1
-        self.msg('post.done')
+        cs.console_print.ok('DONE!')
                 

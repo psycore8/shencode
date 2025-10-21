@@ -21,7 +21,7 @@ cs = ConsoleStyles()
 
 #cs.print(f"{HEADER}")
 cs.print(f'[bright_magenta]{utils.header.get_header(banner)}[/]')
-cs.print(f'[bright_magenta]Version {Version} by psycore8 -[/] [bright_blue u]https://github.com/psycore8/shencode[/]\n')
+cs.print(f'[bright_magenta]Version [bold]{Version}[/bold] by psycore8 -[/] [bright_blue u]https://github.com/psycore8/shencode[/]\n')
 arguments = parse_arguments()
 
 config = None

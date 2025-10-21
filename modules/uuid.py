@@ -1,17 +1,22 @@
 ########################################################
-### UUID Module
-### Status: migrated 090
+### ShenCode Module
+###
+### Name: UUID Obfuscation
+### Docs: https://heckhausen.it/shencode/README
 ### 
 ########################################################
 
 from utils.style import *
-from utils.helper import GetFileInfo, CheckFile
+#from utils.helper import GetFileInfo, CheckFile
 
 from rich.console import Console
 import re
-cs = ConsoleStyles()
+
+
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Obfuscate shellcodes as UUID strings'
+
+cs = ConsoleStyles()
 
 arglist = {
     'input':       { 'value': None, 'desc': 'Input file for UUID encoding' },
@@ -28,7 +33,7 @@ class module:
     out = Console()
     
     Author = 'psycore8'
-    Version = '2.2.7'
+    Version = '0.9.0'
     DisplayName = 'UUID-OBF'
     UUID_string = ''
     hash = ''
@@ -43,21 +48,6 @@ class module:
         self.input_file = input
         self.output = output
         self.reverse = reverse
-
-    def msg(self, message_type, ErrorExit=False):
-        messages = {
-            'pre.head'       : f'{cs.FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{cs.state_fail} File {self.input_file} not found or cannot be opened.',
-            'post.out'       : f'{self.UUID_string}',
-            'post.done'      : f'{cs.state_ok} DONE!',
-            'proc.input_ok'  : f'{cs.state_ok} File {self.input_file} loaded\n{cs.state_ok} Size of shellcode [cyan]{self.data_size}[/cyan] bytes\n{cs.state_ok} Hash: [cyan]{self.hash}[/cyan]',
-            'proc.output_ok' : f'{cs.state_ok} File {self.output} loaded\n{cs.state_ok} Size of shellcode [cyan]{self.data_size}[/cyan] bytes\n{cs.state_ok} Hash: [cyan]{self.hash}[/cyan]',
-            'proc.input_try' : f'{cs.state_note} Try to open file {self.input_file}',
-            'proc.try'       : f'{cs.state_note} Try generate output'
-        }
-        self.out.print(messages.get(message_type, f'{message_type} - this message type is unknown'), highlight=True)
-        if ErrorExit:
-            exit()
 
     def string_to_uuid(self, string_value):
         formatted_string = f"{string_value[:8]}-{string_value[8:12]}-{string_value[12:16]}-{string_value[16:20]}-{string_value[20:]}"
@@ -110,23 +100,20 @@ class module:
         return self.obf_string
     
     def process(self):
-        self.msg('pre.head')
-        self.msg('proc.input_try')
+        cs.module_header(self.DisplayName, self.Version)
+        cs.console_print.note('Try to open file')
         if self.open_file(self.input_file):
-            self.data_size, self.hash = GetFileInfo(self.input_file)
-            self.msg('proc.input_ok')
+            cs.action_open_file2(self.input_file)
         else:
-            self.msg('error.input', True)
-        self.msg('proc.try')
+            cs.console_print.error(f'File {self.input_file} not found or cannot be opened.')
+            return
+        cs.console_print.note('Try to generate output')
         if self.reverse:
             data = self.uuid_to_bytes(self.shellcode)
             self.save_file(data)
+            cs.action_save_file2(self.output)
         else:
             self.UUID_string = self.CreateVar()
-            print(self.UUID_string)
             self.save_file(self.UUID_string)
-        if CheckFile(self.output):
-            self.data_size, self.hash = GetFileInfo(self.output)
-            self.msg('proc.output_ok')
-        #self.msg('post.out')
-        self.msg('post.done')
+            cs.action_save_file2(self.output)
+        cs.console_print.ok('DONE!')

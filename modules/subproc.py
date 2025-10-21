@@ -1,3 +1,11 @@
+########################################################
+### ShenCode Module
+###
+### Name: Subproc Module
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 from utils.style import *
 import subprocess
 

@@ -1,3 +1,11 @@
+########################################################
+### ShenCode Module
+###
+### Name: Output
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 from keystone import *
 from utils.helper import CheckFile, GetFileHash
 from utils.style import *
@@ -62,22 +70,6 @@ class module:
         self.output = output
         if not output == '':
             self.cFile = True
-
-    # def msg(self, message_type, ErrorExit=False, MsgVar=None):
-    #     messages = {
-    #         'pre.head'      : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-    #         'pre.input'     : f'{s_note} Input File: {self.input}',
-    #         'pre.hash'      : f'{f_out} File Hash: {MsgVar}',
-    #         'process'       : f'{s_note} processing shellcode format... NoLineBreak: {self.no_line_break}',
-    #         'post.output'   : f'{s_ok} Output file: {self.output}',
-    #         'post.summary'  : f'{s_info} Total length: {MsgVar} bytes',
-    #         'post.done'     : f'{s_ok} DONE!',
-    #         'error.input'   : f'{s_fail} Input file not found' ,
-    #         'error.output'  : f'{s_fail} Output file not found'
-    #     }
-    #     print(messages.get(message_type, 'Unknown message type'))
-    #     if ErrorExit:
-    #         exit()
  
     def LoadInputFile(self):
         with open(self.input, 'rb') as file:
@@ -144,21 +136,17 @@ class module:
         pass
 
     def process(self):
-        #self.msg('pre.head')
-        #self.msg('pre.input')
         cs.module_header(self.DisplayName, self.Version)
         cs.print(f'Input File: {self.input}', cs.state_note)
         if isinstance(self.input, str):
             if CheckFile(self.input):
                 self.LoadInputFile()
                 cs.action_open_file2(self.input)
-                #self.msg('pre.hash', False, GetFileHash(self.input))
         elif isinstance(self.input, bytes):
             self.file_bytes = self.input
         else:
             cs.print('Input file not found', cs.state_fail)
             return False
-            #self.msg('error.input', True)
         if self.syntax == 'asm':
             try:
                 ks = Ks(KS_ARCH_X86, KS_MODE_64)
@@ -166,23 +154,17 @@ class module:
                 print(f'{self.file_bytes} // {count}')
             except KsError as e:
                 print("ERROR: %s" %e)
-        #self.msg('process')
         cs.print('Processing shellcode format', cs.state_note)
         output, size = self.GenerateOutput()
         if not self.output == None:
             self.SaveOutputFile(output)
             if CheckFile(self.output):
                 cs.print(output)
-                #self.msg('post.output')
             else:
                 cs.print('Output file not found', cs.state_fail)
-                #self.msg('error.output', True)
-        #print(output)
         cs.print(output, rules=True)
         cs.print(f'Output total length {str(len(output))} bytes', cs.state_info)
         cs.print('DONE!', cs.state_ok)
-        #self.msg('post.summary', False, size)
-        #self.msg('post.done')
         
     lang = {
         'asm': {

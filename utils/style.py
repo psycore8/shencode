@@ -18,7 +18,7 @@ class ConsoleStyles:
     state_info      = '[bold grey42][[blue]#[/blue]][/]'
 
     def module_header(self, ModHeadText, ModVersion):
-        f = f'[bold][grey42][[red]{ModHeadText}[/red]]-[[red]{ModVersion}[/red]][/grey42][/bold]'
+        f = f'[bold][grey42][[red]{ModHeadText}[/red]]-[[red]{ModVersion}[/red]][/grey42][/bold]\n'
         cs.print(f)
         #return f
     
@@ -29,16 +29,16 @@ class ConsoleStyles:
         cs.print(f'{self.state_info} File size: [cyan]{size}[/cyan] bytes')
         cs.print(f'{self.state_info} File hash: [cyan]{hash}[/cyan]')
 
-    def action_open_file2(sekf, filename):
+    def action_open_file2(self, filename):
         size, hash = GetFileInfo(filename)
-        table = Table(border_style='grey42')
-        table.add_column('[bright_magenta]Key[/]', style='bright_magenta')
+        table = Table(border_style='grey42', show_header=False)
+        table.add_column(f'[bright_magenta] {self.state_ok} Key[/]', style='bright_magenta')
         table.add_column('Value')
         #table.add_column('Hash')
         #table.add_row(filename, str(size), hash)
-        table.add_row('File', filename)
-        table.add_row('Size', str(sizeof_fmt(size)))
-        table.add_row('Hash', hash)
+        table.add_row(f'{self.state_info} File', filename)
+        table.add_row(f'{self.state_info} Size', str(sizeof_fmt(size)))
+        table.add_row(f'{self.state_info} Hash', hash)
         cs.print(table)
         
     def action_save_file(self, filename):
@@ -54,14 +54,14 @@ class ConsoleStyles:
     def action_save_file2(self, filename):
         if CheckFile(filename):
             size, hash = GetFileInfo(filename)
-            table = Table(border_style='grey42')
+            table = Table(border_style='grey42', show_header=False)
             table.add_column('[bright_magenta]Key[/]', style='bright_magenta')
             table.add_column('Value')
             #table.add_column('Hash')
             #table.add_row(filename, str(size), hash)
-            table.add_row('File', filename)
-            table.add_row('Size', str(sizeof_fmt(size)))
-            table.add_row('Hash', hash)
+            table.add_row(f'{self.state_info} File', filename)
+            table.add_row(f'{self.state_info} Size', str(sizeof_fmt(size)))
+            table.add_row(f'{self.state_info} Hash', hash)
             cs.print(table)
         else:
             cs.print(f'{self.state_fail} {filename } not found!')
@@ -112,7 +112,6 @@ class ConsoleStyles:
 
     def rule(self, title=''):
         cs.rule(title=title)
-
 
 s_ok    = '\033[90m[\033[92m+\033[90m]\033[0m'
 s_note  = '\033[90m[\033[94m*\033[90m]\033[0m'

@@ -1,4 +1,10 @@
-# shencode module
+########################################################
+### ShenCode Module
+###
+### Name: Feed Obfuscation
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
 
 import datetime
 import feedparser

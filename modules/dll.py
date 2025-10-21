@@ -1,6 +1,14 @@
+########################################################
+### ShenCode Module
+###
+### Name: DLL Injection
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 import os
 from utils.style import *
-from utils.helper import CheckFile, GetFileInfo
+from utils.helper import CheckFile
 from utils.windef import *
 from utils.winconst import *
 

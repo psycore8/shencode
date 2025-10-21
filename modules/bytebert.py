@@ -1,3 +1,11 @@
+########################################################
+### ShenCode Module
+###
+### Name: ByteBert Encoder
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 ### DEFINITIONS
 # reg1 = save / read encryptedbyte(odd)
 # reg2 = shellcode indexer

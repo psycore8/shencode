@@ -1,3 +1,11 @@
+########################################################
+### ShenCode Module
+###
+### Name: Linject
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 import ctypes
 import mmap
 
@@ -6,6 +14,8 @@ from utils.style import *
 
 CATEGORY    = 'inject'
 DESCRIPTION = 'Linux based injection module'
+
+cs = ConsoleStyles()
 
 arglist = {
     'input':            { 'value': None, 'desc': 'Input file for injection' }
@@ -17,26 +27,13 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.0.2'
+    Version = '0.9.0'
     DisplayName = 'LiNUX-iNJECTER'
     relay_input = False
     shell_path = '::inject::linject'
     data_size = 0
     hash = ''
     shellcode = any
-
-
-    def msg(self, message_type, MsgVar=None, ErrorExit=False):
-        messages = {
-            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'post.done'      : f'{s_ok} DONE!',
-            'mok'            : f'{s_ok} {MsgVar}',
-            'mnote'          : f'{s_note} {MsgVar}',
-            'merror'         : f'{s_fail} {MsgVar}'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
 
     def __init__(self, input):
         self.input = input
@@ -47,7 +44,7 @@ class module:
         ctypes_buffer = ctypes.c_void_p(ctypes.addressof(ctypes.c_char.from_buffer(buf)))
         func_type = ctypes.CFUNCTYPE(None)
         func = func_type(ctypes_buffer.value)
-        self.msg('mnote', 'Execute shellcode...')
+        cs.print('Execute shellcode...', cs.state_note)
         func()
 
     def open_file(self):
@@ -58,15 +55,16 @@ class module:
             return False
 
     def process(self):
-        m = self.msg
-        m('pre.head')
+        cs.module_header(self.DisplayName, self.Version)
         if isinstance(self.input, str):
-            CheckFile(self.input)
-            self.data_size, self.hash = GetFileInfo(self.input)
-            m('mok', f'File {self.input} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}')
+            if CheckFile(self.input):
+                cs.action_open_file2(self.input)
+            else:
+                cs.print('File not found!', cs.state_fail)
+                return
             self.open_file()
             self.start_injection()
         elif isinstance(self.input, bytes):
             self.shellcode = self.input
             self.start_injection()
-        m('post.done')
+        cs.print('DONE!', cs.state_ok)

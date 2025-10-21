@@ -1,6 +1,7 @@
 import argparse
 import importlib
 import os
+from sys import argv, stderr
 from utils.const import *
 from textwrap import wrap
 
@@ -60,4 +61,7 @@ def create_parser():
 def parse_arguments():
     parser = create_parser()
     arguments = parser.parse_args()
+    if len(argv) == 1:
+        parser.print_help(stderr)
+        exit()
     return arguments

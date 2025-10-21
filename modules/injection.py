@@ -1,3 +1,11 @@
+########################################################
+### ShenCode Module
+###
+### Name: Injection
+### Docs: https://heckhausen.it/shencode/README
+### 
+########################################################
+
 import os
 from utils.windef import *
 from utils.winconst import *
