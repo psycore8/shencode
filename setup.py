@@ -36,7 +36,7 @@ setup(
         'cffi==2.0.0',
         'charset-normalizer==3.4.4',
         'colorama==0.4.6',
-        'cryptography==46.0.2',
+        'cryptography==46.0.3',
         'feedparser==6.0.12',
         'idna==3.11',
         'keystone-engine',
