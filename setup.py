@@ -34,7 +34,7 @@ setup(
         'capstone==5.0.6',
         'certifi==2025.10.5',
         'cffi==2.0.0',
-        'charset-normalizer==3.4.3',
+        'charset-normalizer==3.4.4',
         'colorama==0.4.6',
         'cryptography==46.0.2',
         'feedparser==6.0.12',
