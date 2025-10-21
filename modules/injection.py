@@ -125,7 +125,7 @@ class module:
             return False
     
     def process(self):
-        self.msg('pre.head')
+        cs.module_header(self.DisplayName, self.Version)
         if isinstance(self.input, str):
             cs.console_print.note('Try to open file')
             CheckFile(self.input)

@@ -67,6 +67,7 @@ To activate the virtual environment use the following command:
 - `core/output` - removed inspect
 - `core/task` - Improved JSON scheme for better iteration and multiple module usage in one file
 - `obfuscate/uuid` - file output and reverse function added
+- `stager/meterpreter` - fixed some argument errors
 - `stager/sliver` - fixed a datatype error and os.name implementation
 
 

