@@ -1,17 +1,21 @@
 ########################################################
-### AES Module
-### Status: cleaned, 085
+### ShenCode Module
+###
+### Name: ByteSwap Encoder
+### Docs: https://heckhausen.it/shencode/README
 ### 
 ########################################################
 
 from utils.style import *
-from utils.helper import CheckFile, GetFileInfo
+from utils.helper import CheckFile
 from utils.const import tpl_path
 from utils.binary import replace_bytes_at_offset
 from os import path as osp
 
 CATEGORY    = 'encoder'
 DESCRIPTION = '(Deprecated) Polymorphic encoder stub'
+
+cs = ConsoleStyles()
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file or buffer to use with byteswap stub')
@@ -20,7 +24,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.1.5'
+    Version = '0.9.0'
     DisplayName = 'BYTESWAP-ENC'
     Shellcode = ''
     Shellcode_Length = 0
@@ -34,28 +38,6 @@ class module:
         self.output = output
         self.template_file = f'{tpl_path}byteswap-short.tpl'
         self.xor_key = key
-
-    def msg(self, message_type, ErrorExit=False):
-        messages = {
-            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.size'     : f'{s_fail} Shellcode exceeds max size of 255 bytes',
-            'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
-            'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
-            'error.template' : f'{s_fail} File {self.template_file} not found or cannot be opened.',
-            'post.done'      : f'{s_ok} DONE!',
-            'proc.input_ok'  : f'{s_ok} File {self.input} loaded!\n{s_note} Size of shellcode {self.data_size} bytes\n{s_note} Hash: {self.hash}',
-            'proc.output_ok' : f'{s_ok} File {self.output} created!\n{s_note} Size {self.data_size} bytes\n{s_note} Hash: {self.hash}',
-            'proc.stub_ok'   : f'{s_ok} Stub {self.template_file} loaded!\n{s_note} Size {self.data_size} bytes\n{s_note} Hash: {self.hash}',
-            'proc.input_try' : f'{s_note} Try to open file {self.input}',
-            'proc.output_try': f'{s_note} Try to write XORPOLY shellcode to file',
-            'proc.stub'      : f'{s_note} Try to load stub from {self.template_file}',
-            'proc.try'       : f'{s_note} Try to append shellcode',
-            'proc.key'       : f'{s_note} Changing key to {self.xor_key} and patching length',
-            'proc.stats'     : f'{s_note} Shellcode size: {len(self.Shellcode)} bytes'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
 
     def encrypt(self, data: bytes, xor_key: int) -> bytes:
         transformed = bytearray()
@@ -80,50 +62,44 @@ class module:
             self.Shellcode = file.read()
         self.Shellcode_Length = len(self.Shellcode)
         if self.Shellcode_Length > 255:
-            self.msg('error.size', True)
+            cs.console_print.error('Shellcode exceeds max size of 255 bytes')
 
     def AppendShellcode(self):
         self.Modified_Shellcode += self.encrypt(self.Shellcode, int(self.xor_key))
         size = len(self.Modified_Shellcode)
-        print(f'{OKBLUE} XORed payload added, size of shellcode {size} bytes')
+        cs.console_print.ok(f'XORed payload added, size of shellcode {size} bytes')
 
     def WriteToFile(self):
       with open(self.output, 'wb') as file:
         file.write(self.Modified_Shellcode)
 
     def process(self):
-       self.msg('pre.head')
+       cs.module_header(self.DisplayName, self.Version)
        Length_Offset = 10
        XOR_Key_Offset = 36
-       self.msg('proc.stub')
+       cs.console_print.note(f'Try to load stub from {self.template_file}')
        if CheckFile(self.template_file):
-           self.data_size, self.hash = GetFileInfo(self.template_file)
-           self.msg('proc.stub_ok')
+           cs.action_open_file2(self.template_file)
            self.LoadHeader()
-           self.msg('proc.stats')
+           cs.console_print.note(f'Shellcode size: {len(self.Shellcode)} bytes')
        else:
-            self.msg('error.template', True)
-       self.msg('proc.input_try')
+            cs.console_print.error(f'File {self.template_file} not found or cannot be opened.')
+            return
        if CheckFile(self.input):
-        self.data_size, self.hash = GetFileInfo(self.input)
-        self.msg('proc.input_ok')   
+        cs.action_open_file2(self.input)
         self.LoadShellcode()
        else:
-           self.msg('error.input', True)
-       self.msg('proc.try')
+           cs.console_print.error(f'File {self.input} not found or cannot be opened.')
+       cs.console_print.note('Try to append shellcode')
        self.AppendShellcode()
-       self.msg('proc.stats')
-       self.msg('proc.key')
+       cs.console_print.note(f'Shellcode size: {len(self.Shellcode)} bytes')
+       cs.console_print.note(f'Changing key to {self.xor_key} and patching length')
        self.Modified_Shellcode = replace_bytes_at_offset(self.Modified_Shellcode, Length_Offset, self.Shellcode_Length)
        self.Modified_Shellcode = replace_bytes_at_offset(self.Modified_Shellcode, XOR_Key_Offset, self.xor_key)
        if not self.relay:
         self.WriteToFile()
-        if CheckFile(self.output):
-            self.data_size, self.hash = GetFileInfo(self.output)
-            self.msg('proc.output_ok') 
-        else:
-            self.msg('error.output', True)
+        cs.action_save_file2(self.output)
        elif self.relay:
-        self.msg('post.done')
+        cs.console_print.ok('DONE!')
         return self.Modified_Shellcode    
-       self.msg('post.done')
+       cs.console_print.ok('DONE!')

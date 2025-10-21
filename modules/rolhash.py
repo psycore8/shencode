@@ -1,16 +1,19 @@
 ########################################################
-### ROLHash Module
-### Status: migrated 085
+### ShenCode Module
+###
+### Name: ROL-Hash Obfuscation
+### Docs: https://heckhausen.it/shencode/README
 ### 
 ########################################################
 
 import pefile
 from os import path as ospath
-#from utils.helper import nstate as nstate
 from utils.style import *
 
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Change ROR13 to ROL encoding in metasploit payloads'
+
+cs = ConsoleStyles()
 
 arglist = {
    'input':       { 'value': None, 'desc': 'Input file for UUID encoding' },
@@ -25,7 +28,7 @@ def register_arguments(parser):
 
 class module:
   Author = 'bordergate, psycore8'
-  Version = '2.1.5'
+  Version = '0.9.0'
   DisplayName = 'ROLLIN-HASH'
   data_size = 0
   hash = ''
@@ -43,25 +46,6 @@ class module:
      self.input = input
      self.output = output
      self.key = key
-
-  def msg(self, message_type, MsgVar=any, ErrorExit=False):
-    messages = {
-        'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-        'error.input'    : f'{s_fail} File {self.input} not found or cannot be opened.',
-        'error.enc'      : f'{s_fail} En-/Decrption error, aborting script execution',
-        'error.mode'     : f'{s_fail} Please provide a valid mode: encode / decode',
-        'post.done'      : f'{s_ok} DONE!',
-        'proc.input_ok'  : f'{s_ok} File {self.input} loaded\n{s_ok} Size of shellcode {self.data_size} bytes\n{s_ok} Hash: {self.hash}',
-        'proc.out'       : f'{s_ok} File created in {self.output}\n{s_ok} Hash: {self.hash}',
-        'proc.error'     : f'{s_fail} encoded Shellcode error, aborting script execution',
-        'proc.done'      : f'{s_ok} encoded shellcode created in {self.output}',
-        'proc.sizemod'   : f'{s_note} Shellcode size: {MsgVar}',
-        'proc.out'       : f'{s_note} Writing bytes to file: {self.output}',
-        'proc.input'     : f'{s_ok} Reading shellcode'
-    }
-    print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-    if ErrorExit:
-        exit()
 
   def lookup_functions(self, dll_path):
     pe = pefile.PE(dll_path)
@@ -144,19 +128,17 @@ class module:
     for key,value in self.hash_dict.items():
         index = self.check_shellcode(shellcode, key)
         if index != -1:
-            #self.msg('proc.func')
-            print(f'{s_note} 0x%08X = %s offset: %s' % (key, value, index))
+            cs.console_print.info(f'0x{key:08X} = {value} offset: {index}')
             dll_name = value.split('!')[0]
             function_name = value.split('!')[1]
             hash = self.calculate_hash(dll_name, function_name, ror_key, "rol")
-            #self.msg('proc.newfunc')
-            print(f'{s_ok} New value: 0x%08X' % (hash))
+            cs.console_print.ok(f'New value: 0x{hash:08X}')
             byte_data = hash.to_bytes(4, 'big')
             reversed_bytes = byte_data[::-1]
             new_shellcode = self.replace_bytes_at_offset(new_shellcode, index, reversed_bytes)
             hex_string = ''.join('\\x{:02X}'.format(byte) for byte in new_shellcode)
  
-    print(f"{s_note} Changing ROR key")
+    cs.console_print.note(f'Changing ROR key to {self.key} (0x{self.key:08X})')
     
     # \xC1\xCF\x0D ror edi,D
 
@@ -168,19 +150,17 @@ class module:
          
     return new_shellcode
   
-  # def process(dll_paths, filename, out_file, showmod, decompile, ror_key):
   def process(self):
-    m = self.msg
-    m('pre.head')
+    cs.module_header(self.DisplayName, self.Version)
     for dll in self.dll_paths:
       self.lookup_functions(dll)
     # Read existing shellcode
-    m('proc.input')
+    cs.console_print.note('Try to open file')
     try: 
       with open(self.input, "rb") as file:
         shellcode = file.read()
     except FileNotFoundError:
-        m('error.input', None, True)
+        cs.console_print.error(f'File {self.input} not found or cannot be opened.')
  
     new_shellcode = self.process_shellcode(shellcode,int(self.key))
  
@@ -189,18 +169,12 @@ class module:
     bytes_to_insert = b"\xFF\xC0\xFF\xC8" * 5  # INC EAX, DEC EAX
     modified_shellcode = new_shellcode[:position] + bytes_to_insert + new_shellcode[position:]
    
-    m('proc.sizemod', len(modified_shellcode))
+    cs.console_print.note(f'Shellcode size: {len(modified_shellcode)}')
     if self.relay:
-       m('proc.done')
+       cs.console_print.ok(f'Encoded shellcode created in {self.output}')
        return modified_shellcode
     else:
-      m('proc.out')
       with open(self.output, 'wb') as file:
         file.write(modified_shellcode)
-      cf = ospath.isfile(self.output)
-      if cf == True:
-        m('proc.done')
-      else:
-        m('proc.error')
-        exit()
-      m('post.done')
+      cs.action_save_file2(self.output)
+      cs.console_print.ok('DONE!')

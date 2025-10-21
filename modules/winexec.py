@@ -1,12 +1,11 @@
 ########################################################
-### WinExec Shellcode Module
-### Status: migrated 085
+### ShenCode Module
 ###
-### DiceWare wordlist: https://github.com/ulif/diceware/blob/master/diceware/wordlists/wordlist_en_eff.txt
-###
+### Name: Winexec Payload
+### Docs: https://heckhausen.it/shencode/README
+### 
 ########################################################
 
-#from utils.const import variable_instruction_set
 from utils.asm import variable_instruction_set
 from utils.binary import get_coff_section
 from utils.const import nasm
@@ -18,6 +17,8 @@ import os
 
 CATEGORY    = 'payload'
 DESCRIPTION = 'Generate a dynamic WinExec shellcode'
+
+cs = ConsoleStyles()
 
 arglist = {
     'command_line':     { 'value': None, 'desc': 'Command to execute with WinExec' },
@@ -31,12 +32,11 @@ def register_arguments(parser):
     parser.add_argument('-o', '--output', required=True, help=arglist['output']['desc'])
     opt = parser.add_argument_group('additional')
     opt.add_argument('-d', '--debug', action='store_true', default=False, help=arglist['debug']['desc'])
-    #opt.add_argument('-n', '--no-comment', action='store_true', default=False, help='No comments in nasm file')
     opt.add_argument('-r', '--random-label', action='store_true', default=False, help=arglist['random_label']['desc'])
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.6'
+    Version = '0.9.0'
     DisplayName = 'WinEXEC'
     opcode = ''
     size = 0
@@ -51,53 +51,31 @@ class module:
         self.output = output
         self.random_label = random_label
 
-    def msg(self, message_type, MsgVar=str, ErrorExit=False):
-        messages = {
-            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n', 
-            'proc.try'       : f'{s_note} Try to generate shellcode',
-            'proc.output_ok' : f'{s_ok} {MsgVar}',
-            'proc.output_try': f'{s_note} Writing to file {self.output}',
-            'm.note'         : f'{s_note} {MsgVar}',
-            'm.ok'           : f'{s_ok} {MsgVar}',
-            'error.output'   : f'{s_fail} File {self.output} not found or cannot be opened.',
-            'post.done'      : f'{s_ok} DONE!'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
-
     def process(self):
-        m = self.msg
-        m('pre.head')
-        m('proc.try')
+        cs.module_header(self.DisplayName, self.Version)
+        cs.print('Try to generate shellcode', cs.state_note)
         fn_root, fn_extension = os.path.splitext(self.output)
         fn_nasm = f'{fn_root}.nasm'
         fn_obj = f'{fn_root}.obj'
         self.opcode = self.generate_shellcode()
         if self.debug:
-            m('proc.output_try')
-            if self.write_outputfile(fn_nasm):
-                size, hash = GetFileInfo(fn_nasm)
-                m('proc.output_ok', f'File {fn_nasm} created\n{s_ok} Size {size} bytes\n{s_ok} Hash: {hash}')
-            else:
-                m('error.output', '', True)
+            cs.print('Try to generate output file', cs.state_note)
+            self.write_outputfile(fn_nasm)
+            cs.action_save_file2(self.output)
         else:
             self.write_outputfile(fn_nasm)
-            m('m.note', 'Compiling object file')
+            cs.print('Compile object file', cs.state_note)
             run([nasm, '-f', 'win64', fn_nasm, '-o', fn_obj])
-            m('m.note', 'Extract .text section from object file')
+            cs.print('Extract .text section from object file', cs.state_note)
             sc = get_coff_section(fn_obj, '.text')
             if self.relay_output:
                 return sc
             else:
-                m('proc.output_try')
+                cs.print('Write to file', cs.state_note)
                 self.opcode = sc
-                if self.write_outputfile(self.output):
-                    size, hash = GetFileInfo(self.output)
-                    m('proc.output_ok', f'File {self.output} created\n{s_ok} Size {size} bytes\n{s_ok} Hash: {hash}')
-                else:
-                    m('error.output', None, True)
-        m('post.done')
+                self.write_outputfile(self.output)
+                cs.action_save_file2(self.output)
+        cs.print('DONE!', cs.state_ok)
 
     def write_outputfile(self, filename):
         try:

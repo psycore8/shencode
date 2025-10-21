@@ -1,1 +1,1 @@
-from .shencode import main
+from .core import main

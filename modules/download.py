@@ -1,16 +1,20 @@
 ########################################################
-### Download Module
-### Status: migrated 085
+### ShenCode Module
 ###
+### Name: Download Module
+### Docs: https://heckhausen.it/shencode/README
+### 
 ########################################################
 
 import requests
-from utils.helper import GetFileInfo
+#from utils.helper import GetFileInfo
 from utils.style import *
 from tqdm import tqdm
 
 CATEGORY    = 'core'
 DESCRIPTION = 'Download files'
+
+cs = ConsoleStyles()
 
 arglist ={
     'output':               { 'value': None, 'desc': 'Output file' },
@@ -25,7 +29,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.1.2'
+    Version = '0.9.0'
     DisplayName = 'D0WNL04D3R'
     data_size = int
     hash = ''
@@ -38,52 +42,33 @@ class module:
         self.protocol = protocol
         self.uri = uri
 
-    def msg(self, message_type, MsgVar=None, ErrorExit=False):
-        messages = {
-            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'post.done'      : f'{s_ok} DONE!',
-            'proc.out'       : f'{s_ok} File created in {self.output}\n{s_info} Hash: {self.hash}',
-            'mok'            : f'{s_ok} {MsgVar}',
-            'mnote'          : f'{s_note} {MsgVar}',
-            'merror'         : f'{s_fail} {MsgVar}'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
-
     def process(self):
-        m = self.msg
-        m('pre.head')
+        cs.module_header(self.DisplayName, self.Version)
         if hasattr(self, self.protocol):
             processed_data = getattr(self, self.protocol)()
             if not processed_data:
-                m('merror', 'Error during download', True)
+                cs.print('Error during download', cs.state_fail)
+                return
             if self.relay_output:
                 return processed_data
             if processed_data != True:
-                m('mnote', 'Trying to write output file...')
-                if self.save_file(processed_data):
-                    self.data_size, self.hash = GetFileInfo(self.output)
-                    m('proc.out')
-                else:
-                    m('merror', f'Error saving {self.output}', True)
-            else:
-                self.data_size, self.hash = GetFileInfo(self.output)
-                m('proc.out')
+                cs.print('Trying to write output file...', cs.state_note)
+                self.save_file(processed_data)
+                cs.action_save_file2(self.output)
         else:
-            m('merror', f'Protocol {self.protocol} is not valid!', True)
-        m('post.done')
+            cs.print(f'Protocol {self.protocol} is not valid!', cs.state_fail)
+        cs.print('DONE!', cs.state_ok)
 
     def http(self):
         data = any
         r = requests.head(self.uri, allow_redirects=True)
         if 'Content-Length' in r.headers:
             size_bytes = int(r.headers['Content-Length'])
-            self.msg('mnote', f'File size: {size_bytes} bytes')
+            cs.print(f'File size: {size_bytes} bytes', cs.state_note)
             self.download_with_progress(self.uri, self.output)
             data = True
         else:
-            self.msg('mnote', 'Content header not available, download without progress...')
+            cs.print('Content header not available, download without progress...', cs.state_note)
             data = self.download_without_progresss()
         return data
     
@@ -106,6 +91,8 @@ class module:
                     f.write(chunk)
                     downloaded += len(chunk)
                     progress.update(len(chunk))
+            cs.print('\n')
+            cs.action_save_file2(self.output)
 
     def download_without_progresss(self):
         r = requests.get(self.uri)

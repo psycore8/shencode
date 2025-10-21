@@ -1,0 +1,45 @@
+{
+    "name": "Getting started example Task",
+    "scheme": "V2",
+    "single_step": null,
+    "tasks": [
+        {
+            "id": "1",
+            "module": "winexec",
+            "args":
+            {
+                "command_line": "cmd /k net user",
+                "output": "netuser.bin",
+                "debug": false,
+                "random_label": false
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "2",
+            "module": "alphanum",
+            "args": {
+                "input": "netuser.bin",
+                "output": "netuser_encoded.bin",
+                "compile": true,
+                "decode": false
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "3",
+            "module": "inspect",
+            "args": {
+                "input": "netuser_encoded.bin",
+                "bytes_per_row": 16,
+                "highlight": null,
+                "range": [0, 0],
+                "decimal": true
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        }
+    ]
+}

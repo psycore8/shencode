@@ -1,5 +1,118 @@
 import re
 
+from utils.helper import CheckFile, GetFileInfo, sizeof_fmt
+
+from rich.console import Console
+from rich.table import Table
+
+cs = Console()
+
+class ConsoleStyles:
+
+    def __init__(self):
+        pass
+
+    state_ok        = '[bold grey42][[green]+[/green]][/]'
+    state_note      = '[bold grey42][[purple]*[/purple]][/]'
+    state_fail      = '[bold grey42][[red]-[/red]][/]'
+    state_info      = '[bold grey42][[blue]#[/blue]][/]'
+
+    def module_header(self, ModHeadText, ModVersion):
+        f = f'[bold][grey42][[red]{ModHeadText}[/red]]-[[red]{ModVersion}[/red]][/grey42][/bold]\n'
+        cs.print(f)
+        #return f
+    
+    #class actions:
+    def action_open_file(self, filename):
+        size, hash = GetFileInfo(filename)
+        cs.print(f'{self.state_ok} [cyan][u]{filename}[/u][/cyan] - loaded')
+        cs.print(f'{self.state_info} File size: [cyan]{size}[/cyan] bytes')
+        cs.print(f'{self.state_info} File hash: [cyan]{hash}[/cyan]')
+
+    def action_open_file2(self, filename):
+        size, hash = GetFileInfo(filename)
+        table = Table(border_style='grey42', show_header=False)
+        table.add_column(f'[bright_magenta] {self.state_ok} Key[/]', style='bright_magenta')
+        table.add_column('Value')
+        #table.add_column('Hash')
+        #table.add_row(filename, str(size), hash)
+        table.add_row(f'{self.state_info} File', filename)
+        table.add_row(f'{self.state_info} Size', str(sizeof_fmt(size)))
+        table.add_row(f'{self.state_info} Hash', hash)
+        cs.print(table)
+        
+    def action_save_file(self, filename):
+        if CheckFile(filename):
+            size, hash = GetFileInfo(filename)
+            cs.print(f'{self.state_ok} [cyan][u]{filename}[/u][/cyan] - saved')
+            cs.print(f'{self.state_info} File size: [cyan]{size}[/cyan] bytes')
+            cs.print(f'{self.state_info} File hash: [cyan]{hash}[/cyan]')
+        else:
+            cs.print(f'{self.state_fail} {filename } not found!')
+            return False
+        
+    def action_save_file2(self, filename):
+        if CheckFile(filename):
+            size, hash = GetFileInfo(filename)
+            table = Table(border_style='grey42', show_header=False)
+            table.add_column('[bright_magenta]Key[/]', style='bright_magenta')
+            table.add_column('Value')
+            #table.add_column('Hash')
+            #table.add_row(filename, str(size), hash)
+            table.add_row(f'{self.state_info} File', filename)
+            table.add_row(f'{self.state_info} Size', str(sizeof_fmt(size)))
+            table.add_row(f'{self.state_info} Hash', hash)
+            cs.print(table)
+        else:
+            cs.print(f'{self.state_fail} {filename } not found!')
+            return False
+        
+    class console_print():
+        def info(text:str):
+            message = f'{ConsoleStyles.state_info} {text}'
+            cs.print(message)
+        def error(text:str):
+            message = f'{ConsoleStyles.state_fail} {text}'
+            cs.print(message)
+        def ok(text:str):
+            message = f'{ConsoleStyles.state_ok} {text}'
+            cs.print(message)
+        def note(text:str):
+            message = f'{ConsoleStyles.state_note} {text}'
+            cs.print(message)
+
+    def print(self, text:str, state:str=None, rules:bool=False):
+        if state == None: state = ''
+        message = f'{state} {text}'
+        if rules:
+            cs.rule('')
+            cs.print(message)
+            cs.rule('')
+        else:
+            cs.print(message)
+
+    def print_error(self, text:str):
+        message = f'{self.state_fail} {text}'
+        cs.print(message)
+
+    def print_note(self, text:str):
+        message = f'{self.state_note} {text}'
+        cs.print(message)
+
+    def print_info(self, text:str):
+        message = f'{self.state_info} {text}'
+        cs.print(message)
+
+    def print_ok(self, text:str):
+        message = f'{self.state_ok} {text}'
+        cs.print(message)
+
+    def log(self, message):
+        cs.log(message)
+
+    def rule(self, title=''):
+        cs.rule(title=title)
+
 s_ok    = '\033[90m[\033[92m+\033[90m]\033[0m'
 s_note  = '\033[90m[\033[94m*\033[90m]\033[0m'
 s_fail  = '\033[90m[\033[91m-\033[90m]\033[0m'

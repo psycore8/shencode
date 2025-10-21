@@ -1,11 +1,13 @@
 ########################################################
-### AES Module
-### Status: migrated 085
+### ShenCode Module
+###
+### Name: XOR-Poly Encoder
+### Docs: https://heckhausen.it/shencode/README
 ### 
 ########################################################
 
 from utils.style import *
-from utils.helper import CheckFile, GetFileInfo
+from utils.helper import CheckFile
 from utils.const import tpl_path
 from utils.binary import replace_bytes_at_offset
 from os import path as osp
@@ -13,6 +15,8 @@ from modules.xor import module as xormod
 
 CATEGORY    = 'encoder'
 DESCRIPTION = 'Polymorphic XOR encoder'
+
+cs = ConsoleStyles()
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for XOR stub')
@@ -23,7 +27,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '2.1.5'
+    Version = '0.9.0'
     DisplayName = 'X0RP0LY-ENC'
     shellcode = b''
     xored_shellcode = b''
@@ -37,27 +41,6 @@ class module:
        self.output_file = output
        self.template_file = f'{tpl_path}xor-stub.tpl'
        self.xor_key = key
-
-    def msg(self, message_type, ErrorExit=False):
-        messages = {
-            'pre.head'       : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'error.input'    : f'{s_fail} File {self.input_file} not found or cannot be opened.',
-            'error.output'   : f'{s_fail} File {self.output_file} not found or cannot be opened.',
-            'error.template' : f'{s_fail} File {self.template_file} not found or cannot be opened.',
-            'post.done'      : f'{s_ok} DONE!',
-            'proc.input_ok'  : f'{s_ok} File {self.input_file} loaded!\n{s_note} Size of shellcode {self.data_size} bytes\n{s_note} Hash: {self.hash}',
-            'proc.output_ok' : f'{s_ok} File {self.output_file} created!\n{s_note} Size {self.data_size} bytes\n{s_note} Hash: {self.hash}',
-            'proc.stub_ok'   : f'{s_ok} Stub {self.template_file} loaded!\n{s_note} Size {self.data_size} bytes\n{s_note} Hash: {self.hash}',
-            'proc.input_try' : f'{s_note} Try to open file {self.input_file}',
-            'proc.output_try': f'{s_note} Try to write XORPOLY shellcode to file',
-            'proc.stub'      : f'{s_note} Try to load stub from {self.template_file}',
-            'proc.try'       : f'{s_note} Try to append shellcode',
-            'proc.key'       : f'{s_note} Changing key to {self.xor_key}',
-            'proc.stats'     : f'{s_note} Shellcode size: {len(self.shellcode)} bytes'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
 
     def LoadHeader(self):
         with open(self.template_file, "rb") as file:
@@ -76,44 +59,37 @@ class module:
         file.write(self.shellcode)
 
     def process(self):
-        self.msg('pre.head')
+        cs.module_header(self.DisplayName, self.Version)
         xor_enc = xormod('', '', 0, False, 'encode')
         self.xored_shellcode = xor_enc.xor_crypt_bytes(self.shellcode, self.xor_key)
-        self.msg('proc.stub')
+        cs.console_print.note(f'Try to load stub from {self.template_file}')
         if CheckFile(self.template_file):
-          self.data_size, self.hash = GetFileInfo(self.template_file)
           self.LoadHeader()
-          self.msg('proc.stub_ok')
-          self.msg('proc.stats')
+          cs.action_open_file2(self.template_file)
         else:
-            self.msg('error.template', True)
+            cs.console_print.error(f'File {self.template_file} not found or cannot be opened.')
+            return
         if self.relay_input:
             self.shellcode = self.input_file
         else:
-            self.msg('proc.try')
+            cs.console_print.note('Try to append shellcode...')
             if CheckFile(self.input_file):
                 self.LoadPayload()
-                self.data_size, self.hash = GetFileInfo(self.input_file)
-                self.msg('proc.input_ok')
+                cs.action_open_file2(self.input_file)
             else:
-                self.msg('error.input', True)
+                cs.console_print.error(f'File {self.input_file} not found or cannot be opened.')
+                return
         self.AppendShellcode()
-        self.msg('proc.stats')
-        self.msg('proc.key')
+        cs.console_print.note(f'Changing key to {self.xor_key} (0x{self.xor_key:08X})')
         self.shellcode = replace_bytes_at_offset(self.shellcode, 5, self.xor_key)
         if not self.relay_output:
-            self.msg('proc.output_try')
+            cs.console_print.note('Try to write XORPOLY shellcode to file')
             self.WriteToFile()
-            if CheckFile(self.output_file):
-                self.data_size, self.hash = GetFileInfo(self.output_file)
-                self.msg('proc.output_ok')
-            else:
-                self.msg('error.output', True)
+            cs.action_save_file2(self.output_file)
         else:
-           self.msg('post.done')
-           print('\n')
+           cs.console_print.ok('DONE!')
            return self.shellcode
-        self.msg('post.done')
+        cs.console_print.ok('DONE!')
 
     
         

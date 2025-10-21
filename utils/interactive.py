@@ -36,7 +36,7 @@ help_list = {
 auto_complete = []
 
 imods = {
-    'core':         [ 'download', 'extract', 'minidump', 'output', 'subproc' ],
+    'core':         [ 'download', 'extract', 'inspect', 'minidump', 'output', 'subproc' ],
     'encoder':      [ 'alphanum', 'bytebert', 'multicoder', 'xor', 'xorchain' ],
     'inject':       [ 'dll', 'injection', 'linject', 'psoverwrite' ],
     'obfuscate':    [ 'feed', 'qrcode', 'rolhash', 'uuid' ],

