@@ -44,7 +44,7 @@ setup(
         'OpenCv-python==4.12.0.88',
         'pefile==2024.8.26',
         "prompt_toolkit==3.0.52",
-        'psutil==7.0.0',
+        'psutil==7.1.2',
         'pycparser==2.23',
         'pypng==0.20220715.0',
         'pyzbar==0.1.9',
