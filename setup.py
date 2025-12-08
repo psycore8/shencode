@@ -50,7 +50,7 @@ setup(
         'pyzbar==0.1.9',
         'qrcode==8.2',
         'requests==2.32.5',
-        'rich==14.1.0',
+        'rich==14.2.0',
         'setuptools==80.9.0',
         'sgmllib3k==1.0.0',
         'tqdm==4.67.1',
