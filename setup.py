@@ -32,7 +32,7 @@ setup(
     ],
     install_requires=[
         'capstone==5.0.6',
-        'certifi==2025.10.5',
+        'certifi==2025.11.12',
         'cffi==2.0.0',
         'charset-normalizer==3.4.4',
         'colorama==0.4.6',
@@ -44,19 +44,19 @@ setup(
         'OpenCv-python==4.12.0.88',
         'pefile==2024.8.26',
         "prompt_toolkit==3.0.52",
-        'psutil==7.0.0',
+        'psutil==7.1.3',
         'pycparser==2.23',
         'pypng==0.20220715.0',
         'pyzbar==0.1.9',
         'qrcode==8.2',
         'requests==2.32.5',
-        'rich==14.1.0',
+        'rich==14.2.0',
         'setuptools==80.9.0',
         'sgmllib3k==1.0.0',
         'tqdm==4.67.1',
         'typing_extensions==4.15.0',
-        'urllib3==2.5.0',
         'yaspin==3.4.0'
+        'urllib3==2.6.0',
         ] + extras,
         entry_points={
             'console_scripts': [
