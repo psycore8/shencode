@@ -32,7 +32,7 @@ setup(
     ],
     install_requires=[
         'capstone==5.0.6',
-        'certifi==2025.10.5',
+        'certifi==2025.11.12',
         'cffi==2.0.0',
         'charset-normalizer==3.4.4',
         'colorama==0.4.6',
