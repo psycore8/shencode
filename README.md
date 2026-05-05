@@ -2,7 +2,7 @@
 tags:
   - Label/Repo
 title: ShenCode
-Version: 0.9.0
+Version: 1.0.0
 Release:
 ---
 # ShenCode
@@ -23,7 +23,7 @@ ShenCode is a framework for developing, analyzing and testing shellcodes. It sup
 - [Task Mode](https://www.heckhausen.it/shencode/core/task)
 	- Automate modules in different steps with `json`
 
-### Version 0.9.0
+### Version 1.0.0
 
 #### General usage
 
@@ -69,6 +69,10 @@ To activate the virtual environment use the following command:
 - `obfuscate/uuid` - file output and reverse function added
 - `stager/meterpreter` - fixed some argument errors
 - `stager/sliver` - fixed a datatype error and os.name implementation
+- `core/task` - removed deprecated old task module
+- `general` - updated dependencies
+- `general` - fixed setup.py syntax bug
+- `general` - fixed banner bug
 
 
 ## References

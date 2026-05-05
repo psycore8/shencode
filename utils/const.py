@@ -1,7 +1,7 @@
 import os
 
 module_dir        = 'modules'
-Version           = '0.9.0'
+Version           = '1.0.0'
 banner            = -1
 priv_key          = 'shencode_priv_key.pem'
 pub_key           = 'shencode_pub_key.pem'
