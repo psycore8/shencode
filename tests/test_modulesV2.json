@@ -204,7 +204,7 @@
             "module": "subproc",
             "args":
             {
-                "command_line": ["dev\\ndisasm.exe", "tests\\calc.raw"]
+                "command_line": ["tests\\ndisasm.exe", "tests\\calc.raw"]
             },
             "input_buffer": false,
             "return_buffer": false

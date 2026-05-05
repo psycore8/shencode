@@ -13,8 +13,10 @@ from prompt_toolkit import prompt, styles
 from prompt_toolkit.completion import WordCompleter
 from prompt_toolkit.formatted_text import HTML
 
-print(f'{clRED}Interactive mode is still experimental{ENDC}')
-print(f'For error reporting use: {f_link}https://github.com/psycore8/shencode{ENDC}')
+cs = ConsoleStyles()
+
+cs.print('[bold red]Interactive mode is still experimental[/]')
+cs.print('For error reporting use: [blue][link=https://github.com/psycore8/shencode]github.com/psycore8/shencode[/link][/]')
 
 cmd = ''
 

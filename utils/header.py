@@ -120,7 +120,7 @@ ____/ / _  / / //  __/_  / / // /___   / /_/ // /_/ /  /  __/
 """
 ]
 
-def get_header(num_banner=int):
+def get_header(num_banner:int):
     if num_banner >= 0:
         header = headers[num_banner]
     else:
