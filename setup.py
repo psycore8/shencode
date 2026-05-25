@@ -40,7 +40,7 @@ setup(
         'feedparser==6.0.12',
         'idna==3.14',
         'keystone-engine',
-        'lxml==6.1.0',
+        'lxml==6.1.1',
         'OpenCv-python==4.13.0.92',
         'pefile==2024.8.26',
         "prompt_toolkit==3.0.52",
