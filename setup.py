@@ -31,7 +31,7 @@ setup(
         'utils'
     ],
     install_requires=[
-        'capstone==5.0.7',
+        'capstone==5.0.8',
         'certifi==2026.5.20',
         'cffi==2.0.0',
         'charset-normalizer==3.4.7',
