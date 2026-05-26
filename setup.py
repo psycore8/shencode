@@ -49,7 +49,7 @@ setup(
         'pypng==0.20220715.0',
         'pyzbar==0.1.9',
         'qrcode==8.2',
-        'requests==2.33.1',
+        'requests==2.34.2',
         'rich==15.0.0',
         'setuptools==82.0.1',
         'sgmllib3k==1.0.0',
