@@ -38,7 +38,7 @@ setup(
         'colorama==0.4.6',
         'cryptography==48.0.0',
         'feedparser==6.0.12',
-        'idna==3.16',
+        'idna==3.17',
         'keystone-engine',
         'lxml==6.1.1',
         'OpenCv-python==4.13.0.92',
