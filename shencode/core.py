@@ -3,7 +3,7 @@
 # ShenCode
 # Autor:      psycore8
 # Repo:       https://github.com/psycore8/shencode
-# Web:        https://www.heckhausen.it
+# Web:        https://psy8.dev/shencode
 #
 ########################################################################
 
