@@ -54,7 +54,7 @@ setup(
         'setuptools==82.0.1',
         'sgmllib3k==1.0.0',
         'tqdm==4.68.3',
-        'typing_extensions==4.15.0',
+        'typing_extensions==4.16.0',
         'yaspin==3.4.0',
         'urllib3==2.7.0',
         ] + extras,
