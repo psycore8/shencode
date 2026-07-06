@@ -51,7 +51,7 @@ setup(
         'qrcode==8.2',
         'requests==2.34.2',
         'rich==15.0.0',
-        'setuptools==82.0.1',
+        'setuptools==83.0.0',
         'sgmllib3k==1.0.0',
         'tqdm==4.68.3',
         'typing_extensions==4.15.0',
