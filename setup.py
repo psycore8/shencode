@@ -37,7 +37,7 @@ setup(
         'charset-normalizer==3.4.7',
         'colorama==0.4.6',
         'cryptography==50.0.0',
-        'feedparser==6.0.12',
+        'feedparser==6.0.14',
         'idna==3.18',
         'keystone-engine',
         'lxml==6.1.1',
