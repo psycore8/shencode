@@ -43,7 +43,7 @@ setup(
         'lxml==6.1.1',
         'OpenCv-python==5.0.0.93',
         'pefile==2024.8.26',
-        "prompt_toolkit==3.0.52",
+        "prompt_toolkit==3.0.53",
         'psutil==7.2.2',
         'pycparser==3.0',
         'pypng==0.20220715.0',
