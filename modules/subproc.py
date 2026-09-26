@@ -12,7 +12,8 @@ import subprocess
 CATEGORY    = 'core'
 DESCRIPTION = 'Execute a subprocess'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
     'command_line':         { 'value': [], 'desc': 'Command line to execute' }
@@ -23,7 +24,7 @@ def register_arguments(parser):
 
 class module:
     Author =      'psycore8'
-    Version =     '0.9.0'
+    Version =     '1.0.1'
     DisplayName = 'SUBPR0CESS'
     hash = ''
     data_size = 0
@@ -36,12 +37,12 @@ class module:
         subprocess.run(self.command_line)
 
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
+        css.module_header(self.DisplayName, self.Version)
         result = subprocess.run(self.command_line).returncode
         
         if result != 0:
-            cs.print(f'Error during processing: {result} {self.command_line}', cs.state_fail)
-        cs.print('Subprocess executed', cs.state_ok)
-        cs.print('DONE!', cs.state_ok)
+            cs_print.error(f'Error during processing: {result} {self.command_line}')
+        cs_print.ok('Subprocess executed')
+        cs_print.ok('DONE!')
 
             

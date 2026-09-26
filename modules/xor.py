@@ -15,7 +15,8 @@ from tqdm import tqdm
 CATEGORY    = 'encoder'
 DESCRIPTION = 'XOR encoder for payloads'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file for XOR encoding')
@@ -28,12 +29,12 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.9.0'
+    Version = '1.0.1'
     DisplayName = 'XOR-ENCODER'
     hash = ''
     data_size = 0
-    shellcode = bytes
-    mod_shellcode = bytes
+    shellcode = bytes()
+    mod_shellcode = bytes()
     out = list
     relay = False
 
@@ -44,7 +45,7 @@ class module:
         self.verbose = verbose
         self.mode = mode
 
-    def xor_crypt_string(data, key, encode = False, decode = False):
+    def xor_crypt_string(self, data, key, encode = False, decode = False):
         if decode:
             data_bytes = base64.b64decode(data)
             data = data_bytes.decode("utf-8")
@@ -75,13 +76,13 @@ class module:
             file.write(self.mod_shellcode)
     
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
-        cs.print('Try to open file', cs.state_note)
+        css.module_header(self.DisplayName, self.Version)
+        cs_print.note('Try to open file')
         if CheckFile(self.input):
             self.open_file()
 
-            cs.action_open_file2(self.input)
-            cs.print('Try to generate XORed shellcode', cs.state_note)
+            css.action_open_file2(self.input)
+            cs_print.note('Try to generate XORed shellcode')
             if self.mode == 'encode':
                 for i in tqdm (range (100), colour='magenta', leave=False):
                     self.mod_shellcode = self.xor_crypt_bytes(self.shellcode, self.xor_key)
@@ -89,21 +90,21 @@ class module:
                 for i in tqdm (range (100), colour='magenta', leave=False):
                     self.mod_shellcode = self.xor_decrypt_bytes(self.shellcode, self.xor_key)
             if self.verbose:
-                cs.print(f'\n{self.out}\n', cs.state_note)
+                cs_print.note(f'\n{self.out}\n')
             if not self.relay:
                 CheckFile(self.output)
                 self.write_to_file()
-                cs.print('Try to write XORed shellcode to file', cs.state_note)
-                cs.action_save_file2(self.output)
+                cs_print.note('Try to write XORed shellcode to file')
+                css.action_save_file2(self.output)
             elif self.relay:
-                cs.print('DONE!', cs.state_ok)
-                cs.print('\n')
+                cs_print.ok('DONE!')
+                cs_print.note('\n')
                 return self.mod_shellcode
                 exit()
         else:
-            cs.print(f'File {self.input} not found or cannot be opened!', cs.state_fail)
+            cs_print.error(f'File {self.input} not found or cannot be opened!')
             return
-        cs.print('DONE!', cs.state_ok)
+        cs_print.ok('DONE!')
 
 
 

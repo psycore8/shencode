@@ -16,7 +16,8 @@ import re
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Obfuscate shellcodes as UUID strings'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
     'input':       { 'value': None, 'desc': 'Input file for UUID encoding' },
@@ -33,7 +34,7 @@ class module:
     out = Console()
     
     Author = 'psycore8'
-    Version = '0.9.0'
+    Version = '1.0.1'
     DisplayName = 'UUID-OBF'
     UUID_string = ''
     hash = ''
@@ -100,20 +101,20 @@ class module:
         return self.obf_string
     
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
-        cs.console_print.note('Try to open file')
+        css.module_header(self.DisplayName, self.Version)
+        cs_print.note('Try to open file')
         if self.open_file(self.input_file):
-            cs.action_open_file2(self.input_file)
+            css.action_open_file2(self.input_file)
         else:
-            cs.console_print.error(f'File {self.input_file} not found or cannot be opened.')
+            cs_print.error(f'File {self.input_file} not found or cannot be opened.')
             return
-        cs.console_print.note('Try to generate output')
+        cs_print.note('Try to generate output')
         if self.reverse:
             data = self.uuid_to_bytes(self.shellcode)
             self.save_file(data)
-            cs.action_save_file2(self.output)
+            css.action_save_file2(self.output)
         else:
             self.UUID_string = self.CreateVar()
             self.save_file(self.UUID_string)
-            cs.action_save_file2(self.output)
-        cs.console_print.ok('DONE!')
+            css.action_save_file2(self.output)
+        cs_print.ok('DONE!')

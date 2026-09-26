@@ -15,7 +15,8 @@ from os import path as osp
 CATEGORY    = 'encoder'
 DESCRIPTION = '(Deprecated) Polymorphic encoder stub'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 def register_arguments(parser):
     parser.add_argument('-i', '--input', help='Input file or buffer to use with byteswap stub')
@@ -24,11 +25,11 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.9.0'
+    Version = '1.0.1'
     DisplayName = 'BYTESWAP-ENC'
-    Shellcode = ''
+    Shellcode = b''
     Shellcode_Length = 0
-    Modified_Shellcode = bytes
+    Modified_Shellcode = b''
     data_size = 0
     hash = ''
     relay = False
@@ -62,44 +63,44 @@ class module:
             self.Shellcode = file.read()
         self.Shellcode_Length = len(self.Shellcode)
         if self.Shellcode_Length > 255:
-            cs.console_print.error('Shellcode exceeds max size of 255 bytes')
+            cs_print.error('Shellcode exceeds max size of 255 bytes') 
 
     def AppendShellcode(self):
         self.Modified_Shellcode += self.encrypt(self.Shellcode, int(self.xor_key))
         size = len(self.Modified_Shellcode)
-        cs.console_print.ok(f'XORed payload added, size of shellcode {size} bytes')
+        cs_print.ok(f'XORed payload added, size of shellcode {size} bytes') 
 
     def WriteToFile(self):
       with open(self.output, 'wb') as file:
         file.write(self.Modified_Shellcode)
 
     def process(self):
-       cs.module_header(self.DisplayName, self.Version)
+       css.module_header(self.DisplayName, self.Version)
        Length_Offset = 10
        XOR_Key_Offset = 36
-       cs.console_print.note(f'Try to load stub from {self.template_file}')
+       cs_print.note(f'Try to load stub from {self.template_file}') 
        if CheckFile(self.template_file):
-           cs.action_open_file2(self.template_file)
+           css.action_open_file2(self.template_file)
            self.LoadHeader()
-           cs.console_print.note(f'Shellcode size: {len(self.Shellcode)} bytes')
+           cs_print.note(f'Shellcode size: {len(self.Shellcode)} bytes') 
        else:
-            cs.console_print.error(f'File {self.template_file} not found or cannot be opened.')
+            cs_print.error(f'File {self.template_file} not found or cannot be opened.') 
             return
        if CheckFile(self.input):
-        cs.action_open_file2(self.input)
-        self.LoadShellcode()
+            css.action_open_file2(self.input)
+            self.LoadShellcode()
        else:
-           cs.console_print.error(f'File {self.input} not found or cannot be opened.')
-       cs.console_print.note('Try to append shellcode')
+           cs_print.error(f'File {self.input} not found or cannot be opened.') 
+       cs_print.note('Try to append shellcode') 
        self.AppendShellcode()
-       cs.console_print.note(f'Shellcode size: {len(self.Shellcode)} bytes')
-       cs.console_print.note(f'Changing key to {self.xor_key} and patching length')
+       cs_print.note(f'Shellcode size: {len(self.Shellcode)} bytes')
+       cs_print.note(f'Changing key to {self.xor_key} and patching length') 
        self.Modified_Shellcode = replace_bytes_at_offset(self.Modified_Shellcode, Length_Offset, self.Shellcode_Length)
        self.Modified_Shellcode = replace_bytes_at_offset(self.Modified_Shellcode, XOR_Key_Offset, self.xor_key)
        if not self.relay:
         self.WriteToFile()
-        cs.action_save_file2(self.output)
+        css.action_save_file2(self.output)
        elif self.relay:
-        cs.console_print.ok('DONE!')
+        cs_print.ok('DONE!') 
         return self.Modified_Shellcode    
-       cs.console_print.ok('DONE!')
+       cs_print.ok('DONE!') 

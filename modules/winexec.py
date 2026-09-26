@@ -18,7 +18,8 @@ import os
 CATEGORY    = 'payload'
 DESCRIPTION = 'Generate a dynamic WinExec shellcode'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
     'command_line':     { 'value': None, 'desc': 'Command to execute with WinExec' },
@@ -36,7 +37,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.9.0'
+    Version = '1.0.1'
     DisplayName = 'WinEXEC'
     opcode = ''
     size = 0
@@ -52,30 +53,30 @@ class module:
         self.random_label = random_label
 
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
-        cs.print('Try to generate shellcode', cs.state_note)
+        css.module_header(self.DisplayName, self.Version)
+        cs_print.note('Try to generate shellcode')
         fn_root, fn_extension = os.path.splitext(self.output)
         fn_nasm = f'{fn_root}.nasm'
         fn_obj = f'{fn_root}.obj'
         self.opcode = self.generate_shellcode()
         if self.debug:
-            cs.print('Try to generate output file', cs.state_note)
+            cs_print.note('Try to generate output file')
             self.write_outputfile(fn_nasm)
-            cs.action_save_file2(self.output)
+            css.action_save_file2(self.output)
         else:
             self.write_outputfile(fn_nasm)
-            cs.print('Compile object file', cs.state_note)
+            cs_print.note('Compile object file')
             run([nasm, '-f', 'win64', fn_nasm, '-o', fn_obj])
-            cs.print('Extract .text section from object file', cs.state_note)
+            cs_print.note('Extract .text section from object file')
             sc = get_coff_section(fn_obj, '.text')
             if self.relay_output:
                 return sc
             else:
-                cs.print('Write to file', cs.state_note)
+                cs_print.note('Write to file')
                 self.opcode = sc
                 self.write_outputfile(self.output)
-                cs.action_save_file2(self.output)
-        cs.print('DONE!', cs.state_ok)
+                css.action_save_file2(self.output)
+        cs_print.ok('DONE!')
 
     def write_outputfile(self, filename):
         try:

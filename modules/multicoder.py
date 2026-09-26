@@ -17,7 +17,8 @@ from utils.const import priv_key, pub_key
 CATEGORY    = 'encoder'
 DESCRIPTION = 'En- / Decoder for different algorithms. Supports: AES, Base32, Base64, RSA'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
     'algorithm':     { 'value': None, 'desc': 'Choose an algorithm: base32, base64, aes, rsa' },
@@ -36,11 +37,11 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.9.0'
+    Version = '1.0.1'
     DisplayName = 'MultiC0DER'
     data_size = int
     hash = ''
-    data_bytes = bytes
+    data_bytes = bytes()
     relay_input = False
     relay_output = False
     shell_path = '::encoder::multicoder'
@@ -53,30 +54,30 @@ class module:
         self.output = output
 
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
-        cs.console_print.note('Load input file...')
+        css.module_header(self.DisplayName, self.Version)
+        cs_print.note('Load input file...')
         if self.load_file():
             if not self.relay_input:
                 self.data_size, self.hash = GetFileInfo(self.input)
-                cs.action_open_file2(self.input)
+                css.action_open_file2(self.input)
         else:
-            cs.console_print.error(f'Error loading file {self.input}')
+            cs_print.error(f'Error loading file {self.input}')
             return
-        cs.console_print.note(f'Process input with {self.algorithm.upper()}')
+        cs_print.note(f'Process input with {self.algorithm.upper()}')
         if hasattr(self, self.algorithm):
             processed_data = getattr(self, self.algorithm)()
         else:
-            cs.console_print.error(f'Algorithm {self.algorithm} is not valid')
+            cs_print.error(f'Algorithm {self.algorithm} is not valid')
             return
         if processed_data == None:
-            cs.console_print.error('Error while processing data')
+            cs_print.error('Error while processing data')
             return
         if self.relay_output:
             return processed_data
         else:
             self.save_file(processed_data)
-            cs.action_save_file2(self.output)
-        cs.console_print.ok('DONE!')
+            css.action_save_file2(self.output)
+        cs_print.ok('DONE!')
 
 
     def load_file(self):
@@ -85,6 +86,7 @@ class module:
                 self.data_bytes = f.read()
             return True
         except:
+            #self.data_bytes = b''
             return False
             
     def save_file(self, data):
@@ -115,7 +117,7 @@ class module:
 
     def rsa(self):
         if not os.path.exists(priv_key) or not os.path.exists(pub_key):
-            cs.console_print.note('Private and/or public key not found, set generate flag!')
+            cs_print.note('Private and/or public key not found, set generate flag!')
             gen_keys = True
         else:
             gen_keys = False
@@ -143,7 +145,7 @@ class module:
             processed_data = self.aes()
             return processed_data
         else:
-            cs.console_print.error('Mode not valid, try encode/decode')
+            cs_print.error('Mode not valid, try encode/decode')
             return
     
     def aes(self):

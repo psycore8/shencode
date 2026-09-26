@@ -13,7 +13,8 @@ import subprocess
 CATEGORY    = 'payload'
 DESCRIPTION = 'Generate payloads with msfvenom'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
    'command_line':      { 'value': None, 'desc': 'Msfvenom command line, use quotation marks and equal sign e.g --cmd=\"-p ...\"' },
@@ -26,7 +27,7 @@ def register_arguments(parser):
 
 class module:
   Author        = 'psycore8'
-  Version       = '0.9.0'
+  Version       = '1.0.1'
   DisplayName   = 'MSF-VENOM'
   Args          = []
   shell_path    = '::payload::msfvenom'
@@ -37,16 +38,16 @@ class module:
     self.output = output
   
   def CreateShellcodeEx(self):
-    cs.module_header(self.DisplayName, self.Version)
+    css.module_header(self.DisplayName, self.Version)
     msf_args = self.command_line.split()
     msf_args.insert(0, self.msfvenom_path)
     msf_args.append('-o')
     msf_args.append(self.output)
     self.Args = msf_args
-    cs.print(f'{self.Args}', cs.state_note)
+    cs_print.note(f'{self.Args}')
     subprocess.run(msf_args)
-    cs.action_save_file2(self.output)
-    cs.print('DONE!', cs.state_ok)
+    css.action_save_file2(self.output)
+    cs_print.ok('DONE!')
     return True
   
   def process(self):

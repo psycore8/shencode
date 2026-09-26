@@ -15,7 +15,8 @@ from rich.console import Console
 CATEGORY    = 'core'
 DESCRIPTION = 'Output and inspect binaries in different formats'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
     'input':            { 'value': None, 'desc': 'Input file or buffer for formatted output' },
@@ -47,15 +48,16 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     DisplayName = 'MODOUT'
-    Version = '0.9.0'
-    file_bytes = bytes
+    Version = '1.0.1'
+    file_bytes: bytes = b''
     offset_color = clLIGHTMAGENTA
     cFile = False
     shell_path = '::core::output'
     table = Table()
     console = Console()
 
-    def __init__(self, input=any, syntax=str, bytes_per_row=int, decimal=bool, highlight=None, lines=bool, range=[0, 0], no_line_break=bool, output=None):
+    def __init__(self, input, syntax:str, bytes_per_row:int, decimal:bool, highlight=None, lines:bool=False, range=[0, 0], no_line_break:bool=False, output: str | None = None):
+        self.file_bytes = b''
         self.input = input
         self.syntax = syntax
         self.lines = lines
@@ -67,9 +69,11 @@ class module:
             self.range = [range[0], range[1]]
         else:
             self.range = [0, 0]
-        self.output = output
-        if not output == '':
+        self.output: str = output if isinstance(output, str) and output != '' else ''
+        if output is not None and output != '':
             self.cFile = True
+        else:
+            self.cFile = False
  
     def LoadInputFile(self):
         with open(self.input, 'rb') as file:
@@ -82,11 +86,11 @@ class module:
                 self.file_bytes = file.read(y - x)
 
     def SaveOutputFile(self, data):
-        remove_ansi_escape_sequences(data)
-        with open(self.output, 'w') as file:
-            file.write(
-                remove_ansi_escape_sequences( data )
-                )
+        if not self.output:
+            return
+        clean_data = remove_ansi_escape_sequences(data)
+        with open(self.output, 'w', encoding='utf-8') as file:
+            file.write(clean_data)
 
     def highlight_word(self, text, word, colorclass):
         highlighted_text = text.replace(word, f"{colorclass}{word}{ENDC}")  # Rote Markierung
@@ -123,7 +127,7 @@ class module:
                 head = f'{c}Offset(h) {row_numbers}{ENDC}\n'
         return head
     
-    def GenerateOffset(self, counter=int):
+    def GenerateOffset(self, counter:int):
         #c = self.offset_color
         c = '[magenta]'
         if self.decimal:
@@ -136,35 +140,37 @@ class module:
         pass
 
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
-        cs.print(f'Input File: {self.input}', cs.state_note)
+        css.module_header(self.DisplayName, self.Version)
+        cs_print.note(f'Input File: {self.input}')
         if isinstance(self.input, str):
             if CheckFile(self.input):
                 self.LoadInputFile()
-                cs.action_open_file2(self.input)
+                css.action_open_file2(self.input)
         elif isinstance(self.input, bytes):
             self.file_bytes = self.input
         else:
-            cs.print('Input file not found', cs.state_fail)
+            #self.file_bytes = b''
+            cs_print.error('Input file not found')
             return False
         if self.syntax == 'asm':
             try:
                 ks = Ks(KS_ARCH_X86, KS_MODE_64)
-                self.file_bytes, count = ks.asm(self.file_bytes)
+                self.file_bytes, count = ks.asm(self.file_bytes) # type: ignore
                 print(f'{self.file_bytes} // {count}')
             except KsError as e:
+                self.file_bytes = b''
                 print("ERROR: %s" %e)
-        cs.print('Processing shellcode format', cs.state_note)
+        cs_print.note('Processing shellcode format')
         output, size = self.GenerateOutput()
-        if not self.output == None:
+        if not self.output == '':
             self.SaveOutputFile(output)
             if CheckFile(self.output):
-                cs.print(output)
+                css.print(output)
             else:
-                cs.print('Output file not found', cs.state_fail)
-        cs.print(output, rules=True)
-        cs.print(f'Output total length {str(len(output))} bytes', cs.state_info)
-        cs.print('DONE!', cs.state_ok)
+                cs_print.error('Output file not found')
+        css.print(output, rules=True)
+        cs_print.info(f'Output total length {str(len(output))} bytes')
+        cs_print.ok('DONE!')
         
     lang = {
         'asm': {

@@ -13,7 +13,8 @@ import struct
 CATEGORY    = 'core'
 DESCRIPTION = 'Extract bytes or sections from PE files'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
     'input':                { 'value': None, 'desc': 'Input file for extract module'},
@@ -32,7 +33,7 @@ def register_arguments(parser):
 
 class module:
     Author =      'psycore8'
-    Version =     '0.9.0'
+    Version =     '1.0.1'
     DisplayName = 'BYTE-XTRACT0R'
     hash = ''
     data_size = 0
@@ -66,30 +67,31 @@ class module:
                 section_buffer = data[raw_data_offset : raw_data_offset + raw_data_size]
                 return section_buffer
 
-        cs.print(f'{section_name} section not found!', cs.state_fail)
-        return None
+        cs_print.error(f'{section_name} section not found!')
+        return b''
 
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
-        cs.print('Try to open file', cs.state_note)
+        css.module_header(self.DisplayName, self.Version)
+        cs_print.note('Try to open file')
         try:
             with open(self.input, "rb") as file:
                 shellcode = file.read()
                 self.data_size, self.hash = GetFileInfo(self.input)
-                cs.action_open_file2(self.input)
+                css.action_open_file2(self.input)
         except FileNotFoundError:
-            self.msg('error.input', True)
+            cs_print.error('File not found')
+            #self.msg('error.input', True)
         if self.extract_section == None:
             if isinstance(self.extract_range, str): pass
             bytes_from = int(self.extract_range[0])
             bytes_until = int(self.extract_range[1])
             if bytes_from > -1 and bytes_until > 0:
-                cs.print(f'Try to extract bytes from {self.extract_range[0]} to {self.extract_range[1]}', cs.state_note)
+                cs_print.note(f'Try to extract bytes from {self.extract_range[0]} to {self.extract_range[1]}')
                 shellcode_new = shellcode[bytes_from:bytes_until]
         else:
             shellcode_new = self.extract_section_from_file(self.input, self.extract_section)
-        cs.print('Writing to file...', cs.state_note)
+        cs_print.note('Writing to file...')
         with open(self.output, 'wb') as file:
             file.write(shellcode_new)
-        cs.action_save_file2(self.output)
-        cs.print('DONE!', cs.state_ok)
+        css.action_save_file2(self.output)
+        cs_print.ok('DONE!')

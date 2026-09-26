@@ -20,7 +20,8 @@ from subprocess import run
 CATEGORY    = 'encoder'
 DESCRIPTION = 'Encode bytes to alphanumeric output'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
     'input':                { 'value': None,    'desc': 'Input file to use' },
@@ -42,7 +43,7 @@ def register_arguments(parser):
 class module:
     out = Console()
     Author          = 'psycore8'
-    Version         = '0.9.0'
+    Version         = '1.0.1'
     DisplayName     = 'AlphaNum'
     shellcode       = b''
     encoded_data    = ''
@@ -67,7 +68,7 @@ class module:
             return False
 
     def to_alphanum(self, encoded_shellcode):
-        cs.print('Encoder running...', cs.state_note)
+        cs_print.note('Encoder running...')
         alphanum_shellcode = ''
         for hex_byte in tqdm.tqdm (encoded_shellcode.split('\\x')[1:], colour='magenta'):
             num = int(hex_byte, 16)
@@ -77,7 +78,7 @@ class module:
         return alphanum_shellcode
     
     def from_alphanum(self, alphanum_shellcode):
-        cs.print('Decoder running...', cs.state_note)
+        cs_print.note('Decoder running...')
         if len(alphanum_shellcode) % 2 != 0:
             raise ValueError('Alphanumeric chars not valid!')
 
@@ -179,7 +180,7 @@ class module:
                 random_noppy_index = random.randint(4, len(paddy)-4)
                 paddy.insert(random_noppy_index, noppy)
                 stub64_paddy = '\n'.join(paddy)
-                cs.print(f'NOP inserted at line {random_noppy_index}: {nop}', cs.state_note)
+                cs_print.note(f'NOP inserted at line {random_noppy_index}: {nop}')
                 i += 1
             return stub64_paddy
         else:
@@ -190,17 +191,17 @@ class module:
             shellcode_bytes = self.input
         else:
             try:
-                cs.print(f'Try to open file {self.input}', cs.state_note)
+                cs_print.note(f'Try to open file {self.input}')
                 with open(self.input, 'rb') as file:
                     shellcode_bytes = file.read()
-                    cs.action_open_file2(self.input)
+                    cs_print.ok(f'File {self.input} opened successfully')
             except FileNotFoundError:
-                cs.print(f'File {self.input} not found or cannot be opened.', cs.state_fail)
+                cs_print.error(f'File {self.input} not found or cannot be opened.')
                 exit()
         self.shellcode = shellcode_bytes
 
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
+        css.module_header(self.DisplayName, self.Version)
         fn_root, fn_extension = os.path.splitext(self.output)
         fn_obj = f'{fn_root}.obj'
         fn_asm = f'{fn_root}.nasm'
@@ -222,15 +223,15 @@ class module:
             run([self.compiler_cmd, '-f', 'win64', fn_asm, '-o', fn_obj])
             sc = get_coff_section(fn_obj, '.text')
         else:
-            cs.print(f'nasm.exe not found! Download and place it into the shencode directory: {f_link}https://nasm.us/{f_end}', cs.state_fail)
+            cs_print.error(f'nasm.exe not found! Download and place it into the shencode directory: {f_link}https://nasm.us/{f_end}')
         if self.relay_output:
             return sc
         else:
-            cs.print(f'Writing to file {self.output}', cs.state_note)
+            cs_print.note(f'Writing to file {self.output}')
             with open(self.output, 'wb') as f:
                 if isinstance(sc, str):
                     f.write(sc.encode('utf-8'))
                 else:
                     f.write(sc)
-            cs.action_save_file2(self.output)
-        cs.print('Done!', cs.state_ok)
+            css.action_save_file2(self.output)
+        cs_print.ok('Done!')
