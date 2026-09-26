@@ -68,20 +68,20 @@ class ConsoleStyles:
             return False
         
     class console_print():
-        def info(text:str):
+        def info(self, text:str):
             message = f'{ConsoleStyles.state_info} {text}'
             cs.print(message)
-        def error(text:str):
+        def error(self, text:str):
             message = f'{ConsoleStyles.state_fail} {text}'
             cs.print(message)
-        def ok(text:str):
+        def ok(self,text:str):
             message = f'{ConsoleStyles.state_ok} {text}'
             cs.print(message)
-        def note(text:str):
+        def note(self, text:str): 
             message = f'{ConsoleStyles.state_note} {text}'
             cs.print(message)
 
-    def print(self, text:str, state:str=None, rules:bool=False):
+    def print(self, text:str, state:str='', rules:bool=False):
         if state == None: state = ''
         message = f'{state} {text}'
         if rules:

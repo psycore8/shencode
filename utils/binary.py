@@ -1,6 +1,6 @@
 import struct
 
-def get_coff_section(file_name=str, section_name=str):
+def get_coff_section(file_name:str, section_name:str):
     with open(file_name, 'rb') as f:
         data = f.read()
     num_sections = struct.unpack_from("<H", data, 2)[0]
@@ -17,7 +17,7 @@ def get_coff_section(file_name=str, section_name=str):
             text_data = data[raw_data_offset : raw_data_offset + raw_data_size]
             return text_data
     print(f'{section_name} not found!')
-    return None
+    return b''
 
 def replace_bytes_at_offset(data, offset, new_bytes):
     data = bytearray(data)

@@ -20,7 +20,8 @@ from utils.helper import GetFileInfo, CheckFile
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Obfuscate shellcodes as XML Feed'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
     'input':            { 'value': None, 'desc': 'Input file for feed encoding' },
@@ -50,7 +51,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.9.0'
+    Version = '1.0.1'
     DisplayName = 'FEED-OBF'
     hash = ''
     data_size = 0
@@ -60,7 +61,7 @@ class module:
     relay_output = False
     shell_path = '::obfuscate::feed'
 
-    def __init__(self, input, output, uri, reassemble, feed_author, feed_title, feed_subtitle, feed_uri):
+    def __init__(self, input:str, output, uri, reassemble, feed_author, feed_title, feed_subtitle, feed_uri):
         self.input_file = input
         self.output_file = output
         self.uri = uri
@@ -122,7 +123,7 @@ class module:
         if self.feed_author == None:
             self.feed_author = 'Bill Ports'
 
-    def generate_feed(self):
+    def generate_feed(self) -> str:
         date_time = datetime.datetime.now()
         root = etree.Element('feed')
 
@@ -182,32 +183,36 @@ class module:
             return self.shellcode
         else:
             with open(self.output_file, 'wb') as f:
-                f.write(self.shellcode)
+                if isinstance(self.shellcode, str):
+                    f.write(self.shellcode.encode('utf-8'))
+                else:
+                    f.write(self.shellcode)
 
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
+        css.module_header(self.DisplayName, self.Version)
         self.generate_additional_attributes()
         if self.reassemble:
-            cs.console_print.note('Try to reassemble shellcode')
-            self.shellcode = self.reassemble_shellcode()
+            cs_print.note('Try to reassemble shellcode')
+            sc = self.reassemble_shellcode()
+            self.shellcode = sc.decode('UTF-8')
             self.output_result()
         else:
-            cs.console_print.note('Try to open file')
+            cs_print.note('Try to open file')
             if CheckFile(self.input_file):
                 self.data_size, self.hash = GetFileInfo(self.input_file)
                 self.open_file()
-                cs.action_open_file2(self.input_file)
+                css.action_open_file2(self.input_file)
                 self.convert_bytes_to_fake_id()
-                cs.console_print.note('Try to generate fake feed')
+                cs_print.note('Try to generate fake feed')
                 self.shellcode = self.generate_feed()
                 self.output_result()
             else:
-                cs.console_print.error(f'File {self.input_file} not found or cannot be opened')
+                cs_print.error(f'File {self.input_file} not found or cannot be opened')
         if self.relay_output:
             return self.shellcode
         else:
-            cs.action_save_file2(self.output_file)
-        cs.console_print.ok('DONE!')
+            css.action_save_file2(self.output_file)
+        cs_print.ok('DONE!')
 
 
 

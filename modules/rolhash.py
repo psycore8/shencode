@@ -13,7 +13,8 @@ from utils.style import *
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Change ROR13 to ROL encoding in metasploit payloads'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
    'input':       { 'value': None, 'desc': 'Input file for UUID encoding' },
@@ -49,8 +50,8 @@ class module:
 
   def lookup_functions(self, dll_path):
     pe = pefile.PE(dll_path)
-    export_dir = pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_EXPORT']]
-    for exp in pe.DIRECTORY_ENTRY_EXPORT.symbols:
+    export_dir = pe.OPTIONAL_HEADER.DATA_DIRECTORY[pefile.DIRECTORY_ENTRY['IMAGE_DIRECTORY_ENTRY_EXPORT']]  # type: ignore
+    for exp in pe.DIRECTORY_ENTRY_EXPORT.symbols:  # type: ignore
       if exp.name:
         function_name = exp.name.decode()
         dll_name = ospath.basename(dll_path)
@@ -128,17 +129,17 @@ class module:
     for key,value in self.hash_dict.items():
         index = self.check_shellcode(shellcode, key)
         if index != -1:
-            cs.console_print.info(f'0x{key:08X} = {value} offset: {index}')
+            cs_print.info(f'0x{key:08X} = {value} offset: {index}')
             dll_name = value.split('!')[0]
             function_name = value.split('!')[1]
             hash = self.calculate_hash(dll_name, function_name, ror_key, "rol")
-            cs.console_print.ok(f'New value: 0x{hash:08X}')
+            cs_print.ok(f'New value: 0x{hash:08X}')
             byte_data = hash.to_bytes(4, 'big')
             reversed_bytes = byte_data[::-1]
             new_shellcode = self.replace_bytes_at_offset(new_shellcode, index, reversed_bytes)
             hex_string = ''.join('\\x{:02X}'.format(byte) for byte in new_shellcode)
  
-    cs.console_print.note(f'Changing ROR key to {self.key} (0x{self.key:08X})')
+    cs_print.note(f'Changing ROR key to {self.key} (0x{self.key:08X})')
     
     # \xC1\xCF\x0D ror edi,D
 
@@ -151,16 +152,16 @@ class module:
     return new_shellcode
   
   def process(self):
-    cs.module_header(self.DisplayName, self.Version)
+    css.module_header(self.DisplayName, self.Version)
     for dll in self.dll_paths:
       self.lookup_functions(dll)
     # Read existing shellcode
-    cs.console_print.note('Try to open file')
+    cs_print.note('Try to open file')
     try: 
       with open(self.input, "rb") as file:
         shellcode = file.read()
     except FileNotFoundError:
-        cs.console_print.error(f'File {self.input} not found or cannot be opened.')
+        cs_print.error(f'File {self.input} not found or cannot be opened.')
  
     new_shellcode = self.process_shellcode(shellcode,int(self.key))
  
@@ -169,12 +170,12 @@ class module:
     bytes_to_insert = b"\xFF\xC0\xFF\xC8" * 5  # INC EAX, DEC EAX
     modified_shellcode = new_shellcode[:position] + bytes_to_insert + new_shellcode[position:]
    
-    cs.console_print.note(f'Shellcode size: {len(modified_shellcode)}')
+    cs_print.note(f'Shellcode size: {len(modified_shellcode)}')
     if self.relay:
-       cs.console_print.ok(f'Encoded shellcode created in {self.output}')
+       cs_print.ok(f'Encoded shellcode created in {self.output}')
        return modified_shellcode
     else:
       with open(self.output, 'wb') as file:
         file.write(modified_shellcode)
-      cs.action_save_file2(self.output)
-      cs.console_print.ok('DONE!')
+      css.action_save_file2(self.output)
+      cs_print.ok('DONE!')

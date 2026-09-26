@@ -14,7 +14,8 @@ from tqdm import tqdm
 CATEGORY    = 'core'
 DESCRIPTION = 'Download files'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist ={
     'output':               { 'value': None, 'desc': 'Output file' },
@@ -29,7 +30,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.9.0'
+    Version = '1.0.1'
     DisplayName = 'D0WNL04D3R'
     data_size = int
     hash = ''
@@ -43,32 +44,32 @@ class module:
         self.uri = uri
 
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
+        css.module_header(self.DisplayName, self.Version)
         if hasattr(self, self.protocol):
             processed_data = getattr(self, self.protocol)()
             if not processed_data:
-                cs.print('Error during download', cs.state_fail)
+                cs_print.error('Error during download')
                 return
             if self.relay_output:
                 return processed_data
             if processed_data != True:
-                cs.print('Trying to write output file...', cs.state_note)
+                cs_print.note('Trying to write output file...')
                 self.save_file(processed_data)
-                cs.action_save_file2(self.output)
+                css.action_save_file2(self.output)
         else:
-            cs.print(f'Protocol {self.protocol} is not valid!', cs.state_fail)
-        cs.print('DONE!', cs.state_ok)
+            cs_print.error(f'Protocol {self.protocol} is not valid!')
+        cs_print.ok('DONE!')
 
     def http(self):
         data = any
         r = requests.head(self.uri, allow_redirects=True)
         if 'Content-Length' in r.headers:
             size_bytes = int(r.headers['Content-Length'])
-            cs.print(f'File size: {size_bytes} bytes', cs.state_note)
+            cs_print.note(f'File size: {size_bytes} bytes')
             self.download_with_progress(self.uri, self.output)
             data = True
         else:
-            cs.print('Content header not available, download without progress...', cs.state_note)
+            cs_print.note('Content header not available, download without progress...')
             data = self.download_without_progresss()
         return data
     
@@ -92,7 +93,7 @@ class module:
                     downloaded += len(chunk)
                     progress.update(len(chunk))
             cs.print('\n')
-            cs.action_save_file2(self.output)
+            css.action_save_file2(self.output)
 
     def download_without_progresss(self):
         r = requests.get(self.uri)

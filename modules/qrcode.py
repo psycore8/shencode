@@ -18,7 +18,8 @@ import qrcode.constants
 CATEGORY    = 'obfuscate'
 DESCRIPTION = 'Obfuscate shellcodes as QR-Codes'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
     'input':        { 'value': None, 'desc': 'Input file for QR-Code encoding' },
@@ -33,7 +34,7 @@ def register_arguments(parser):
 
 class module:
     Author = 'psycore8'
-    Version = '0.9.0'
+    Version = '1.0.1'
     DisplayName = 'QRCODE-OBF'
     hash = ''
     data_size = 0
@@ -65,21 +66,21 @@ class module:
             cv2.line(im, tuple(bbox[j][0]), tuple(bbox[ (j+1) % n][0]), (255,0,0), 3)
         cv2.imshow("Results", im)
 
-    def bytes_to_base64_str(self, input_bytes=bytes) -> str:
+    def bytes_to_base64_str(self, input_bytes:bytes) -> str:
         try:
             data = base64.b64encode(input_bytes).decode('ascii')
             return data
         except:
-            cs.console_print.error('Base64 encoding error!')
-            return
+            cs_print.error('Base64 encoding error!') # type: ignore
+            return ''
 
-    def base64_str_to_bytes(self, input_string=str) -> bytes:
+    def base64_str_to_bytes(self, input_string:str) -> bytes:
         try:
             data = base64.b64decode(input_string.encode('ascii'))
             return data
         except:
-            cs.console_print.error('Base64 decoding error!')
-            return
+            cs_print.error('Base64 decoding error!') # type: ignore
+            return b''
 
     def decode_qr_code(self):
         data = cv2.imread(self.input_file)
@@ -89,8 +90,8 @@ class module:
             with open(self.output_file, 'wb') as f:
                 f.write(out_bytes)
         else:
-            cs.console_print.error('QR Code not detected')
-            cv2.imshow("Results", dec_data)
+            cs_print.error('QR Code not detected') # type: ignore
+            #cv2.imshow("Results", dec_data)
         
         cv2.waitKey(0)
         cv2.destroyAllWindows()
@@ -110,31 +111,31 @@ class module:
 
                         
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
-        cs.console_print.note('Try to open file')
+        css.module_header(self.DisplayName, self.Version)
+        cs_print.note('Try to open file')
         self.open_file()
         if CheckFile(self.input_file):
-            cs.action_open_file2(self.input_file)
+            css.action_open_file2(self.input_file)
             if self.reverse:
                 self.decode_qr_code()
-                cs.action_save_file2(self.output_file)
-                cs.console_print.ok('DONE!')
+                css.action_save_file2(self.output_file)
+                cs_print.ok('DONE!') # type: ignore
                 return True
             else:
                 if self.check_max_size(self.shellcode):
-                    cs.console_print.note('File size check passed')
+                    cs_print.note('File size check passed') # type: ignore
                 else:
-                    cs.console_print.error('File size exceeds 1852 bytes')
+                    cs_print.error('File size exceeds 1852 bytes') # type: ignore
                     return
-                cs.console_print.note('Try to generate QR Code')
+                cs_print.note('Try to generate QR Code') # type: ignore
                 qr = qrcode.QRCode(image_factory=PyPNGImage, error_correction=qrcode.constants.ERROR_CORRECT_Q)
                 payload_bytes = self.bytes_to_base64_str(self.shellcode)
                 qr.add_data(payload_bytes)
                 qr.make(fit=True)
                 img = qr.make_image(fill_color='white', back_color='black')
                 img.save(self.output_file)
-                cs.action_save_file2(self.output_file)
+                css.action_save_file2(self.output_file)
         else:
-            cs.console_print.error('File not found or cannot be opened')
+            cs_print.error('File not found or cannot be opened') # type: ignore
             return
-        cs.console_print.ok('DONE!')
+        cs_print.ok('DONE!') # type: ignore

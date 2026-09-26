@@ -26,7 +26,8 @@ PULONG      = ctypes.wintypes.PULONG
 SIZE_T      = ctypes.c_size_t
 ULONG       = ctypes.wintypes.ULONG
 USHORT      = ctypes.wintypes.USHORT
-ULONG_PTR   = ctypes.POINTER(SIZE_T)
+#ULONGPTR    = ctypes.POINTER(SIZE_T)
+ULONG_PTR   = ctypes.POINTER(ctypes.c_size_t)
 VOID        = ctypes.c_void_p
 WORD        = ctypes.wintypes.WORD
 
@@ -266,8 +267,8 @@ NtAllocateVirtualMemory.argtypes = [ HANDLE, LPVOID, ULONG, ULONG_PTR, ULONG, UL
 NtAllocateVirtualMemory.restype = LONG
 
 def pNtAllocateVirtualMemory(
-        ProcessHandle=HANDLE, BaseAddress=LPVOID, ZeroBits=ULONG,
-        RegionSize=ULONG_PTR, AllocationType=ULONG, Protect=ULONG
+        ProcessHandle:HANDLE, BaseAddress:LPVOID, ZeroBits:ULONG,
+        RegionSize:ULONG_PTR, AllocationType:ULONG, Protect:ULONG
     ):
     r = NtAllocateVirtualMemory(ProcessHandle, BaseAddress, ZeroBits, RegionSize, AllocationType, Protect)
     return r
