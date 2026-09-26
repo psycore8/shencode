@@ -2,7 +2,7 @@
 tags:
   - Label/Repo
 title: ShenCode
-Version: 1.0.0
+Version: 1.0.1
 Release:
 ---
 # ShenCode
