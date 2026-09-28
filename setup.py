@@ -56,7 +56,7 @@ setup(
         'tqdm==4.68.4',
         'typing_extensions==4.16.0',
         'yaspin==3.4.0',
-        'urllib3==2.7.0',
+        'urllib3==2.8.0',
         ] + extras,
         entry_points={
             'console_scripts': [
